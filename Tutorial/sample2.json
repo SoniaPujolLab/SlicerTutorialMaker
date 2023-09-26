@@ -1,0 +1,14 @@
+{
+  "nombre": "John Doe",
+  "edad": 30,
+  "email": "johndoe@example.com",
+  "direccion": {
+    "calle": "123 Main St",
+    "ciudad": "Ciudad Ejemplo",
+    "pais": "País Ejemplo"
+  },
+  "telefonos": [
+    "+123456789",
+    "+987654321"
+  ]
+}

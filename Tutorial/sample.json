@@ -1,0 +1,38 @@
+[
+	{
+		"path":"img1.png",
+		"widget": "qSlicerMainWindow", 
+		"position": [0, 0], 
+		"size": [1919, 1032]
+	},
+	{
+		"path":"img2.png",
+		"widget": "qSlicerMainWindow/SequenceBrowserToolBar",
+		"position": [0, 97],
+		"size": [1919, 49]
+	},
+	{
+		"path":"img3.png",
+		"widget": "qSlicerMainWindow/SequenceBrowserToolBar/?",
+		"position": [765, 111],
+		"size": [349, 21]
+	},
+	{
+		"path":"img4.png",
+		"widget": "qSlicerMainWindow", 
+		"position": [0, 0], 
+		"size": [1919, 1032]
+	},
+	{
+		"path":"img5.png",
+		"widget": "qSlicerMainWindow/SequenceBrowserToolBar",
+		"position": [0, 97],
+		"size": [1919, 49]
+	},
+	{
+		"path":"img6.png",
+		"widget": "qSlicerMainWindow/SequenceBrowserToolBar/?",
+		"position": [765, 111],
+		"size": [349, 21]
+	}
+]
