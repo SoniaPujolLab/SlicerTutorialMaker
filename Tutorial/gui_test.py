@@ -625,7 +625,7 @@ class MyApp(QMainWindow):
             self.labels.append(label)
             self.images_list.append(path)
             self.steps.append("")
-            self.widgets.append("Instrucctión for " + i["widget"])
+            self.widgets.append("Instrucctión for " + i["widget name"])
         
         self.firts_screen()
         
@@ -709,16 +709,10 @@ if __name__ == '__main__':
     my_app = MyApp()
     json_file = [
         {
-            'widget': 'QToolButton', 
+            'widget name': '', 
                'position': [13, 23], 
             'size': [31, 30], 
-            'path': 'Load Data-20230504-182458.png'
-        }, 
-        {
-            'widget': 'QToolButton', 
-            'position': [598, 23], 
-            'size': [31, 30], 
-            'path': 'WideScreen Style-20230504-182502.png'
+            'path': 'wall.png'
         }
         ]
 

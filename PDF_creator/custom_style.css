@@ -1,0 +1,63 @@
+section {
+    background-color: rgb(255, 255, 255);
+    width: 1200px;
+    height: 900px;
+    margin: 0 auto;
+}
+
+h1 {
+  color: royalblue;
+  font-size: 60px;
+  font-weight: bold;
+  position: relative;
+  top: 60px;
+}
+
+h2 {
+  color: rgb(57, 57, 57);
+  font-size: 40px;
+  font-weight: bold;
+  position: absolute;
+  top: 20px;
+  margin-top: 20px;
+}
+
+p {
+  color: rgb(86, 86, 86);
+  padding-top:  10px;
+  position: absolute;
+  top: 20px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+p.tutorial_info {
+  width: auto;
+  position: relative;
+  margin-top: 10px;
+}
+
+p.steps {
+  width: 90%;
+  margin-top: 80px;
+}
+
+img.screenshot {
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  margin-top: -30px;
+  /* Centering the image */
+  display: block;
+  position: relative;
+  left: auto;
+  
+}
+
+img.icon {
+  position: absolute;
+  top: 50px;
+  right: 70px;
+  width: 60px;
+  height: 60px;
+}
