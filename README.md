@@ -8,7 +8,7 @@ Requirements:
 
 Execute on the Slicer Python console(CTRL + 3) the next command:
 
-Obs: Dont forget to change the EXTENSION PATH at the fourth command
+Obs: Dont forget to change the EXTENSION PATH at the third command
 ```
 import pip
 pip.main(['install', 'pyautogui', 'PyQt5'])
@@ -58,7 +58,7 @@ python demo_june.py
 ```
 This command creates a Markdown file with slides from the tutorial.
 
-![](DOCS/md.png)
+![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/324621c4-f6f5-46fd-920f-c0da694fc562)
 
 Then execute the command marp to convert the Markdown file to html file. This file can be used to upload on a web page.
 ```
