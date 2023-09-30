@@ -1,18 +1,74 @@
-# TutorialMaker
+## Metadata Acquisition Tool
 
-Tutorial Maker, enables to automatic capture of metadata and screenshots of the 3D Slicer user interface while executing an image analysis workflow. 
-The figure below shows an example of metadata collected, on the left side of the screenshot.
+Requirements:
+- Python 3
+- PyQt5 and qt
+- pyautogui
+- slicer
 
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/c69ce2bf-2d12-48dd-b18f-3fffec50de25)
+Execute on the Slicer Python console(CTRL + 3) the next command:
 
-This is used combined with other tools, to generate tutorials in any language in an automated way. A sample is the figures below, that use the TutorialEditor to draw in the screenshots.
+Obs: Dont forget to change the EXTENSION PATH at the fourth command
+```
+import pip
+pip.main(['install', 'pyautogui', 'PyQt5'])
+exec(open('EXTENSION PATH/metadata_gui.py').read())
+```
 
-![image1](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/b50eeae1-7bac-437d-ad96-0eb580a461de)
-Figure 1. Example of metadata and screen capture of the white matter visualization step of the Slicer4 minute tutorial using the Spanish version of 3D Slicer
+This program will allow you to capture metadata which includes a JSON with the record of the selected widget and screenshots, this JSON file will be used in the GUI stage (described below). The programming logic of metadata_gui.py is represented as follows.
 
-![image3](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/a8b35174-151a-4b5e-b582-7bd480e5eaaf)
-Figure 2. Example of a red arrow being added on the recorded screenshot along with instructions in Spanish to display the 3D model of the brain white matter.
+ ![](DOCS/Fig1.jpg)
 
-![image2](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/cff20e46-264d-4f15-b34e-1d2e3bcc087b)
-Figure 3. Example of a slide from the PDF file generated using Markdown and Marp. The slide includes the red arrow and the text added in Figure 2.
 
+## GUI 
+
+Requirements:
+- Python 3
+- Qt 5
+
+Execute on the terminal, inside the "Tutorial" folder, execute the next command:
+
+```
+pip install pyautogui PyQt5 imutils opencv-python
+python gui_test.py
+```
+
+Load the metadata by clicking the open button in the toolbar. Select a JSON file with the metadata(that file exists in the folder "screenshot_new" inside the Slicer installation path) and an image path.
+
+![](DOCS/open.png)
+![](DOCS/meta.png)
+
+To add annotations you must select an image in the screenshot carousel. You can use the commands on the toolbar to drag and drop the mouse over the image to paint the annotations.
+
+![](DOCS/annotations2.png)
+
+Generate a JSON file to save the annotations for the next step, by clicking the save command on the toolbar.
+
+![](DOCS/save.png)
+## Create PDF
+
+Requirements:
+- Python 3
+- Node js 18
+- Marp
+
+Execute the sequence commands on the terminal inside the "PDF_creator" folder:
+```
+python demo_june.py
+```
+This command creates a Markdown file with slides from the tutorial.
+
+![](DOCS/md.png)
+
+Then execute the command marp to convert the Markdown file to html file. This file can be used to upload on a web page.
+```
+npm i -g @marp-team/marp-cli
+marp output_tutorial.md --html output_tutorial.html
+```
+![](DOCS/html.png)
+Finally, execute the command to install the JS libraries and the JS script to convert the html file to PDF.
+```
+npm install
+node convertToPDF.js
+```
+![](DOCS/pdf.png)

@@ -6,6 +6,7 @@
 !.git-blame-ignore-revs
 !.pre-commit-config.yaml
 !.readthedocs.yaml
+!.puppeteerrc.cjs
 
 # Ignore all back-up files...
 *~
@@ -29,4 +30,11 @@ tags
 # Ignore pyc files ...
 *.pyc
 
+*.json
+
+!package.json
+!package-lock.json
+
 node_modules
+
+output_tutorial.*

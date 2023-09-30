@@ -602,14 +602,14 @@ class MyApp(QMainWindow):
 
         for i in json_file:
             new_anotation = []
-            path = 'Resources/Images/'+i["path"]
+            path = i["path"]
             image = cv2.imread(path)
             print(path)
             cv2.rectangle(image, (i["position"]), (i["size"]), (0, 255, 255), 4)
             self.anotations.append(new_anotation)
             
             new_frame = imutils.resize(image, width=800, height=800)
-            new_path = 'Resources/Images/'+'new_'+i["path"]
+            new_path = i["path"]
             cv2.imwrite(new_path, new_frame)
             # print(new_path)
             self.edit_screen.append(new_path)
@@ -712,7 +712,7 @@ if __name__ == '__main__':
             'widget name': '', 
                'position': [13, 23], 
             'size': [31, 30], 
-            'path': 'wall.png'
+            'path': 'Resources/Images/wall.png'
         }
         ]
 
