@@ -97,6 +97,13 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #self.widgetFinder.sinalManager.connect(self.widgetPainter.setTargetWidget)
 
         # Buttons
+
+        #Main
+        self.ui.pushButtonRecordMain.connect('clicked(bool)', self.logic.startRecorder)
+        self.ui.pushButtonEditMain.connect('clicked(bool)', self.logic.startEditor)
+        self.ui.pushButtonConvertMain.connect('clicked(bool)', self.logic.startConverter)
+
+        #Experimental
         self.ui.applyButton.connect('clicked(bool)', self.onApplyButton)
         self.ui.pushButtonRecord.connect('clicked(bool)', self.onRecordButton)
         self.ui.pushButtonStop.connect('clicked(bool)', self.onStopButton)
@@ -252,6 +259,23 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         """
         print("World!")
         
+    def startRecorder(self):
+        #These dependencies will be removed shortly
+        import pip
+        pip.main(['install', 'pyautogui', 'PyQt5'])
+        path = os.path.dirname(os.path.abspath(__file__)) + "\Lib\standalone\metadata_gui.py"
+        path = path.replace("\\", "/").encode("ascii")
+        print(path)
+        exec(open(path).read())
+        pip.main(['uninstall', 'pyautogui', 'PyQt5'])
+
+
+    def startEditor(self):
+        print(self)
+
+    def startConverter(self):
+        print(self)
+
 #
 # TutorialMakerTest
 #

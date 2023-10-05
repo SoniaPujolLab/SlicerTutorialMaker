@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>414</height>
+    <height>687</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,6 +29,36 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetMinAndMaxSize</enum>
    </property>
+   <item>
+    <widget class="ctkCollapsibleButton" name="CollapsibleButtonTutorialMaking">
+     <property name="text">
+      <string>Tutorial Making</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0" colspan="2">
+       <widget class="QPushButton" name="pushButtonRecordMain">
+        <property name="text">
+         <string>Record</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QPushButton" name="pushButtonEditMain">
+        <property name="text">
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QPushButton" name="pushButtonConvertMain">
+        <property name="text">
+         <string>Convert</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item>
     <widget class="ctkCollapsibleButton" name="CollapsibleWidgetFinder">
      <property name="sizePolicy">
@@ -56,38 +86,17 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="textLabel">
-          <property name="text">
-           <string>Text</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="toolTipLabel">
-          <property name="text">
-           <string>ToolTip</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="classNameLabel">
-          <property name="text">
-           <string>ClassName</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="IDLabel">
-          <property name="text">
-           <string>ID</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <widget class="QLabel" name="widgetName">
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="textLabel">
+          <property name="text">
+           <string>Text</string>
           </property>
          </widget>
         </item>
@@ -98,6 +107,13 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="toolTipLabel">
+          <property name="text">
+           <string>ToolTip</string>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="1">
          <widget class="QLabel" name="widgetToolTip">
           <property name="text">
@@ -105,10 +121,24 @@
           </property>
          </widget>
         </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="classNameLabel">
+          <property name="text">
+           <string>ClassName</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="1">
          <widget class="QLabel" name="widgetClassName">
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="IDLabel">
+          <property name="text">
+           <string>ID</string>
           </property>
          </widget>
         </item>
