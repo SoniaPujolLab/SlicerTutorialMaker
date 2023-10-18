@@ -259,19 +259,25 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         """
         print("World!")
         
+
+    #And all of this will be converted to be python modules so we can load them properly
     def startRecorder(self):
         #These dependencies will be removed shortly
         import pip
         pip.main(['install', 'pyautogui', 'PyQt5'])
         path = os.path.dirname(os.path.abspath(__file__)) + "\Lib\standalone\metadata_gui.py"
         path = path.replace("\\", "/").encode("ascii")
-        print(path)
         exec(open(path).read())
-        pip.main(['uninstall', 'pyautogui', 'PyQt5'])
+        #pip.main(['uninstall', 'pyautogui', 'PyQt5'])
 
 
     def startEditor(self):
-        print(self)
+        import pip
+        pip.main(['install', 'pyautogui', 'PyQt5', 'imutils', 'opencv-python'])
+        path = os.path.dirname(os.path.abspath(__file__)) + "\Lib\standalone\Editor\gui_test.py"
+        path = path.replace("\\", "/").encode("ascii")
+        exec(open(path).read())
+        #pip.main(['uninstall', 'pyautogui', 'PyQt5', 'imutils', 'opencv-python'])
 
     def startConverter(self):
         print(self)

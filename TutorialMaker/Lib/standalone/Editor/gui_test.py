@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QLabel, QWidget, QToolBar, QGridLayout, QTextEdit, Q
 from PyQt5.QtGui import QImage, QPixmap, QIcon, QPainter, QPen, QBrush, QColor, QColor, QPainterPath, QFont
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt, QRect, QPoint, QSize
-from Anotations import Notes
 import imutils
 import cv2
 import sys, os
@@ -704,7 +703,20 @@ class MyApp(QMainWindow):
                 action.setChecked(False)
                 action.setIcon(icons['inactive'])
 
-if __name__ == '__main__':
+class Notes:
+    def __init__(self, tp, ip, fp, cl, tk, fl, tx=None):
+        self.tp = tp    # type for annotation
+        self.ip = ip    # inicial point
+        self.fp = fp    # final point
+        self.cl = cl    # color selected 
+        self.tk = tk    # thickness and size
+        self.fl = fl    # fill (boolean)
+        self.tx = tx    # text and path image
+
+    def metodo(self):
+        print("Hola desde MiClase")
+
+def main():
     app = QApplication(sys.argv)
     my_app = MyApp()
     json_file = [
@@ -719,4 +731,13 @@ if __name__ == '__main__':
     my_app.load_all_images(json_file)
     my_app.show()
     sys.exit(app.exec_())
+
+
+
+if __name__ == '__main__':
+    main()
+
+#call it anyway for now
+main()
+
 
