@@ -31,7 +31,7 @@ class TutorialEditor():
 
     def Setup(self):
         self.ui.pushButtonStartStopRecord.clicked.connect(self.logic.StopStartRecording)
-        self.logic.stateManager(self.ui.tableWidgetStates)
+        self.logic.stateManager.connectTable(self.ui.tableWidgetStates)
         pass
 
     def Show(self):
