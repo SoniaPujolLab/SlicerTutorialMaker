@@ -3,10 +3,10 @@ import os
  
 import vtk
 import slicer
-import Lib.utils as utils
-from Lib.utils import *
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
+
+from Lib.TutorialEditor import TutorialEditor
 
 #
 # TutorialMaker
@@ -51,8 +51,6 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.logic = None
         self._parameterNode = None
         self._updatingGUIFromParameterNode = False
-        self.widgetFinder = WidgetFinder(slicer.util.mainWindow())
-        self.widgetPainter = Shapes(slicer.util.mainWindow())
         self.__tableSize = 0
 
         #PROTOTYPE FOR PLAYBACK
@@ -71,27 +69,9 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.layout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
 
-        self.__tableInitiliaze()
-
-        #setStyle of widget info table
-        self.ui.widgetName.setStyleSheet("border: 1px solid black;")
-        self.ui.widgetText.setStyleSheet("border: 1px solid black;")
-        self.ui.widgetToolTip.setStyleSheet("border: 1px solid black;")
-        self.ui.widgetClassName.setStyleSheet("border: 1px solid black;")
-        self.ui.widgetID.setStyleSheet("border: 1px solid black;")
-
-        self.ui.widgetName.setAlignment(qt.Qt.AlignRight | qt.Qt.AlignVCenter)
-        self.ui.widgetText.setAlignment(qt.Qt.AlignRight | qt.Qt.AlignVCenter)
-        self.ui.widgetToolTip.setAlignment(qt.Qt.AlignRight | qt.Qt.AlignVCenter)
-        self.ui.widgetClassName.setAlignment(qt.Qt.AlignRight | qt.Qt.AlignVCenter)
-        self.ui.widgetID.setAlignment(qt.Qt.AlignRight | qt.Qt.AlignVCenter)
-
         # Create logic class. Logic implements all computations that should be possible to run
         # in batch mode, without a graphical user interface.
         self.logic = TutorialMakerLogic()
-
-        # Connections
-        self.widgetFinder.sinalManager.connect(self.updateStatus)
 
         # will only draw the circle at playback for now
         #self.widgetFinder.sinalManager.connect(self.widgetPainter.setTargetWidget)
@@ -99,19 +79,15 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Buttons
 
         #Main
-        self.ui.pushButtonRecordMain.connect('clicked(bool)', self.logic.startRecorder)
-        self.ui.pushButtonEditMain.connect('clicked(bool)', self.logic.startEditor)
-        self.ui.pushButtonConvertMain.connect('clicked(bool)', self.logic.startConverter)
-
-        #Experimental
-        self.ui.applyButton.connect('clicked(bool)', self.onApplyButton)
-        self.ui.pushButtonRecord.connect('clicked(bool)', self.onRecordButton)
-        self.ui.pushButtonStop.connect('clicked(bool)', self.onStopButton)
+        self.ui.pushButtonEdit.connect('clicked(bool)', self.logic.Edit)
+        self.ui.pushButtonSave.connect('clicked(bool)', self.logic.Save)
+        self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
 
     def cleanup(self):
+        self.logic.exitTutorialEditor()
         """
         Called when the application closes and the module widget is destroyed.
         """
@@ -152,85 +128,6 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """
         return
     
-    def onApplyButton(self):
-        self.widgetFinder.showFullSize()
-
-    def onRecordButton(self):
-        print("Record")
-
-        self.widgetFinder.showFullSize()
-        #self.widgetFinder.raise_()
-        return
-
-    def onStopButton(self):
-        import time
-        self.widgetPainter.showFullSize()
-        self.widgetPainter.raise_()
-        for widget in self.actionList:
-            self.widgetPainter.setTargetWidget(widget.inner())
-            time.sleep(0.1)
-            self.widgetPainter.repaint()
-            time.sleep(4)
-
-            print(widget.inner())
-            #Só da pra usar este se for um qMRML
-            #slicer.util.clickAndDrag(widget.inner(), steps=0)
-            
-
-        print("Stop")
-        self.widgetPainter.hideOverlay()
-        return
-
-    def getCurrentWidget(self):
-        widget = self.widgetFinder.currentWidgetSelect
-        if widget == '':
-            self.ui.AlertText.setText('Click in "Apply" and select a widget!')
-            return
-        
-        self.ui.AlertText.setText('Copy! (Its not true)')
-    
-    def updateStatus(self, w):
-        widget = Widget(w)
-        widgetData = widget.__dict__()
-        
-        self.addItemOnTable(widgetData['name'], widgetData['className'], 'Circle')
-        self.actionList.append(widget)
-
-        self.ui.widgetName.setText(widgetData['name'])
-        self.ui.widgetText.setText(widgetData['text'])
-        self.ui.widgetToolTip.setText(widgetData['toolTip'])
-        self.ui.widgetClassName.setText(widgetData['className'])
-        self.ui.widgetID.setText(widgetData['id'])
-
-
-    #table func
-    def __tableInitiliaze(self):
-        table = self.ui.tableWidget
-        table.setColumnCount(3)
-        table.setHorizontalHeaderLabels(['Name', 'Widget', 'Shape'])
-
-    def addItemOnTable(self, name:str='', code:str='', shape:str=''):
-        item_name = qt.QTableWidgetItem(name)
-        item_code = qt.QTableWidgetItem(code)
-        item_shape = qt.QTableWidgetItem(shape)
-        
-        table = self.ui.tableWidget
-        table.setRowCount(self.__tableSize+1)
-        table.setItem(self.__tableSize, 0, item_name)
-        table.setItem(self.__tableSize, 1, item_code)
-        table.setItem(self.__tableSize, 2, item_shape)
-
-        self.__tableSize += 1
-
-    def delItemOnTable(self):
-        print(self.__tableSize)
-        if self.__tableSize == 0:
-            return
-        
-        self.__tableSize -= 1
-        table = self.ui.tableWidget
-        table.setRowCount(self.__tableSize)
-
 
 
 #
@@ -252,6 +149,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         Called when the logic class is instantiated. Can be used for initializing member variables.
         """
         ScriptedLoadableModuleLogic.__init__(self)
+        self.tutorialEditor = TutorialEditor()
 
     def setDefaultParameters(self, parameterNode):
         """
@@ -259,28 +157,24 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         """
         print("World!")
         
-
-    #And all of this will be converted to be python modules so we can load them properly
-    def startRecorder(self):
-        #These dependencies will be removed shortly
-        import pip
-        pip.main(['install', 'pyautogui', 'PyQt5'])
-        path = os.path.dirname(os.path.abspath(__file__)) + "\Lib\standalone\metadata_gui.py"
-        path = path.replace("\\", "/").encode("ascii")
-        exec(open(path).read())
-        #pip.main(['uninstall', 'pyautogui', 'PyQt5'])
+    def exitTutorialEditor(self):
+        self.tutorialEditor.exit()
 
 
-    def startEditor(self):
-        import pip
-        pip.main(['install', 'pyautogui', 'PyQt5', 'imutils', 'opencv-python'])
-        path = os.path.dirname(os.path.abspath(__file__)) + "\Lib\standalone\Editor\gui_test.py"
-        path = path.replace("\\", "/").encode("ascii")
-        exec(open(path).read())
-        #pip.main(['uninstall', 'pyautogui', 'PyQt5', 'imutils', 'opencv-python'])
 
-    def startConverter(self):
-        print(self)
+    def Edit(self):
+        self.tutorialEditor.Show()
+        pass
+
+
+    def Save(self):
+        pass
+
+    def Load(self):
+        pass
+
+    def ExportScreenshots(self):
+        pass
 
 #
 # TutorialMakerTest

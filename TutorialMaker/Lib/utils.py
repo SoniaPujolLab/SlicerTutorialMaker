@@ -101,7 +101,6 @@ class WidgetFinder(qt.QWidget):
         self.shortcut = None
         self.logic = None
         self.cursorOverridden = False
-        self.currentWidgetSelect = "" 
         self.currentWidget = None
         self.sinalManager = SignalManager()
         self.aux = parent
@@ -166,8 +165,8 @@ class WidgetFinder(qt.QWidget):
         self.overlayOnWidget(widget)
         self.hideOverlay()
         self.showPointCursor(False)
-        self.currentWidgetSelect = str(widget)
-        self.sinalManager.emit(widget)
+        #self.currentWidgetSelect = str(widget)
+        self.sinalManager.emit(Widget(widget))
 
         self.currentWidget = widget
 
