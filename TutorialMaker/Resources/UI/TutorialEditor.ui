@@ -47,11 +47,19 @@
       <string>Next Widget</string>
      </property>
     </column>
-    <column>
-     <property name="text">
-      <string>Actions</string>
-     </property>
-    </column>
+   </widget>
+   <widget class="QPushButton" name="pushButtonAnnotate">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>20</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>PushButton</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

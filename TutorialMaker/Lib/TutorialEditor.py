@@ -31,11 +31,22 @@ class TutorialEditor():
 
     def Setup(self):
         self.ui.pushButtonStartStopRecord.clicked.connect(self.logic.StopStartRecording)
-        self.logic.stateManager.connectTable(self.ui.tableWidgetStates)
+
         pass
 
     def Show(self):
         self.window.show()
+
+    def Annotate(self):
+        pass
+
+
+    def TableItemSelected(self):
+        pass
+    
+    def TableAddItem(self, widget):
+
+        pass
     
     def exit(self):
         self.logic.StopRecording()
@@ -50,7 +61,7 @@ class TutorialEditor():
     pass
 
 class TutorialEditorLogic():
-    def __init__(self, gui):
+    def __init__(self, gui=None):
         self.stateManager = StateManager()
         self.widgetFinder = utils.WidgetFinder(slicer.util.mainWindow())
         self.widgetFinder.sinalManager.connect(self.NextWidget)
@@ -83,12 +94,13 @@ class TutorialEditorLogic():
         if self.isRecording:
             self.SaveState(widget)
             self.widgetFinder.showFullSize()
+            self.gui.TableAddItem(widget)
         pass
 
     def SaveState(self, widget):
         _state = SlicerState(widget)
+
         self.stateManager.InsertState(_state)
-        
         pass
 
 
@@ -100,29 +112,15 @@ class StateManager():
 
     def InsertState(self, state):
         self.states.append(state)
-
-        self.updateTable()
         pass
 
 
     def deleteState(self, index):
         self.states.pop(index)
-        self.updateTable()
         pass
 
     def annotateState(self, index):
-
-        pass
-
-    def updateTable(self):
-        if self.table is None:
-            return
-        self.table.clear()
-        for i in range(self.states):
-            self.table.insertItem(i, "teste")
-
-    def connectTable(self, table):
-        self.table = table
+        #
         pass
 
 
