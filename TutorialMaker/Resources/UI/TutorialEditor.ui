@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
-    <height>367</height>
+    <width>619</width>
+    <height>325</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -20,55 +20,43 @@
    <string>TutorialEditor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButtonStartStopRecord">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>141</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start Recording</string>
-    </property>
-   </widget>
-   <widget class="QTableWidget" name="tableWidgetStates">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>60</y>
-      <width>571</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <column>
-     <property name="text">
-      <string>Next Widget</string>
-     </property>
-    </column>
-   </widget>
-   <widget class="QPushButton" name="pushButtonAnnotate">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>20</y>
-      <width>131</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="pushButtonAnnotate">
+        <property name="text">
+         <string>Annotate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonStartStopRecord">
+        <property name="text">
+         <string>Start Recording</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="tableWidgetStates">
+      <column>
+       <property name="text">
+        <string>Next Widget</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>612</width>
-     <height>20</height>
+     <width>619</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

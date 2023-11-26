@@ -5,52 +5,77 @@ import os
 import Lib.utils as utils
 
 #
-# Tutorial Editor
+# Tutorial Editor Widget
 #
 
-class TutorialEditor():
+class TutorialEditor(qt.QWidget):
 
-    def __init__(self):
-        self.window = qt.QMainWindow()
-        self.mainWidget = qt.QWidget()
-        self.layout = qt.QVBoxLayout()
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
         self.logic = TutorialEditorLogic(self)
-        self.window.setWindowTitle("Tutorial Editor")  # Make translatable # needs TR directives maybe?
+        self.setWindowTitle("Tutorial Editor")     
+        self.setGeometry(0, 0, 300, 200)
 
-        uiWidget = slicer.util.loadUI(self.resourcePath('UI/TutorialEditor.ui'))
-        self.layout.addWidget(uiWidget)
-        self.ui = slicer.util.childWidgetVariables(uiWidget)
-
-        self.mainWidget.setLayout(self.layout)
-        self.window.setCentralWidget(self.mainWidget)
-
-
+        self.boxLayout = qt.QVBoxLayout()
+        
         self.Setup()
 
+        self.setLayout(self.boxLayout)
+        
+        self.currentCell = None
         pass
-
+    
     def Setup(self):
+
+        # Load Ui file
+        uiWidget = slicer.util.loadUI(self.resourcePath('UI/TutorialEditor.ui'))
+        self.boxLayout.addWidget(uiWidget)
+        self.ui = slicer.util.childWidgetVariables(uiWidget)
+        
+        # Table sentings
+        self.ui.tableWidgetStates.horizontalHeader().setStretchLastSection(True) 
+        self.ui.tableWidgetStates.horizontalHeader().setSectionResizeMode(qt.QHeaderView.Stretch) 
+        
+        # Connections
         self.ui.pushButtonStartStopRecord.clicked.connect(self.logic.StopStartRecording)
+        self.ui.pushButtonAnnotate.clicked.connect(self.OnClickedAnnotate)
+        self.ui.tableWidgetStates.cellClicked.connect(self.onCellClicked)
 
         pass
 
     def Show(self):
-        self.window.show()
+        self.show()
 
-    def Annotate(self):
+    def OnClikedStartStopRecord(self):
         pass
 
-
-    def TableItemSelected(self):
+    def OnClickedAnnotate(self):
+        if not self.currentCell:
+            return
+        
+        print(self.currentCell)
         pass
     
-    def TableAddItem(self, widget):
+    def onCellClicked(self, row, collumn):
+        self.currentCell = self.ui.tableWidgetStates.itemAt(row, collumn)
+    
+    #
+    # Use this method for add itens on table 
+    #
+    def TableAddItem(self, widget:str=''):
+        item = qt.QTableWidgetItem(widget)
+        table = self.ui.tableWidgetStates
+        rowsCount = table.rowCount
+
+        table.setRowCount(rowsCount + 1)
+        table.setItem(rowsCount, 0, item)
 
         pass
     
     def exit(self):
         self.logic.StopRecording()
-        self.window.close()
+        self.close()
 
     # There should be a better way to expose the resource path to the underlying classes of a module but I couldn't think of a clean way.
     def resourcePath(self, filename):
@@ -78,7 +103,7 @@ class TutorialEditorLogic():
         pass
 
     def StartRecording(self):
-        self.gui.window.showMinimized()
+        self.gui.showMinimized()
         self.gui.ui.pushButtonStartStopRecord.text = "Stop Recording" # needs TR directives
         self.widgetFinder.showFullSize()
         pass
