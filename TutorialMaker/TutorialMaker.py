@@ -1,6 +1,7 @@
 import logging
 import os
- 
+import qt
+
 import vtk
 import slicer
 from slicer.ScriptedLoadableModule import *
@@ -82,6 +83,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonEdit.connect('clicked(bool)', self.logic.Edit)
         self.ui.pushButtonSave.connect('clicked(bool)', self.logic.Save)
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
+        self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
@@ -160,12 +162,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
     def exitTutorialEditor(self):
         self.tutorialEditor.exit()
 
-
-
     def Edit(self):
         self.tutorialEditor.Show()
         pass
-
 
     def Save(self):
         pass
@@ -174,7 +173,18 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         pass
 
     def ExportScreenshots(self):
+        self.label = qt.QLabel()
+        self.label.setPixmap(self.getPixmap())
+        self.label.show()
         pass
+
+    def getPixmap(self):
+        mw = slicer.util.mainWindow()
+        screen = slicer.app.screens()[0]
+        pixmap = screen.grabWindow(mw.winId())
+
+        #return a qt object: QPixmap
+        return pixmap
 
 #
 # TutorialMakerTest
