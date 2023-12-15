@@ -202,7 +202,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         widgets = util.getOnScreenWidgets()
         for index in range(widgets.__sizeof__()):
             try:
-                data[index] = {"name": widgets[index].name,"text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
+                data[index] = {"name": widgets[index].name, "path": util.uniqueWidgetPath(widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
             except:
                 pass
         import json
