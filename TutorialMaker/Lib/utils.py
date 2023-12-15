@@ -20,9 +20,9 @@ class util():
     def listOnScreenWidgets(self):
         print(self.mw.className, end=", ")
         print(self.mw.name)
-        self.__getWidgetsRecursive(self.mw, 1)
+        self.__listWidgetsRecursive(self.mw, 1)
 
-    def __getWidgetsRecursive(self, widget, depth):
+    def __listWidgetsRecursive(self, widget, depth):
         children = widget.getChildren()
         for child in children:
             if child.name != "":
@@ -30,7 +30,19 @@ class util():
                     print("\t", end="")
                 print(child.className, end=", ")
                 print(child.name)
-                self.__getWidgetsRecursive(child, depth + 1)
+                self.__listWidgetsRecursive(child, depth + 1)
+    
+    def getOnScreenWidgets(self):
+        widgets = self.__getWidgetsRecursive(self.mw, 1)
+        return widgets
+
+    def __getWidgetsRecursive(self, widget, depth):
+        widgets = []
+        children = widget.getChildren()
+        for child in children:
+            widgets.append(child)
+            widgets = widgets + self.__getWidgetsRecursive(child, depth + 1)
+        return widgets
 
     def getNamedWidget(self, path, widget=None):
         if path == "":

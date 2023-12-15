@@ -6,6 +6,7 @@ import vtk
 import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
+import Lib.utils as utils
 
 from Lib.TutorialEditor import TutorialEditor
 
@@ -173,10 +174,15 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         pass
 
     def ExportScreenshots(self):
-        self.label = qt.QLabel()
-        self.label.setPixmap(self.getPixmap())
-        self.label.show()
+        self.saveScreenshotMetadata(0)
         pass
+
+    # TODO Transfer these functions to the Utils class
+    def saveScreenshotMetadata(self, index):
+        self.saveAllWidgetsData(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".json")
+        self.saveScreenshot(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".png")
+        pass
+
 
     def getPixmap(self):
         mw = slicer.util.mainWindow()
@@ -185,6 +191,24 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
 
         #return a qt object: QPixmap
         return pixmap
+    
+    def saveScreenshot(self, filename):
+        self.getPixmap().save(filename, "PNG")
+        pass
+
+    def saveAllWidgetsData(self, filename):
+        util = utils.util()
+        data = {}
+        widgets = util.getOnScreenWidgets()
+        for index in range(widgets.__sizeof__()):
+            try:
+                data[index] = {"name": widgets[index].name,"text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
+            except:
+                pass
+        import json
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        pass
 
 #
 # TutorialMakerTest
