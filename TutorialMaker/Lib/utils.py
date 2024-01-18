@@ -1,6 +1,7 @@
 import slicer
 import qt
 import logging  
+import os
 
 class util():
 
@@ -321,3 +322,39 @@ class SignalManager(qt.QObject):
 
     def emit(self, msg):
         self.received.emit(msg)
+
+class ScreenshotTools():
+    def __init__(self) -> None:
+        pass
+
+    def saveScreenshotMetadata(self, index):
+        self.saveAllWidgetsData(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".json")
+        self.saveScreenshot(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".png")
+        pass
+
+
+    def getPixmap(self):
+        mw = slicer.util.mainWindow()
+        screen = slicer.app.screens()[0]
+        pixmap = screen.grabWindow(mw.winId())
+
+        #return a qt object: QPixmap
+        return pixmap
+    
+    def saveScreenshot(self, filename):
+        self.getPixmap().save(filename, "PNG")
+        pass
+
+    def saveAllWidgetsData(self, filename):
+        tool = util()
+        data = {}
+        widgets = tool.getOnScreenWidgets()
+        for index in range(widgets.__sizeof__()):
+            try:
+                data[index] = {"name": widgets[index].name, "path": tool.uniqueWidgetPath(widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
+            except:
+                pass
+        import json
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        pass
