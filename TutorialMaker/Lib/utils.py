@@ -329,20 +329,22 @@ class ScreenshotTools():
 
     def saveScreenshotMetadata(self, index):
         self.saveAllWidgetsData(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".json")
-        self.saveScreenshot(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".png")
+        self.saveScreenshot(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index))
         pass
 
 
-    def getPixmap(self):
-        mw = slicer.util.mainWindow()
+    def getPixmap(self, window):
         screen = slicer.app.screens()[0]
-        pixmap = screen.grabWindow(mw.winId())
+        pixmap = screen.grabWindow(window.winId())
 
         #return a qt object: QPixmap
         return pixmap
     
     def saveScreenshot(self, filename):
-        self.getPixmap().save(filename, "PNG")
+        for w in slicer.app.topLevelWidgets():
+            if hasattr(w, "isVisible") and not w.isVisible():
+                continue
+            self.getPixmap(w).save(filename+ "_" + str(w.winId()) +".png", "PNG")
         pass
 
     def saveAllWidgetsData(self, filename):
@@ -351,6 +353,8 @@ class ScreenshotTools():
         widgets = tool.getOnScreenWidgets()
         for index in range(widgets.__sizeof__()):
             try:
+                if hasattr(widgets[index].inner(), "isVisible") and not widgets[index].inner().isVisible():
+                    continue
                 data[index] = {"name": widgets[index].name, "path": tool.uniqueWidgetPath(widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
             except:
                 pass
