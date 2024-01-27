@@ -178,7 +178,6 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         screenshot.saveScreenshotMetadata(0)
         pass
 
-    # TODO Transfer these functions to the Utils class
     
 #
 # TutorialMakerTest
@@ -214,5 +213,7 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
         your test should break so they know that the feature is needed.
         """
 
-        self.delayDisplay("Starting the test")
-        self.delayDisplay('Test passed')
+        #Tutorial Example
+        screenshot = utils.ScreenshotTools()
+        screenshot.saveScreenshotMetadata(0)
+        

@@ -24,12 +24,13 @@ class TutorialEditor(qt.QWidget):
         self.setLayout(self.boxLayout)
         
         self.currentCell = None
+        self.annotator = Annotator(self)
         pass
     
     def Setup(self):
 
         # Load Ui file
-        uiWidget = slicer.util.loadUI(self.resourcePath('UI/TutorialEditor.ui'))
+        uiWidget = slicer.util.loadUI(resourcePath('UI/TutorialEditor.ui'))
         self.boxLayout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
         
@@ -51,14 +52,14 @@ class TutorialEditor(qt.QWidget):
         pass
 
     def OnClickedAnnotate(self):
-        if not self.currentCell:
+        if self.currentCell is None:
             return
-        
-        print(self.currentCell)
+        self.hide()
+        self.annotator.Show()
         pass
     
     def onCellClicked(self, row, collumn):
-        self.currentCell = self.ui.tableWidgetStates.itemAt(row, collumn)
+        self.currentCell = row #self.ui.tableWidgetStates.itemAt(row, collumn)
     
     #
     # Use this method for add itens on table 
@@ -75,13 +76,8 @@ class TutorialEditor(qt.QWidget):
     
     def exit(self):
         self.logic.StopRecording()
+        self.annotator.close()
         self.close()
-
-    # There should be a better way to expose the resource path to the underlying classes of a module but I couldn't think of a clean way.
-    def resourcePath(self, filename):
-        """Return the absolute path of the module ``Resources`` directory."""
-        scriptedModulesPath = os.path.dirname(slicer.util.modulePath("TutorialMaker"))
-        return os.path.join(scriptedModulesPath, "Resources", filename)
 
     pass
 
@@ -156,3 +152,50 @@ class SlicerState():
         self.annotations = []
         pass
     
+class Annotator(qt.QWidget):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.logic = TutorialEditorLogic(self)
+        self.setWindowTitle("Widget Annotator")     
+        self.setGeometry(0, 0, 600, 40)
+
+        self.boxLayout = qt.QVBoxLayout()
+        
+        self.Setup()
+
+        self.setLayout(self.boxLayout)
+
+        self._parent = parent
+        self.widgetFinder = utils.WidgetFinder(slicer.util.mainWindow())
+        self.painter = utils.Shapes(slicer.util.mainWindow())
+        self.widgetFinder.sinalManager.connect(self.AnnotateWidget)
+
+        pass
+    def Setup(self):
+        # Load Ui file
+        uiWidget = slicer.util.loadUI(resourcePath('UI/WidgetAnnotator.ui'))
+        self.boxLayout.addWidget(uiWidget)
+        self.ui = slicer.util.childWidgetVariables(uiWidget)
+
+    def Show(self):
+        self.show()
+        self.widgetFinder.showFullSize()
+        pass
+
+    def closeEvent(self, event):
+        self._parent.Show()
+        self.widgetFinder.hideOverlay()
+        event.accept()
+        pass
+
+    def AnnotateWidget(self, widget):
+        
+        pass
+
+    pass
+
+# There should be a better way to expose the resource path to the underlying classes of a module but I couldn't think of a clean way.
+def resourcePath(filename):
+    """Return the absolute path of the module ``Resources`` directory."""
+    scriptedModulesPath = os.path.dirname(slicer.util.modulePath("TutorialMaker"))
+    return os.path.join(scriptedModulesPath, "Resources", filename)
