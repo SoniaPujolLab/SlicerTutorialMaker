@@ -394,13 +394,15 @@ class Tutorial:
 
     
     def beginTutorial(self):
+        screenshotTools = ScreenshotTools()
         import json
         with open(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Tutorial.json", 'w', encoding='utf-8') as f:
             json.dump(self.__dict__, f, ensure_ascii=False, indent=4)
         #Screenshot counter
         self.nSteps = 0
-        self.screenshottools = ScreenshotTools()
+        self.screenshottools = screenshotTools
         
+    #TODO:Unsafe, there should be a better method to do this, at least add some conditions
     def clearTutorial(self):
         outputPath = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
         if not os.path.exists(outputPath):
