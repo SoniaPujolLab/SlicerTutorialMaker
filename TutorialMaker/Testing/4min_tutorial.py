@@ -36,6 +36,9 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
             "date",
             "description")
 
+        #Clear Output folder
+        self.Tutorial.clearTutorial()
+
         self.Tutorial.beginTutorial()
         self.delayDisplay("Starting the test")
         #logic = Slicer4MinuteLogic()
