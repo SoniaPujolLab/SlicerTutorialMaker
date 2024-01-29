@@ -3,7 +3,7 @@ import qt
 
 import slicer
 
-from Lib.ScriptedLoadableModule import *
+from slicer.ScriptedLoadableModule import *
 import Lib.utils as utils
 
 # Slicer4Minute
