@@ -214,6 +214,8 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
         """
 
         #Tutorial Example
-        screenshot = utils.ScreenshotTools()
-        screenshot.saveScreenshotMetadata(0)
+        import Testing.fourMin_tutorial
+        test = Testing.fourMin_tutorial.Slicer4MinuteTest()
+        test.test_Slicer4Minute1()
+
         
