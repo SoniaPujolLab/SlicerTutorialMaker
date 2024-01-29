@@ -401,7 +401,18 @@ class Tutorial:
         self.nSteps = 0
         self.screenshottools = ScreenshotTools()
         
-
+    def clearTutorial(self):
+        if not os.path.exists(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs"):
+            return
+        dirs = os.listdir(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/")
+        for dir in dirs:
+            if os.path.isdir(dir):
+                for sdir in os.listdir(dir):
+                    os.remove(sdir)
+                os.rmdir(dir)
+            else:
+                os.remove(dir)
+        pass
 
     def nextScreenshot(self):
         self.screenshottools.saveScreenshotMetadata(self.nSteps)
