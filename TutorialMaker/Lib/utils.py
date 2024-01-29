@@ -33,8 +33,11 @@ class util():
                 print(child.name)
                 self.__listWidgetsRecursive(child, depth + 1)
     
-    def getOnScreenWidgets(self):
-        widgets = self.__getWidgetsRecursive(self.mw, 1)
+    def getOnScreenWidgets(self, window=None):
+        if window is None:
+            window = self.mw
+        window = Widget(window)
+        widgets = self.__getWidgetsRecursive(window, 1)
         return widgets
 
     def __getWidgetsRecursive(self, widget, depth):
@@ -325,33 +328,47 @@ class SignalManager(qt.QObject):
 
 class ScreenshotTools():
     def __init__(self) -> None:
+        if not os.path.exists(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs"):
+            os.mkdir(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs")
         pass
 
     def saveScreenshotMetadata(self, index):
-        self.saveAllWidgetsData(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index)+".json")
-        self.saveScreenshot(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/output_tutorial."+str(index))
+        path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
+        openWindows = []
+        for w in slicer.app.topLevelWidgets():
+            if hasattr(w, "isVisible") and not w.isVisible():
+                continue
+            print("test")
+            openWindows.append(w)
+            
+            pass
+        for wIndex in range(len(openWindows)):
+            if not os.path.exists(path + str(index)):
+                os.mkdir(path + str(index))
+                pass
+            self.saveAllWidgetsData(path + str(index) + "/" + str(wIndex) + ".json", openWindows[wIndex])
+            self.saveScreenshot(path + str(index) + "/" + str(wIndex) + ".png", openWindows[wIndex])
+            pass
         pass
 
 
     def getPixmap(self, window):
         screen = slicer.app.screens()[0]
+        slicer.app.processEvents()
         pixmap = screen.grabWindow(window.winId())
 
         #return a qt object: QPixmap
         return pixmap
     
-    def saveScreenshot(self, filename):
-        for w in slicer.app.topLevelWidgets():
-            if hasattr(w, "isVisible") and not w.isVisible():
-                continue
-            self.getPixmap(w).save(filename+ "_" + str(w.winId()) +".png", "PNG")
+    def saveScreenshot(self, filename, window):
+        self.getPixmap(window).save(filename, "PNG")
         pass
 
-    def saveAllWidgetsData(self, filename):
+    def saveAllWidgetsData(self, filename, window):
         tool = util()
         data = {}
-        widgets = tool.getOnScreenWidgets()
-        for index in range(widgets.__sizeof__()):
+        widgets = tool.getOnScreenWidgets(window)
+        for index in range(len(widgets)):
             try:
                 if hasattr(widgets[index].inner(), "isVisible") and not widgets[index].inner().isVisible():
                     continue
@@ -362,3 +379,32 @@ class ScreenshotTools():
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
         pass
+
+class Tutorial:
+    def __init__(self,
+            title,
+            author,
+            date,
+            description
+    ):
+        self.title = title
+        self.author = author
+        self.date = date
+        self.desc = description
+
+    
+    def beginTutorial(self):
+        import json
+        with open(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Tutorial.json", 'w', encoding='utf-8') as f:
+            json.dump(self.__dict__, f, ensure_ascii=False, indent=4)
+        #Screenshot counter
+        self.nSteps = 0
+        self.screenshottools = ScreenshotTools()
+        
+
+
+    def nextScreenshot(self):
+        self.screenshottools.saveScreenshotMetadata(self.nSteps)
+        self.nSteps = self.nSteps + 1
+        
+    pass

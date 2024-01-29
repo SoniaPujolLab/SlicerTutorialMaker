@@ -37,4 +37,4 @@ tags
 
 node_modules
 
-output_tutorial.*
+TutorialMaker/Outputs/*
