@@ -449,6 +449,7 @@ class JSONHandler:
         pass
 
     def parseTutorial(self):
+        
         pass
 
     def saveTutorial(self, metadata, stepsList):
@@ -457,8 +458,8 @@ class JSONHandler:
             windows = []            
             for screenshot in step:
                 datapair = {}
-                datapair["window"] = screenshot.screenshot
-                datapair["metadata"] = screenshot.metadata
+                datapair["window"] = screenshot.screenshot.replace(self.path, "")
+                datapair["metadata"] = screenshot.metadata.replace(self.path, "")
                 windows.append(datapair)
             pass
             metadata["steps"].append(windows)
