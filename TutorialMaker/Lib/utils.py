@@ -439,6 +439,17 @@ class TutorialScreenshot:
         self.screenshot = screenshot
         self.metadata = metadata
         pass
+
+    def getImage(self):
+        image = qt.QImage(self.screenshot)
+        return qt.QPixmap.fromImage(image)
+    def getWidgets(self):
+        widgets = []
+        for keys in JSONHandler.parseJSON(self.metadata):
+            widgets.append(widgets[keys])
+        return widgets 
+
+
 class JSONHandler:
     def __init__(self):
         self.path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
@@ -448,8 +459,36 @@ class JSONHandler:
         self.json = json
         pass
 
-    def parseTutorial(self):
+    def parseTutorial(self, inline=False):
+        with open(self.path + "Tutorial.json", 'r', encoding='utf-8') as f:
+            tutorialData = self.json.load(f)
+        tutorial = Tutorial(
+            tutorialData["title"],
+            tutorialData["author"],
+            tutorialData["date"],
+            tutorialData["desc"]
+        )
+        if inline:
+            stepList = []
+            tutorial.steps = stepList
+            for steps in tutorialData["steps"]:
+                for windows in steps:
+                    for window in windows:
+                        wScreenshot = TutorialScreenshot(
+                            self.path + window["window"],
+                            self.path + window["metadata"]
+                        )
+                        tutorial.stepsList.append(wScreenshot)
+            return tutorial
+        
         pass
+    
+    def parseJSON(path):
+        import json
+        with open(path, "r") as file:
+            data = json.load(file)
+        return data
+        
 
     def saveTutorial(self, metadata, stepsList):
         metadata["steps"] = []
