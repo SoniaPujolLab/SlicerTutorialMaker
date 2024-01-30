@@ -353,8 +353,8 @@ class ScreenshotTools():
             screenshotData.screenshot = path + str(index) + "/" + str(wIndex) + ".png"
             screenshotData.metadata = path + str(index) + "/" + str(wIndex) + ".json"
 
-            self.saveAllWidgetsData(screenshotData.screenshot, openWindows[wIndex])
-            self.saveScreenshot(screenshotData.metadata, openWindows[wIndex])
+            self.saveAllWidgetsData(screenshotData.metadata, openWindows[wIndex])
+            self.saveScreenshot(screenshotData.screenshot, openWindows[wIndex])
 
             windows.append(screenshotData)
             pass
@@ -449,7 +449,6 @@ class JSONHandler:
         pass
 
     def parseTutorial(self):
-        
         pass
 
     def saveTutorial(self, metadata, stepsList):
