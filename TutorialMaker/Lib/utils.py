@@ -1,6 +1,5 @@
 import slicer
 import qt
-import logging  
 import os
 
 class util():
@@ -328,12 +327,12 @@ class SignalManager(qt.QObject):
 
 class ScreenshotTools():
     def __init__(self) -> None:
-        if not os.path.exists(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs"):
-            os.mkdir(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs")
+        self.handler = JSONHandler()
         pass
 
     def saveScreenshotMetadata(self, index):
         path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
+
         openWindows = []
         for w in slicer.app.topLevelWidgets():
             if hasattr(w, "isVisible") and not w.isVisible():
@@ -342,14 +341,25 @@ class ScreenshotTools():
             openWindows.append(w)
             
             pass
+
+        windows = []
         for wIndex in range(len(openWindows)):
             if not os.path.exists(path + str(index)):
                 os.mkdir(path + str(index))
                 pass
-            self.saveAllWidgetsData(path + str(index) + "/" + str(wIndex) + ".json", openWindows[wIndex])
-            self.saveScreenshot(path + str(index) + "/" + str(wIndex) + ".png", openWindows[wIndex])
+
+            
+            screenshotData = TutorialScreenshot()
+            screenshotData.screenshot = path + str(index) + "/" + str(wIndex) + ".png"
+            screenshotData.metadata = path + str(index) + "/" + str(wIndex) + ".json"
+
+            self.saveAllWidgetsData(screenshotData.screenshot, openWindows[wIndex])
+            self.saveScreenshot(screenshotData.metadata, openWindows[wIndex])
+
+            windows.append(screenshotData)
             pass
         pass
+        return windows
 
 
     def getPixmap(self, window):
@@ -375,10 +385,7 @@ class ScreenshotTools():
                 data[index] = {"name": widgets[index].name, "path": tool.uniqueWidgetPath(widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
             except:
                 pass
-        import json
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        pass
+        self.handler.saveScreenshotMetadata(data, filename)
 
 class Tutorial:
     def __init__(self,
@@ -387,17 +394,17 @@ class Tutorial:
             date,
             description
     ):
-        self.title = title
-        self.author = author
-        self.date = date
-        self.desc = description
+        self.metadata = {}
+        self.metadata["title"] = title
+        self.metadata["author"] = author
+        self.metadata["date"] = date
+        self.metadata["desc"] = description
+
+        self.steps = []
 
     
     def beginTutorial(self):
         screenshotTools = ScreenshotTools()
-        import json
-        with open(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Tutorial.json", 'w', encoding='utf-8') as f:
-            json.dump(self.__dict__, f, ensure_ascii=False, indent=4)
         #Screenshot counter
         self.nSteps = 0
         self.screenshottools = screenshotTools
@@ -418,7 +425,52 @@ class Tutorial:
         pass
 
     def nextScreenshot(self):
-        self.screenshottools.saveScreenshotMetadata(self.nSteps)
+        self.steps.append(self.screenshottools.saveScreenshotMetadata(self.nSteps))
         self.nSteps = self.nSteps + 1
-        
     pass
+
+    def endTutorial(self):
+        handler = JSONHandler()
+        handler.saveTutorial(self.metadata, self.steps)
+
+
+class TutorialScreenshot:
+    def __init__(self, screenshot="", metadata=""):
+        self.screenshot = screenshot
+        self.metadata = metadata
+        pass
+class JSONHandler:
+    def __init__(self):
+        self.path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+        import json
+        self.json = json
+        pass
+
+    def parseTutorial(self):
+        pass
+
+    def saveTutorial(self, metadata, stepsList):
+        metadata["steps"] = []
+        for step in stepsList:
+            windows = []            
+            for screenshot in step:
+                datapair = {}
+                datapair["window"] = screenshot.screenshot
+                datapair["metadata"] = screenshot.metadata
+                windows.append(datapair)
+            pass
+            metadata["steps"].append(windows)
+        with open(self.path + "Tutorial.json", 'w', encoding='utf-8') as f:
+            self.json.dump(metadata, f, ensure_ascii=False, indent=4)
+        pass
+
+    def saveScreenshotMetadata(self, data, path):
+        with open(path, 'w', encoding='utf-8') as f:
+            self.json.dump(data, f, ensure_ascii=False, indent=4)
+        pass
+
+
+
+
