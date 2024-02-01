@@ -160,13 +160,34 @@ class ImageDrawer:
             image = self.view.grab()
             image.save(dynamic_path, "PNG")
             self.view.close()
-            print(f"Image saved to {dynamic_path}")
+            #print(f"Image saved to {dynamic_path}")
         else:
             print("Error: No view to save.")
 
-
-    def painter(self, metadata, screenshotData):
+    # screenshotData: all widgets in a json
+    # metadata: Victors' outputs
+            
+    def painter(self, metadata, screenshotData, language ):
         import ast
+
+        #import pip
+        #pip.main(['install', 'fuzzywuzzy', 'transformers','torch','pandas', 'sacremoses'])
+        import pandas as pd
+        from fuzzywuzzy import process
+        from transformers import MarianMTModel, MarianTokenizer
+
+        path_data_translation =  os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/data/string_en_to_es.csv'
+
+        # Translation variable#
+        if language == 'es':
+            df_sourcetext = pd.read_csv(path_data_translation, encoding='UTF-16', sep=';')
+            model_name = "Helsinki-NLP/opus-mt-en-es"
+            model = MarianMTModel.from_pretrained(model_name)
+            tokenizer = MarianTokenizer.from_pretrained(model_name)
+            col_name = 'Espanol'
+
+        # Translation variable#
+
         scale = 1
 
         for item in metadata['annotations']:
@@ -181,14 +202,43 @@ class ImageDrawer:
                     widgetSizeX = widget["size"][0]
                     widgetSizeY = widget["size"][1]
                     break
+                    
+            ## translation process ##
+            # Check if there are some words on the already translated on database
+            original_text = item['labelText']
+            similar_text, score, value = process.extractOne(original_text, df_sourcetext['English'])
+            match_text = original_text
+            # Check if the tranformers translation is the same that database translation (needs for transalation performance)
+            if score >= 70:
+                input_ids = tokenizer.encode(similar_text, return_tensors="pt", truncation=True)
+                translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
+                similar_text_trans = tokenizer.decode(translation[0], skip_special_tokens=True).lower()
+                original_text_trans =  df_sourcetext.loc[df_sourcetext['English'] == similar_text, 'Espanol'].values[0].lower()
+            # Improve performance with button names 
+                if (original_text_trans != similar_text_trans):
+                    match_text = original_text.replace(similar_text,original_text_trans)
+                     # Check if the translated text appears before "button" and after the original text
+                    if match_text.find(original_text_trans) != -1 and match_text.find("button") != -1 and match_text.find(similar_text_trans) < match_text.find("button"):
+                        match_text = match_text.replace("button","")
+                        match_text = match_text.replace(original_text_trans, "el botón " + original_text_trans)
+
+            # Final translation        
+            input_ids = tokenizer.encode(match_text, return_tensors="pt", truncation=True)
+            translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
+            translated_text = tokenizer.decode(translation[0], skip_special_tokens=True)
+
+            ## translation process ##
+
+                                    
+
             if item['type'] == 'rectangle':
                 self.draw_rectangle(x = widgetPosX ,
                                     y = widgetPosY,
                                     width = widgetSizeX * scale,
                                     height = widgetSizeY * scale,
-                                    text =  item['labelText'],
+                                    text =  translated_text,
                                     font_size= float(item['fontSize']),
-                                    text_color=qt.Qt.black,
+                                    text_color=qt.Qt.blue,
                                     pen_color=qt.Qt.black,
                                     pen_width=10, 
                                     pen_style=qt.Qt.SolidLine)
@@ -204,14 +254,14 @@ class ImageDrawer:
                                 pen_width=5,
                                 head_size=20,
                                 offset=5,
-                                text =  item['labelText'],
+                                text =  translated_text,
                                 font_size= float(item['fontSize']),
                                 text_color=qt.Qt.black)
                 
             elif item['type'] == 'clickMark':
                 self.draw_click(x=widgetPosX + (widgetSizeX/2) * scale,
                                 y=widgetPosY + (widgetSizeY/2) * scale,
-                                text =  item['labelText'],
+                                text =  translated_text,
                                 font_size= float(item['fontSize']),
                                 text_color=qt.Qt.black,)
 
@@ -237,13 +287,11 @@ class ImageDrawer:
             screenshotData = tutorial.steps[i].getWidgets()
             # Load the image
             image_drawer.load_image(screenshot)
-            image_drawer.painter(OutputAnnotator[annotateSteps], screenshotData)
+            image_drawer.painter(OutputAnnotator[annotateSteps], screenshotData, 'es')
 
-
-        
 
             # Save the view to a PNG file with a dynamic path
-            image_drawer.save_to_png('output_image_' + str(i) + '.png')
+            image_drawer.save_to_png(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/output_image_' + str(i) + '.png')
             
             pass
 
