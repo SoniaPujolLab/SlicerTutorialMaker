@@ -58,6 +58,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._parameterNode = None
         self._updatingGUIFromParameterNode = False
         self.__tableSize = 0
+        self.__selectedTutorial = None
 
         #PROTOTYPE FOR PLAYBACK
 
@@ -89,13 +90,17 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonSave.connect('clicked(bool)', self.logic.Save)
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
+        self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
         #Static Tutorial Handlers
-        self.ui.pushButtonAnnotate.connect('clicked(bool)', self.logic.Annotate)
+        self.ui.pushButtonAnnotate.connect('clicked(bool)', self.annotateButton)
         self.ui.pushButtonTest.connect('clicked(bool)', self.logic.TestAll)
         
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
+
+        #Update GUI
+        self.populateTutorialList()
 
     def cleanup(self):
         self.logic.exitTutorialEditor()
@@ -139,6 +144,21 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """
         return
     
+    def annotateButton(self):
+        self.logic.Annotate(self.__selectedTutorial)
+    
+    def tutorialSelectionChanged(self):
+        self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
+        self.ui.pushButtonAnnotate.setEnabled(not (self.__selectedTutorial is None))
+    
+    def populateTutorialList(self):
+        loadedTutorials = self.logic.loadTutorials()
+        listWidget = self.ui.listWidgetTutorials
+        listWidget.addItems(loadedTutorials)
+        
+
+
+    
 
 
 #
@@ -161,6 +181,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         """
         ScriptedLoadableModuleLogic.__init__(self)
         self.tutorialEditor = TutorialEditor()
+
 
     def setDefaultParameters(self, parameterNode):
         """
@@ -186,16 +207,13 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         screenshot.saveScreenshotMetadata(0)
         pass
 
-    def Annotate(self):
-        #TODO: Make a liist of all Tutorials on 'Testing' folder
-        import Testing.fourMin_tutorial
-        test = Testing.fourMin_tutorial.Slicer4MinuteTest()
-        test.test_Slicer4Minute1()
-        ####
+    def Annotate(self, tutorialName):
+        
+        TutorialMakerTest().test_TutorialMaker1(tutorialName)
         
         Annotator = TutorialGUI()
         Annotator.open_json_file(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/Tutorial.json")
-        Annotator.set_output_name("fourMin_tutorial")
+        Annotator.set_output_name(tutorialName)
         Annotator.show()
         pass
 
@@ -203,6 +221,17 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/fourMin_tutorial.json")
 
         pass
+
+    def loadTutorials(self):
+        test_tutorials = []
+        test_contents = os.listdir(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Testing/")
+        for content in test_contents:
+            if(not (".py" in content)):
+                continue
+            test_tutorials.append(content.replace(".py", ""))
+        return test_tutorials
+
+                
 
     
 #

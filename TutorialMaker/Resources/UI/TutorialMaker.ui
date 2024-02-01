@@ -70,9 +70,15 @@
     </widget>
    </item>
    <item>
+    <widget class="QListWidget" name="listWidgetTutorials"/>
+   </item>
+   <item>
     <widget class="QPushButton" name="pushButtonAnnotate">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
-      <string>Annotate</string>
+      <string>Run and Annotate</string>
      </property>
     </widget>
    </item>
