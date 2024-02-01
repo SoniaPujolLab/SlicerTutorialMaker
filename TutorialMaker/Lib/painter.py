@@ -276,10 +276,7 @@ class ImageDrawer:
         jsonHandler = utils.JSONHandler()
 
         tutorial = jsonHandler.parseTutorial(True)
-
-        # Load Json
-        with open(path,'r') as file:
-            OutputAnnotator = json.load(file)
+        OutputAnnotator = utils.JSONHandler.parseJSON(path)
 
 
         for i, annotateSteps in enumerate(OutputAnnotator):
