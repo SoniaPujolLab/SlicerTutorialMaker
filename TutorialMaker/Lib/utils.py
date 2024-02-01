@@ -129,6 +129,8 @@ class util():
             pass
             index += 1
         name = classname + ":" + str(index)
+        if index + 1 > len(_widgets):
+            name = "?"
         return name
 
         
