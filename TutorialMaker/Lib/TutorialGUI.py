@@ -119,7 +119,7 @@ class TutorialGUI(qt.QMainWindow):
         # toolbar.addAction(actionRemove)
         # toolbar.addAction(actionSelect)
 
-        actionOpen.triggered.connect(self.open_json_file)
+        actionOpen.triggered.connect(self.open_json_file_dialog)
         actionSave.triggered.connect(self.save_json_file)
         actionBack.triggered.connect(self.delete_annotation)
         # actionRemove.triggered.connect(self.delete_screen)
@@ -242,7 +242,7 @@ class TutorialGUI(qt.QMainWindow):
 
         return toolbar
     
-    def open_json_file(self):
+    def open_json_file_dialog(self):
         file_dialog = qt.QFileDialog()
         file_dialog.setNameFilter("JSON Files (*.json)")
         file_dialog.exec()
@@ -251,16 +251,20 @@ class TutorialGUI(qt.QMainWindow):
         if file_dialog.result() == qt.QFileDialog.Accepted:
             # The user selected a file
             selected_file = file_dialog.selectedFiles()[0]
-            directory_path = os.path.dirname(selected_file)
-            
-            # Read the data from the file
-            with open(selected_file, "r") as file:
-                data = json.load(file)
-            # print(data)
-            self.load_all_images(data, directory_path)
+            self.open_json_file(selected_file)
         else:
             # The user canceled the file dialog
             print("The user canceled the file dialog")
+
+    def open_json_file(self, filepath):
+
+        directory_path = os.path.dirname(filepath)
+        # Read the data from the file
+        with open(filepath, "r") as file:
+            data = json.load(file)
+        # print(data)
+        self.load_all_images(data, directory_path)
+        
 
     def load_all_images(self, data, directory_path):
         self.annotations = []

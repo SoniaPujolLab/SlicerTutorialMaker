@@ -194,6 +194,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         ####
         
         Annotator = TutorialGUI()
+        Annotator.open_json_file(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/Tutorial.json")
         Annotator.show()
         pass
 
