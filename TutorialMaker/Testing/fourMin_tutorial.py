@@ -57,7 +57,7 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay('Finished with download and loading')
 
        
-        self.Tutorial.nextScreenshot()
+       
         # Testing "Part 2" of Tutorial
         #
         #
@@ -108,10 +108,14 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         clip.SetRedSliceClipState(0)
         clip.SetYellowSliceClipState(0)
         clip.SetGreenSliceClipState(2)
+        
+        self.Tutorial.nextScreenshot()
 
+
+        self.Tutorial.endTutorial()
         # Can we make this more than just a Smoke Test?
         self.delayDisplay('Optic chiasm should be visible. Front part of white matter should be clipped.')
-
+        
         # Done
         #
         #

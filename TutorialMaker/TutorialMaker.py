@@ -4,11 +4,15 @@ import qt
 
 import vtk
 import slicer
+import logging
+import importlib
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
 import Lib.utils as utils
+import Lib.painter as AnnotationPainter
 
 from Lib.TutorialEditor import TutorialEditor
+from Lib.TutorialGUI import TutorialGUI
 
 #
 # TutorialMaker
@@ -80,12 +84,16 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Buttons
 
-        #Main
+        #Dynamic Tutorial Prototype
         self.ui.pushButtonEdit.connect('clicked(bool)', self.logic.Edit)
         self.ui.pushButtonSave.connect('clicked(bool)', self.logic.Save)
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
 
+        #Static Tutorial Handlers
+        self.ui.pushButtonAnnotate.connect('clicked(bool)', self.logic.Annotate)
+        self.ui.pushButtonTest.connect('clicked(bool)', self.logic.TestAll)
+        
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
 
@@ -178,6 +186,22 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         screenshot.saveScreenshotMetadata(0)
         pass
 
+    def Annotate(self):
+        #TODO: Make a liist of all Tutorials on 'Testing' folder
+        import Testing.fourMin_tutorial
+        test = Testing.fourMin_tutorial.Slicer4MinuteTest()
+        test.test_Slicer4Minute1()
+        ####
+        
+        Annotator = TutorialGUI()
+        Annotator.show()
+        pass
+
+    def TestAll(self):
+        AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/fourMin_tutorial.json")
+
+        pass
+
     
 #
 # TutorialMakerTest
@@ -199,9 +223,34 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
         """Run as few or as many tests as needed here.
         """
         self.setUp()
-        self.test_TutorialMaker1()
+        #Annotator test
+        #Screencapture test
+        #Then run all the tutorials
+        
+        tutorials_failed = 0
+        test_tutorials = os.listdir(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Testing/")
+        for unit_tutorials in test_tutorials:
+            try:
+                if(not (".py" in unit_tutorials)):
+                    continue
+                unit_tutorials = unit_tutorials.replace(".py", "")
+                #Generate Screenshots and widget metadata
+                self.test_TutorialMaker1(unit_tutorials)
+                #Paint Screenshots with annotations
+                AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/" + unit_tutorials + ".json")
+                
+            except:
+                logging.error("Tutorial Execution Failed: " + unit_tutorials)
+                tutorials_failed = tutorials_failed + 1
+                pass
+            finally:
+                self.delayDisplay("Tutorial Tested")
+            pass
+        if tutorials_failed > 0:
+            raise Exception(str(tutorials_failed) +" Tutorials failed to execute")
 
-    def test_TutorialMaker1(self):
+
+    def test_TutorialMaker1(self, tutorial_name):
         """ Ideally you should have several levels of tests.  At the lowest level
         tests should exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -214,8 +263,63 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
         """
 
         #Tutorial Example
-        import Testing.fourMin_tutorial
-        test = Testing.fourMin_tutorial.Slicer4MinuteTest()
-        test.test_Slicer4Minute1()
+        #import Testing.fourMin_tutorial
+        #test = Testing.fourMin_tutorial.Slicer4MinuteTest()
+        #test.test_Slicer4Minute1()
+        TutorialModule = importlib.import_module("Testing." + tutorial_name)
+        for className in TutorialModule.__dict__:
+            if(not ("Test" in className) or className == "ScriptedLoadableModuleTest"):
+                continue
+            testClass = getattr(TutorialModule, className)
+            tutorial = testClass()
+            tutorial.runTest()
+            return
+        logging.error("No tests found in " + tutorial_name)
+        raise Exception("No Tests Found")
+        pass
+
+    def test_TutorialMaker2(self):
+        pass
+
+    def delayDisplay(self, message, requestedDelay=None, msec=None):
+        """
+        Display messages to the user/tester during testing.
+
+        By default, the delay is 50ms.
+
+        The function accepts the keyword arguments ``requestedDelay`` or ``msec``. If both
+        are specified, the value associated with ``msec`` is used.
+
+        This method can be temporarily overridden to allow tests running
+        with longer or shorter message display time.
+
+        Displaying a dialog and waiting does two things:
+        1) it lets the event loop catch up to the state of the test so
+        that rendering and widget updates have all taken place before
+        the test continues and
+        2) it shows the user/developer/tester the state of the test
+        so that we'll know when it breaks.
+
+        Note:
+        Information that might be useful (but not important enough to show
+        to the user) can be logged using logging.info() function
+        (printed to console and application log) or logging.debug()
+        function (printed to application log only).
+        Error messages should be logged by logging.error() function
+        and displayed to user by slicer.util.errorDisplay function.
+        """
+        if hasattr(self, "messageDelay"):
+            msec = self.messageDelay
+        if msec is None:
+            msec = requestedDelay
+        if msec is None:
+            msec = 100
+
+        slicer.util.delayDisplay(message, msec)
+
+
+
+
+
 
         

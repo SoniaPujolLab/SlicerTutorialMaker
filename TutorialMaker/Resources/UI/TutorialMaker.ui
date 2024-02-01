@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>227</height>
+    <height>293</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,6 +33,9 @@
     <widget class="ctkCollapsibleButton" name="CollapsibleButtonTutorialMaking">
      <property name="text">
       <string>Tutorial Making</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
      <layout class="QFormLayout" name="formLayout">
       <item row="0" column="0" colspan="2">
@@ -64,6 +67,20 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButtonAnnotate">
+     <property name="text">
+      <string>Annotate</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButtonTest">
+     <property name="text">
+      <string>Test</string>
+     </property>
     </widget>
    </item>
    <item>
