@@ -175,7 +175,7 @@ class ImageDrawer:
             widgetSizeX = 0
             widgetSizeY = 0
             for widget in screenshotData:
-                if widget["path"] == item["widget"]:
+                if widget["path"] == item["path"]:
                     widgetPosX = widget["position"][0]
                     widgetPosY = widget["position"][1]
                     widgetSizeX = widget["size"][0]
