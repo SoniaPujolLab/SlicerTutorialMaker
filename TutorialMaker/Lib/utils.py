@@ -92,6 +92,18 @@ class util():
     def uniqueWidgetPath(self, widgetToID):
         path = widgetToID.name
         parent = widgetToID
+        if path == "":
+            path = widgetToID.className
+            _widgets = self.getWidgetsByClassName(parent, path)
+            index = 0
+            for _w in _widgets:
+                if id(widgetToID.inner()) == id(_w.inner()):
+                    break
+                pass
+                index += 1
+            path += str(index)
+            pass
+            
         while(True):
             parent = parent.parent()
             if not parent:
@@ -99,7 +111,15 @@ class util():
             if parent.name != "":
                 path = parent.name + "/" + path
             else:
-                path = "/" + path
+                _widgets = self.getWidgetsByClassName(parent.parent(), parent.className)
+                index = 0
+                for _w in _widgets:
+                    if id(widgetToID.inner()) == id(_w.inner()):
+                        break
+                    pass
+                    index += 1
+                path = parent.className + str(index) + "/" + path  
+                pass
         return path
 
         
@@ -257,6 +277,8 @@ class Widget():
         string += "\tToolTip:   " + self.toolTip + "\n"
         string += "\tClassName: " + self.className + "\n"
         string += "\tID:        " + hex(id(self.__widgetData)) + "\n"
+        string += "\tAction:    " + str(self.__widgetData.actions())+ "\n" 
+        string += "\tPath:      " + util().uniqueWidgetPath(self)
         return string
     
     def __dict__(self):
@@ -331,7 +353,7 @@ class ScreenshotTools():
         pass
 
     def saveScreenshotMetadata(self, index):
-        path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
+        path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/"
 
         openWindows = []
         for w in slicer.app.topLevelWidgets():
@@ -411,7 +433,7 @@ class Tutorial:
         
     #TODO:Unsafe, there should be a better method to do this, at least add some conditions
     def clearTutorial(self):
-        outputPath = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
+        outputPath = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/"
         if not os.path.exists(outputPath):
             return
         dirs = os.listdir(outputPath)
@@ -424,7 +446,11 @@ class Tutorial:
                 os.remove(outputPath + dir)
         pass
 
-    def nextScreenshot(self):
+    def nextScreenshot(self, overwriteName=None):
+        if type(overwriteName) == str:
+            self.steps.append(self.screenshottools.saveScreenshotMetadata(overwriteName))
+            self.nSteps = self.nSteps + 1    
+            return
         self.steps.append(self.screenshottools.saveScreenshotMetadata(self.nSteps))
         self.nSteps = self.nSteps + 1
     pass
@@ -445,14 +471,15 @@ class TutorialScreenshot:
         return qt.QPixmap.fromImage(image)
     def getWidgets(self):
         widgets = []
-        for keys in JSONHandler.parseJSON(self.metadata):
-            widgets.append(widgets[keys])
+        nWidgets = JSONHandler.parseJSON(self.metadata)
+        for keys in nWidgets:
+            widgets.append(nWidgets[keys])
         return widgets 
 
 
 class JSONHandler:
     def __init__(self):
-        self.path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/"
+        self.path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/"
         if not os.path.exists(self.path):
             os.mkdir(self.path)
         import json
@@ -471,17 +498,16 @@ class JSONHandler:
         if inline:
             stepList = []
             tutorial.steps = stepList
-            for steps in tutorialData["steps"]:
-                for windows in steps:
-                    for window in windows:
-                        wScreenshot = TutorialScreenshot(
-                            self.path + window["window"],
-                            self.path + window["metadata"]
-                        )
-                        tutorial.stepsList.append(wScreenshot)
+            for step in tutorialData["steps"]:
+                for window in step:
+                    wScreenshot = TutorialScreenshot(
+                        self.path + window["window"],
+                        self.path + window["metadata"]
+                    )
+                    tutorial.steps.append(wScreenshot)
             return tutorial
-        
-        pass
+        #TODO: Non inline parser
+        return tutorial
     
     def parseJSON(path):
         import json
