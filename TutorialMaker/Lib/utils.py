@@ -59,16 +59,12 @@ class util():
             _widget = widget.getNamedChild(name)
             if not _widget:
                 temp = name.split(":", 1)
-                print(temp)
                 if len(temp) < 2:
                     return None
                 wList = self.getWidgetsByClassName(widget, temp[0])
-                print(wList)
-                print(wList[0].className)
                 _widget = wList[int(temp[1])]
                 if not _widget:
                     return None
-                return None
             widget = _widget
         return widget
     
