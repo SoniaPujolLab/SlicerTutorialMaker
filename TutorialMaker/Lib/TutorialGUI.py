@@ -31,6 +31,9 @@ class TutorialGUI(qt.QMainWindow):
         self.author = ""
         self.date = ""
         self.desc = ""
+
+        self.output_name = "output"
+
         self.metadata_image = None
 
         # Load a UI file
@@ -764,6 +767,9 @@ class TutorialGUI(qt.QMainWindow):
                 action.setChecked(False)
                 action.setIcon(icons['inactive'])
 
+    def set_output_name(self, filename):
+        self.output_name = filename
+
     def save_json_file(self):
         # Create json file 
         json_out = []
@@ -804,7 +810,7 @@ class TutorialGUI(qt.QMainWindow):
                 annotations.append(annotation)
 
             data[str(i)] = {
-                "image:":image,
+                "image":image,
                 "step":self.widgets[i-1],
                 "labelText": self.steps[i-1],
                 "annotations":annotations
@@ -812,7 +818,7 @@ class TutorialGUI(qt.QMainWindow):
 
         #json_out = json.dumps(data, indent=4)
         # print("Data",json_out)
-        output_file_path = os.path.join(self.dir_path, '..', 'Outputs', 'archivo.json')
+        output_file_path = os.path.join(self.dir_path, '..', 'Outputs/Annotations', self.output_name + '.json')
         with open(output_file_path, 'w', encoding='utf-8') as archivo:
             json.dump(data, archivo, indent=4)
 
