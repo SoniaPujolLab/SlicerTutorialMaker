@@ -810,10 +810,10 @@ class TutorialGUI(qt.QMainWindow):
                 "annotations":annotations
             }
 
-        json_out = json.dumps(data, indent=4)
+        #json_out = json.dumps(data, indent=4)
         # print("Data",json_out)
         output_file_path = os.path.join(self.dir_path, '..', 'Outputs', 'archivo.json')
-        with open(output_file_path, 'w') as archivo:
-            json.dump(json_out, archivo, indent=4)
+        with open(output_file_path, 'w', encoding='utf-8') as archivo:
+            json.dump(data, archivo, indent=4)
 
         # Create PDF file
