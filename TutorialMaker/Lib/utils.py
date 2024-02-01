@@ -56,9 +56,20 @@ class util():
         extendedPath = self.widgetShortcuts(wNames[0])
         extendedPath.extend(wNames[1:])
         for name in extendedPath:
-            widget = widget.getNamedChild(name)
-            if not widget:
+            _widget = widget.getNamedChild(name)
+            if not _widget:
+                temp = name.split(":", 1)
+                print(temp)
+                if len(temp) < 2:
+                    return None
+                wList = self.getWidgetsByClassName(widget, temp[0])
+                print(wList)
+                print(wList[0].className)
+                _widget = wList[int(temp[1])]
+                if not _widget:
+                    return None
                 return None
+            widget = _widget
         return widget
     
     def widgetShortcuts(self, shortcut):
@@ -93,15 +104,7 @@ class util():
         path = widgetToID.name
         parent = widgetToID
         if path == "":
-            path = widgetToID.className
-            _widgets = self.getWidgetsByClassName(parent, path)
-            index = 0
-            for _w in _widgets:
-                if id(widgetToID.inner()) == id(_w.inner()):
-                    break
-                pass
-                index += 1
-            path += str(index)
+            path = self.__classtoname(widgetToID)
             pass
             
         while(True):
@@ -111,16 +114,22 @@ class util():
             if parent.name != "":
                 path = parent.name + "/" + path
             else:
-                _widgets = self.getWidgetsByClassName(parent.parent(), parent.className)
-                index = 0
-                for _w in _widgets:
-                    if id(widgetToID.inner()) == id(_w.inner()):
-                        break
-                    pass
-                    index += 1
-                path = parent.className + str(index) + "/" + path  
+                _name = self.__classtoname(parent)
+                path = _name + "/" + path  
                 pass
         return path
+    
+    def __classtoname(self, widget):
+        classname = widget.className
+        _widgets = self.getWidgetsByClassName(widget.parent(), classname)
+        index = 0
+        for _w in _widgets:
+            if id(widget.inner()) == id(_w.inner()) and widget.text == _w.text:
+                break
+            pass
+            index += 1
+        name = classname + ":" + str(index)
+        return name
 
         
 
