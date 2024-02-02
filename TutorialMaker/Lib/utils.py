@@ -56,9 +56,16 @@ class util():
         extendedPath = self.widgetShortcuts(wNames[0])
         extendedPath.extend(wNames[1:])
         for name in extendedPath:
-            widget = widget.getNamedChild(name)
-            if not widget:
-                return None
+            _widget = widget.getNamedChild(name)
+            if not _widget:
+                temp = name.split(":", 1)
+                if len(temp) < 2:
+                    return None
+                wList = self.getWidgetsByClassName(widget, temp[0])
+                _widget = wList[int(temp[1])]
+                if not _widget:
+                    return None
+            widget = _widget
         return widget
     
     def widgetShortcuts(self, shortcut):
@@ -93,15 +100,7 @@ class util():
         path = widgetToID.name
         parent = widgetToID
         if path == "":
-            path = widgetToID.className
-            _widgets = self.getWidgetsByClassName(parent, path)
-            index = 0
-            for _w in _widgets:
-                if id(widgetToID.inner()) == id(_w.inner()):
-                    break
-                pass
-                index += 1
-            path += str(index)
+            path = self.__classtoname(widgetToID)
             pass
             
         while(True):
@@ -111,16 +110,24 @@ class util():
             if parent.name != "":
                 path = parent.name + "/" + path
             else:
-                _widgets = self.getWidgetsByClassName(parent.parent(), parent.className)
-                index = 0
-                for _w in _widgets:
-                    if id(widgetToID.inner()) == id(_w.inner()):
-                        break
-                    pass
-                    index += 1
-                path = parent.className + str(index) + "/" + path  
+                _name = self.__classtoname(parent)
+                path = _name + "/" + path  
                 pass
         return path
+    
+    def __classtoname(self, widget):
+        classname = widget.className
+        _widgets = self.getWidgetsByClassName(widget.parent(), classname)
+        index = 0
+        for _w in _widgets:
+            if id(widget.inner()) == id(_w.inner()) and widget.text == _w.text:
+                break
+            pass
+            index += 1
+        name = classname + ":" + str(index)
+        if index + 1 > len(_widgets):
+            name = "?"
+        return name
 
         
 
@@ -269,6 +276,10 @@ class Widget():
         else:
             self.text = widgetData.text
         pass
+        if not hasattr(self.__widgetData, "actions"):
+            self.actions = []
+        else:
+            self.actions = self.__widgetData.actions()
 
     def __str__(self):
         string = "Widget:\n"
@@ -277,7 +288,7 @@ class Widget():
         string += "\tToolTip:   " + self.toolTip + "\n"
         string += "\tClassName: " + self.className + "\n"
         string += "\tID:        " + hex(id(self.__widgetData)) + "\n"
-        string += "\tAction:    " + str(self.__widgetData.actions())+ "\n" 
+        string += "\tAction:    " + str(self.actions)+ "\n" 
         string += "\tPath:      " + util().uniqueWidgetPath(self)
         return string
     
