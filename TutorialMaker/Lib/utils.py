@@ -276,6 +276,10 @@ class Widget():
         else:
             self.text = widgetData.text
         pass
+        if not hasattr(self.__widgetData, "actions"):
+            self.actions = []
+        else:
+            self.actions = self.__widgetData.actions()
 
     def __str__(self):
         string = "Widget:\n"
@@ -284,7 +288,7 @@ class Widget():
         string += "\tToolTip:   " + self.toolTip + "\n"
         string += "\tClassName: " + self.className + "\n"
         string += "\tID:        " + hex(id(self.__widgetData)) + "\n"
-        string += "\tAction:    " + str(self.__widgetData.actions())+ "\n" 
+        string += "\tAction:    " + str(self.actions)+ "\n" 
         string += "\tPath:      " + util().uniqueWidgetPath(self)
         return string
     
