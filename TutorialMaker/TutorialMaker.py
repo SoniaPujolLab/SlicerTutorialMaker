@@ -94,7 +94,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         #Static Tutorial Handlers
         self.ui.pushButtonAnnotate.connect('clicked(bool)', self.annotateButton)
-        self.ui.pushButtonTest.connect('clicked(bool)', self.logic.TestAll)
+        self.ui.pushButtonTestPainter.connect('clicked(bool)', self.testPainterButton)
         
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
@@ -144,12 +144,17 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """
         return
     
+    def testPainterButton(self):
+        self.logic.TestPainter(self.__selectedTutorial)
+
     def annotateButton(self):
         self.logic.Annotate(self.__selectedTutorial)
     
     def tutorialSelectionChanged(self):
         self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
         self.ui.pushButtonAnnotate.setEnabled(not (self.__selectedTutorial is None))
+        self.ui.pushButtonTestPainter.setEnabled(not (self.__selectedTutorial is None))
+
     
     def populateTutorialList(self):
         loadedTutorials = self.logic.loadTutorials()
@@ -217,8 +222,8 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         Annotator.show()
         pass
 
-    def TestAll(self):
-        AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/fourMin_tutorial.json")
+    def TestPainter(self, tutorialName):
+        AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName+".json")
 
         pass
 
