@@ -106,13 +106,13 @@ class ImageDrawer:
 
             # Calculate the background size based on the text size
             text_rect = text_item.boundingRect()
-            text_background = qt.QGraphicsRectItem(start_x , start_y - 20 , text_rect.width(), text_rect.height() + 5)
+            text_background = qt.QGraphicsRectItem(start_x - text_rect.width()/2 , start_y - 20 , text_rect.width(), text_rect.height() + 5)
 
             text_background.setBrush(qt.QBrush(qt.Qt.white))
             self.scene.addItem(text_background)
 
             # Set the position of the text on top of the background rectangle
-            text_item.setPos(start_x, start_y - 20)
+            text_item.setPos(start_x - text_rect.width()/2 , start_y - 20)
             self.scene.addItem(text_item)
 
 
@@ -171,7 +171,7 @@ class ImageDrawer:
         import ast
 
         #import pip
-        #pip.main(['install', 'fuzzywuzzy', 'transformers','torch','pandas', 'sacremoses'])
+        #pip.main(['install', 'fuzzywuzzy', 'transformers','torch','pandas', 'sacremoses','SentecePiece','python-Levenshtein'])
         import pandas as pd
         from fuzzywuzzy import process
         from transformers import MarianMTModel, MarianTokenizer
@@ -191,6 +191,7 @@ class ImageDrawer:
         scale = 1
 
         for item in metadata['annotations']:
+            translated_text = ""
             widgetPosX = 0
             widgetPosY = 0
             widgetSizeX = 0
@@ -201,35 +202,34 @@ class ImageDrawer:
                     widgetPosY = widget["position"][1]
                     widgetSizeX = widget["size"][0]
                     widgetSizeY = widget["size"][1]
-                    break
                     
-            ## translation process ##
-            # Check if there are some words on the already translated on database
-            original_text = item['labelText']
-            similar_text, score, value = process.extractOne(original_text, df_sourcetext['English'])
-            match_text = original_text
-            # Check if the tranformers translation is the same that database translation (needs for transalation performance)
-            if score >= 70:
-                input_ids = tokenizer.encode(similar_text, return_tensors="pt", truncation=True)
-                translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
-                similar_text_trans = tokenizer.decode(translation[0], skip_special_tokens=True).lower()
-                original_text_trans =  df_sourcetext.loc[df_sourcetext['English'] == similar_text, 'Espanol'].values[0].lower()
-            # Improve performance with button names 
-                if (original_text_trans != similar_text_trans):
-                    match_text = original_text.replace(similar_text,original_text_trans)
-                     # Check if the translated text appears before "button" and after the original text
-                    if match_text.find(original_text_trans) != -1 and match_text.find("button") != -1 and match_text.find(similar_text_trans) < match_text.find("button"):
-                        match_text = match_text.replace("button","")
-                        match_text = match_text.replace(original_text_trans, "el botón " + original_text_trans)
+                    ## translation process ##
+                    # Check if there are some words on the already translated on database
+                    original_text = item['labelText']
+                    similar_text, score, value = process.extractOne(original_text, df_sourcetext['English'])
+                    match_text = original_text
+                    # Check if the tranformers translation is the same that database translation (needs for transalation performance)
+                    if score >= 70:
+                        input_ids = tokenizer.encode(similar_text, return_tensors="pt", truncation=True)
+                        translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
+                        similar_text_trans = tokenizer.decode(translation[0], skip_special_tokens=True).lower()
+                        original_text_trans =  df_sourcetext.loc[df_sourcetext['English'] == similar_text, 'Espanol'].values[0].lower()
+                    # Improve performance with button names 
+                        if (original_text_trans != similar_text_trans):
+                            match_text = original_text.replace(similar_text,original_text_trans)
+                             # Check if the translated text appears before "button" and after the original text
+                            if match_text.find(original_text_trans) != -1 and match_text.find("button") != -1 and match_text.find(similar_text_trans) < match_text.find("button"):
+                                match_text = match_text.replace("button","")
+                                match_text = match_text.replace(original_text_trans, "el botón " + original_text_trans)
 
-            # Final translation        
-            input_ids = tokenizer.encode(match_text, return_tensors="pt", truncation=True)
-            translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
-            translated_text = tokenizer.decode(translation[0], skip_special_tokens=True)
-
-            ## translation process ##
-
-                                    
+                    # Final translation        
+                    input_ids = tokenizer.encode(match_text, return_tensors="pt", truncation=True)
+                    translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
+                    translated_text = tokenizer.decode(translation[0], skip_special_tokens=True)
+                    translated_text = translated_text.replace(",", ",\n")
+                    print(translated_text)
+                    ## translation process ##                                    
+                    break
 
             if item['type'] == 'rectangle':
                 self.draw_rectangle(x = widgetPosX ,
@@ -238,19 +238,18 @@ class ImageDrawer:
                                     height = widgetSizeY * scale,
                                     text =  translated_text,
                                     font_size= float(item['fontSize']),
-                                    text_color=qt.Qt.blue,
+                                    text_color=qt.Qt.black,
                                     pen_color=qt.Qt.black,
                                     pen_width=10, 
                                     pen_style=qt.Qt.SolidLine)
 
 
             elif item['type'] == 'arrow':
-                self.draw_arrow(ast.literal_eval(item['position_tail'])[0] ,
-                                ast.literal_eval(item['position_tail'])[1] ,
+                self.draw_arrow(widgetPosX + (widgetSizeX/2) * scale,
+                                widgetPosY + 100 ,
                                 widgetPosX + (widgetSizeX/2) * scale,
                                 widgetPosY + (widgetSizeY/2) * scale, 
-                                
-                                color=qt.Qt.blue, 
+                                color=qt.Qt.red, 
                                 pen_width=5,
                                 head_size=20,
                                 offset=5,
