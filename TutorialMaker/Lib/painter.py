@@ -226,7 +226,7 @@ class ImageDrawer:
                     input_ids = tokenizer.encode(match_text, return_tensors="pt", truncation=True)
                     translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
                     translated_text = tokenizer.decode(translation[0], skip_special_tokens=True)
-                    translated_text = translated_text.replace(",", ",\n")
+                    translated_text = translated_text.replace(";", "\n")
                     print(translated_text)
                     ## translation process ##                                    
                     break
