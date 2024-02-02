@@ -140,7 +140,11 @@ class TutorialGUI(qt.QMainWindow):
 
         self.circle = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act2.png'), "Circle", self)
         self.circle.setCheckable(True)
-        toolbar.addAction(self.circle)
+        #toolbar.addAction(self.circle)
+
+        self.clck = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/pointer.png'), "Click", self)
+        self.clck.setCheckable(True)
+        toolbar.addAction(self.clck)
 
         self.arrow = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act3.png'), "Arrow", self)
         self.arrow.setCheckable(True)
@@ -148,11 +152,11 @@ class TutorialGUI(qt.QMainWindow):
 
         self.icon_image = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act4.png'), "Icon", self)
         self.icon_image.setCheckable(True)
-        toolbar.addAction(self.icon_image)
+        # toolbar.addAction(self.icon_image)
 
         self.in_text = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act5.png'), "Text", self)
         self.in_text.setCheckable(True)
-        toolbar.addAction(self.in_text)
+        # toolbar.addAction(self.in_text)
 
         # self.select = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/selec.png'), "Selection", self)
         # self.select.setCheckable(True)
@@ -166,6 +170,10 @@ class TutorialGUI(qt.QMainWindow):
             self.circle: {
                 'active': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act2_p.png'),
                 'inactive': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act2.png')
+            },
+            self.clck: {
+                'active': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/pointer_p.png'),
+                'inactive': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/pointer.png')
             },
             self.arrow: {
                 'active': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act3_p.png'),
@@ -185,7 +193,7 @@ class TutorialGUI(qt.QMainWindow):
             # }
         }
 
-        self.toolbar_actions = [self.square, self.circle, self.arrow, self.icon_image, self.in_text] #, self.select]
+        self.toolbar_actions = [self.square, self.circle, self.clck, self.arrow, self.icon_image, self.in_text] #, self.select]
         for a in self.toolbar_actions:
             # print(a)
             a.triggered.connect(lambda checked, a=a: self.on_action_triggered(a))
@@ -234,9 +242,10 @@ class TutorialGUI(qt.QMainWindow):
 
         self.load_icon = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/image.png'), "Load icon", self)
         self.load_icon.setCheckable(True)
-        toolbar.addAction(self.load_icon)
+        #toolbar.addAction(self.load_icon)
         self.new_image = qt.QPixmap(20, 20)
         self.dir_icon = None
+        self.open_icon()
 
         self.fill_annot.triggered.connect(self.fill_figures)
         self.load_icon.triggered.connect(self.open_icon)
@@ -420,7 +429,10 @@ class TutorialGUI(qt.QMainWindow):
             self.end = event.pos()    
         elif self.in_text.isChecked():
             self.select_annt = "text"
-            self.end = event.pos()    
+            self.end = event.pos()   
+        elif self.clck.isChecked():
+            self.select_annt = "click"
+            self.end = event.pos()   
         else:
             print("No select annotation")  
 
@@ -464,6 +476,17 @@ class TutorialGUI(qt.QMainWindow):
             star = self.remap_point(qt.QPoint(c_x, c_y))
             end = self.remap_point(qt.QPoint(x_i, y_i)) 
             anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill)
+        elif self.select_annt == "click":
+            x_i, y_i = wdgts_child["position"]
+            w, h = wdgts_child["size"]
+            offset_x = 3 * w // 4
+            offset_y = 3 * h // 4
+            c_x = x_i + offset_x
+            c_y = y_i + offset_y
+            star = self.remap_point(qt.QPoint(c_x, c_y))
+            
+            anotation = Notes(self.select_annt, star, end, self.selected_color, self.t_px, self.fill, self.dir_icon)
+            wdgts_child['labelText'] = self.text_in.text
         elif self.select_annt == "arwT":
             x_i, y_i = wdgts_child["position"]
             w, h = wdgts_child["size"]
@@ -489,31 +512,32 @@ class TutorialGUI(qt.QMainWindow):
             distance = 100
 
             if click.y() > m1 * click.x() + b1 and click.y() > m2 * click.x() + b2:
-                print ("1")
+                # print ("1")
                 wdgts_child['labelPosition'] = 'down'
-                wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]]
+                wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                 star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                 end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
             elif click.y() < m1 * click.x() + b1 and click.y() > m2 * click.x() + b2:
-                print ("2")
+                # print ("2")
                 wdgts_child['labelPosition'] = 'right'
-                wdgts_child['position_tail'] = [right_center[0], right_center[1]]
+                wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                 star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                 end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
             elif click.y() < m1 * click.x() + b1 and click.y() < m2 * click.x() + b2:
-                print ("3")
+                # print ("3")
                 wdgts_child['labelPosition'] = 'top'
-                wdgts_child['position_tail'] = [top_center[0], top_center[1]]
+                wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                 star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                 end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
             else:
-                print ("4")
+                # print ("4")
                 wdgts_child['labelPosition'] = 'left'
-                wdgts_child['position_tail'] = [left_center[0], left_center[1]]
+                wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                 star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                 end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
             
-            anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill)
+            wdgts_child['labelText'] = self.text_in.text
+            anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
 
         elif self.select_annt == "icon":
             pass
@@ -604,8 +628,47 @@ class TutorialGUI(qt.QMainWindow):
                 painter.drawRect(qt.QRect(antts.ip, antts.fp))
             elif antts.tp == "crcls":
                 painter.drawEllipse(antts.ip, self.Mdistance(antts.ip, antts.fp), self.Mdistance(antts.ip, antts.fp))
+            elif antts.tp == "click":
+                painter.drawImage(antts.ip, self.new_image)
             elif antts.tp == "arwT":
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
+                pen = qt.QPen(qt.QColor(255, 255, 255))
+                painter.setPen(pen)
+                painter.setBrush(qt.QBrush(qt.QColor(255, 255, 255)))
+                font_small = qt.QFont("Arial", 14)
+                painter.setFont(font_small)
+                if antts.ip.y() > antts.fp.y():
+                    #print("La flecha apunta hacia abajo")
+                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-20)
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+21, antts.tx)
+                elif antts.ip.y() < antts.fp.y():
+                    #print("La flecha apunta hacia arriba")
+                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+19, antts.tx)
+                elif antts.ip.x() > antts.fp.x():
+                    #print("La flecha apunta hacia la derecha")
+                    tb_i = qt.QPoint(antts.fp.x()-200, antts.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+19, antts.tx)
+                elif antts.ip.x() < antts.fp.x():
+                    #print("La flecha apunta hacia la izquierda")
+                    tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+19, antts.tx)
             elif antts.tp == "icon":
                 painter.drawImage(antts.ip, qt.QImage(antts.tx))
             elif antts.tp == "text":
@@ -737,14 +800,11 @@ class TutorialGUI(qt.QMainWindow):
 
     def open_icon(self):
         # print('load_icon')
-        file_dialog = qt.QFileDialog()
-        file_dialog.setNameFilter("Icons (*.png)")
-        file_dialog.exec()
-
-        if file_dialog.result() == qt.QFileDialog.Accepted:
-            selected_file = file_dialog.selectedFiles()[0]
-            self.new_image = qt.QImage(selected_file)
-            self.dir_icon = selected_file
+        selected_file = self.dir_path+'/../Resources/Icons/Painter/click_icon.png'
+        self.new_image = qt.QImage(selected_file)
+        self.new_image = self.new_image.scaled(20,30)  
+        self.dir_icon = selected_file
+        #print("self.dir_icon:", self.dir_icon)
 
     def actualizar_valor(self, valor):
         # Actualiza el valor de self cuando el QSpinBox cambia
@@ -766,59 +826,67 @@ class TutorialGUI(qt.QMainWindow):
                 # Desactivar QAction y restaurar su icono original
                 action.setChecked(False)
                 action.setIcon(icons['inactive'])
-
+    
     def set_output_name(self, filename):
         self.output_name = filename
 
     def save_json_file(self):
         # Create json file 
+        print("Create json file")
         json_out = []
         data = {}
 
         for i, image in enumerate(self.images_list, start=1):
             annotations = []
             for annts, wdg in zip(self.annotations[i-1], self.annotations_json[i-1]):
-                # print("wdg ", wdg )
+                print("wdg ", wdg )
                 color_rgb = f"{annts.cl.red()}, {annts.cl.green()}, {annts.cl.blue()}"
                 if annts.tp == "rect":
-                    annotation = {
-                        "widget": wdg["name"],
+                    annotation = { #Convert all to string
                         "path": wdg["path"],
                         "type": "rectangle",
-                        "color": color_rgb,
-                        "position_tail": wdg["position"],
-                        "size": wdg["size"]
+                        "color": color_rgb, # (r,g,b)
+                        "labelText":"", #text on annotation
+                        "fontSize": "14", # size of text on annotions 14px 
+                        #"offset": "()" # (x,y) distance bettewn center and text box
                     }
-                elif annts.tp == "crcls":
+                elif annts.tp == "click":
                     annotation = {
-                        "widget": wdg["name"],
                         "path": wdg["path"],
                         "type": "clickMark",
-                        "color": color_rgb,
-                        "center": wdg["center"],
-                        "radio": wdg["radio"]
+                        "labelText":"", #text on annotation
+                        "fontSize": "14", # size of text on annotions 14px 
+                        #"offset": "" # (x,y) distance bettewn center and text box
                     }
                 elif annts.tp == "arwT":
+                    pos_off = wdg["position_tail"]
                     annotation = {
-                        "widget": wdg["name"],
                         "path": wdg["path"],
-                        "type": "clickMark",
+                        "type": "arrow",
                         "color": color_rgb,
-                        "labelPosition": wdg["labelPosition"],
-                        "position_tail": wdg["position_tail"],
+                        "labelText": wdg["labelText"],
+                        "fontSize": "14",
+                        #"offset": "({},{})".format(pos_off[0], pos_off[1]) # position tail
                     }
+                # elif annts.tp == "textBox":
+                #     annotation = {
+                #         "type": "textBox",
+                #         "color": color_rgb, #optional
+                #         "labelText":"", #text on annotation
+                #         "fontSize": "14", # size of text on annotions 14px
+                #         "position": "(x,y)",
+                #     }
                 annotations.append(annotation)
 
             data[str(i)] = {
-                "image":image,
-                "step":self.widgets[i-1],
-                "labelText": self.steps[i-1],
+                #"image:":image,
+                "slide_title":self.widgets[i-1],
+                "slide_text": self.steps[i-1],
                 "annotations":annotations
             }
 
-        #json_out = json.dumps(data, indent=4)
-        # print("Data",json_out)
         output_file_path = os.path.join(self.dir_path, '..', 'Outputs/Annotations', self.output_name + '.json')
+        #print("Data", data)
         with open(output_file_path, 'w', encoding='utf-8') as archivo:
             json.dump(data, archivo, indent=4)
 
