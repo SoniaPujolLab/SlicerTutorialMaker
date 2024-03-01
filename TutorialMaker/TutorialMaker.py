@@ -102,6 +102,9 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         #Update GUI
         self.populateTutorialList()
 
+        #Verify if the folders to manipulate the tutorials are created
+        utils.util.verifyOutputFolders(self)
+
     def cleanup(self):
         self.logic.exitTutorialEditor()
         """

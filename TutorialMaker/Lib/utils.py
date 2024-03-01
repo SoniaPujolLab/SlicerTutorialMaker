@@ -128,8 +128,14 @@ class util():
         if index + 1 > len(_widgets):
             name = "?"
         return name
-
-        
+    
+    def verifyOutputFolders(self):
+        basePath = os.path.dirname(slicer.util.modulePath("TutorialMaker"))+ "/Outputs/"
+        if not os.path.exists(basePath):
+            os.mkdir(basePath)
+            os.mkdir(basePath + "Raw")
+            os.mkdir(basePath + "Annotations")
+            os.mkdir(basePath + "Translation")
 
 
 class WidgetFinder(qt.QWidget):

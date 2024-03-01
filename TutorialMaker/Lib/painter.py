@@ -166,25 +166,28 @@ class ImageDrawer:
 
     # screenshotData: all widgets in a json
     # metadata: Victors' outputs
-            
+
+    #TODO: In that moment we will remove the translation and only show in English
+        # after define the infrastructre with Weblate or GitHub we will use community translation
     def painter(self, metadata, screenshotData, language ):
-        import ast
+        
+        """import ast
 
         #import pip
         #pip.main(['install', 'fuzzywuzzy', 'transformers','torch','pandas', 'sacremoses','SentecePiece','python-Levenshtein'])
         import pandas as pd
         from fuzzywuzzy import process
-        from transformers import MarianMTModel, MarianTokenizer
+        from transformers import MarianMTModel, MarianTokenizer"""
 
-        path_data_translation =  os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/data/string_en_to_es.csv'
+        #path_data_translation =  os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/data/string_en_to_es.csv'
 
         # Translation variable#
-        if language == 'es':
+        """if language == 'es':
             df_sourcetext = pd.read_csv(path_data_translation, encoding='UTF-16', sep=';')
             model_name = "Helsinki-NLP/opus-mt-en-es"
             model = MarianMTModel.from_pretrained(model_name)
             tokenizer = MarianTokenizer.from_pretrained(model_name)
-            col_name = 'Espanol'
+            col_name = 'Espanol'"""
 
         # Translation variable#
 
@@ -206,7 +209,7 @@ class ImageDrawer:
                     ## translation process ##
                     # Check if there are some words on the already translated on database
                     original_text = item['labelText']
-                    similar_text, score, value = process.extractOne(original_text, df_sourcetext['English'])
+                    """similar_text, score, value = process.extractOne(original_text, df_sourcetext['English'])
                     match_text = original_text
                     # Check if the tranformers translation is the same that database translation (needs for transalation performance)
                     if score >= 70:
@@ -226,7 +229,8 @@ class ImageDrawer:
                     input_ids = tokenizer.encode(match_text, return_tensors="pt", truncation=True)
                     translation = model.generate(input_ids, max_length=50, num_beams=5, length_penalty=0.6)
                     translated_text = tokenizer.decode(translation[0], skip_special_tokens=True)
-                    translated_text = translated_text.replace(";", "\n")
+                    translated_text = translated_text.replace(";", "\n")"""
+                    translated_text = original_text
                     print(translated_text)
                     ## translation process ##                                    
                     break
