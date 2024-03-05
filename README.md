@@ -2,20 +2,16 @@
 
 ### Instalation
 
-Clone the repository to anywhere on your computer
-
-Open 3D Slicer and add the Tutorial Maker folder using Edit > Application Settings > Modules
+- Install latest Slicer Stable Release (currently Slicer-5.6.1)
+- Clone [this repository](https://github.com/SlicerLatinAmerica/TutorialMaker) to anywhere on your computer
+- Open 3D Slicer and drag-and-drop the `TutorialMaker` folder to the Slicer application window, click OK to "Add Python scripted modules..."", click yes to load the module
 
 ### Usage
 
-On 3D Slicer select the Tutorial Maker Module, temporarily under the TUTORIAL category
-
-On the module panel select the example "fourMin_tutorial" and click Annotate
-
-TODO: Annotator Guide
-
-Save the annotation file and click "Reload And Test"
+- Go to Tutorial Maker module (under the TUTORIAL category)
+- Select `fourMin_tutorial`
+- Click `Run and Annotate`
+- TODO: Annotator Guide
+- Save the annotation file and click "Reload And Test"
 
 The Screenshots with Annotations are now saved on the Module folder under Outputs/Translation
-
-
