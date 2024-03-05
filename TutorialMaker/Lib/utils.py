@@ -402,9 +402,8 @@ class ScreenshotTools():
 
 
     def getPixmap(self, window):
-        screen = slicer.app.screens()[0]
         slicer.app.processEvents()
-        pixmap = screen.grabWindow(window.winId())
+        pixmap = window.grab()
 
         #return a qt object: QPixmap
         return pixmap
