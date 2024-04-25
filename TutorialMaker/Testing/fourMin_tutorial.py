@@ -64,6 +64,8 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         #
         #
         self.delayDisplay('Testing Part 2 of the Tutorial')
+        m = slicer.util.mainWindow()
+        m.moduleSelector().selectModule('Welcome')
 
         # check volume is loaded out of scene
         volumeNode = slicer.util.getNode(pattern="grayscale")
