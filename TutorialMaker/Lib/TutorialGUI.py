@@ -5,7 +5,8 @@ import math
 import os
 from Lib.tmLabel import tmLabel
 from Lib.Anotations import Notes
-
+from Lib.FileMDHTML import markdownHTMLCreator
+import Lib.painter as AnnotationPainter
 from slicer import qMRMLWidget
 
 class TutorialGUI(qt.QMainWindow):
@@ -33,6 +34,7 @@ class TutorialGUI(qt.QMainWindow):
         self.desc = ""
 
         self.output_name = "output"
+        self.save_annotation = False
 
         self.metadata_image = None
 
@@ -83,6 +85,7 @@ class TutorialGUI(qt.QMainWindow):
         self.label_image.setFixedSize(label_width, label_height)
 
         self.label_image.installEventFilter(self)
+        self.label_image.setMouseTracking(True)
 
         self.background_image = qt.QPixmap(label_width, label_height)
         self.background_image.fill(qt.QColor(255, 255, 255))
@@ -277,11 +280,9 @@ class TutorialGUI(qt.QMainWindow):
         # print(data)
         self.load_all_images(data, directory_path)
         
-
     def load_all_images(self, data, directory_path):
         self.annotations = []
-        self.annotations_json = []
-        self.annotations_json = []
+        self.annotations_json = [] 
         self.images_list = []
         self.metadata_list = []
         cont = 0
@@ -416,8 +417,9 @@ class TutorialGUI(qt.QMainWindow):
         pass
 
     def mouse_press_event(self, event):
-        # print('press_event')
+        #print('press_event', event)
         self.start = event.pos()
+        self.save_annotation = True
         if self.square.isChecked():
             self.select_annt = "rect"
         elif self.circle.isChecked():
@@ -441,7 +443,31 @@ class TutorialGUI(qt.QMainWindow):
             self.calculate_annotation()
 
     def mouse_move_event(self, event):
-        pass
+        self.start = event.pos()
+        self.save_annotation = False
+        #print('press_event', event)
+        if self.square.isChecked():
+            self.select_annt = "rect"
+        elif self.circle.isChecked():
+            self.select_annt = "crcls"
+        elif self.arrow.isChecked():
+            self.select_annt = "arwT"
+        elif self.icon_image.isChecked():
+            self.select_annt = "icon"
+            self.end = event.pos()    
+        elif self.in_text.isChecked():
+            self.select_annt = "text"
+            self.end = event.pos()   
+        elif self.clck.isChecked():
+            self.select_annt = "click"
+            self.end = event.pos()   
+        else:
+            pass
+            #print("No select annotation")  
+
+        # self.metadata_list[self.scree_prev] contend all widgets from scree_prev index
+        if self.select_annt != False:
+            self.calculate_annotation()
 
     def mouse_release_event(self, event):
         pass
@@ -458,98 +484,104 @@ class TutorialGUI(qt.QMainWindow):
         end = None
 
         anotation = None
-        if self.select_annt == "rect":
-            x_i,y_i = wdgts_child["position"]
-            a,b = wdgts_child["size"]
-            x_f = x_i + a
-            y_f = y_i + b
-            star = self.remap_point(qt.QPoint(x_i, y_i))
-            end = self.remap_point(qt.QPoint(x_f, y_f))
-            anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill)
-        elif self.select_annt == "crcls":
-            x_i, y_i = wdgts_child["position"]
-            w, h = wdgts_child["size"]
-            c_x = x_i + w / 2
-            c_y = y_i + h / 2
-            wdgts_child['center'] = [c_x, c_y]
-            wdgts_child['radio'] = [x_i, y_i]
-            star = self.remap_point(qt.QPoint(c_x, c_y))
-            end = self.remap_point(qt.QPoint(x_i, y_i)) 
-            anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill)
-        elif self.select_annt == "click":
-            x_i, y_i = wdgts_child["position"]
-            w, h = wdgts_child["size"]
-            offset_x = 3 * w // 4
-            offset_y = 3 * h // 4
-            c_x = x_i + offset_x
-            c_y = y_i + offset_y
-            star = self.remap_point(qt.QPoint(c_x, c_y))
-            
-            anotation = Notes(self.select_annt, star, end, self.selected_color, self.t_px, self.fill, self.dir_icon)
-            wdgts_child['labelText'] = self.text_in.text
-        elif self.select_annt == "arwT":
-            x_i, y_i = wdgts_child["position"]
-            w, h = wdgts_child["size"]
+        if wdgts_child is not None:
+            if self.select_annt == "rect":
+                x_i,y_i = wdgts_child["position"]
+                a,b = wdgts_child["size"]
+                x_f = x_i + a
+                y_f = y_i + b
+                star = self.remap_point(qt.QPoint(x_i, y_i))
+                end = self.remap_point(qt.QPoint(x_f, y_f))
+                anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill)
+            elif self.select_annt == "crcls":
+                x_i, y_i = wdgts_child["position"]
+                w, h = wdgts_child["size"]
+                c_x = x_i + w / 2
+                c_y = y_i + h / 2
+                wdgts_child['center'] = [c_x, c_y]
+                wdgts_child['radio'] = [x_i, y_i]
+                star = self.remap_point(qt.QPoint(c_x, c_y))
+                end = self.remap_point(qt.QPoint(x_i, y_i)) 
+                anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill)
+            elif self.select_annt == "click":
+                x_i, y_i = wdgts_child["position"]
+                w, h = wdgts_child["size"]
+                offset_x = 3 * w // 4
+                offset_y = 3 * h // 4
+                c_x = x_i + offset_x
+                c_y = y_i + offset_y
+                star = self.remap_point(qt.QPoint(c_x, c_y))
+                
+                anotation = Notes(self.select_annt, star, end, self.selected_color, self.t_px, self.fill, self.dir_icon)
+                wdgts_child['labelText'] = self.text_in.text
+            elif self.select_annt == "arwT":
+                x_i, y_i = wdgts_child["position"]
+                w, h = wdgts_child["size"]
 
-            top_left = (x_i, y_i)
-            top_right = (x_i + w, y_i)
-            bottom_left = (x_i, y_i + h)
-            bottom_right = (x_i + w, y_i + h)
+                top_left = (x_i, y_i)
+                top_right = (x_i + w, y_i)
+                bottom_left = (x_i, y_i + h)
+                bottom_right = (x_i + w, y_i + h)
 
-            top_center = (x_i + w / 2, y_i)
-            bottom_center = (x_i + w / 2, y_i + h)
-            left_center = (x_i, y_i + h / 2)
-            right_center = (x_i + w, y_i + h / 2)
+                top_center = (x_i + w / 2, y_i)
+                bottom_center = (x_i + w / 2, y_i + h)
+                left_center = (x_i, y_i + h / 2)
+                right_center = (x_i + w, y_i + h / 2)
 
-            click = self.map_point(self.start)
+                click = self.map_point(self.start)
 
-            m1 = (bottom_right[1] - top_left[1]) / (bottom_right[0] - top_left[0])
-            b1 = top_left[1] - m1 * top_left[0]
+                m1 = (bottom_right[1] - top_left[1]) / (bottom_right[0] - top_left[0])
+                b1 = top_left[1] - m1 * top_left[0]
 
-            m2 = (bottom_left[1] - top_right[1]) / (bottom_left[0] - top_right[0])
-            b2 = top_right[1] - m2 * top_right[0]
-            
-            distance = 100
+                m2 = (bottom_left[1] - top_right[1]) / (bottom_left[0] - top_right[0])
+                b2 = top_right[1] - m2 * top_right[0]
+                
+                distance = 100
 
-            if click.y() > m1 * click.x() + b1 and click.y() > m2 * click.x() + b2:
-                # print ("1")
-                wdgts_child['labelPosition'] = 'down'
-                wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
-                star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
-                end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
-            elif click.y() < m1 * click.x() + b1 and click.y() > m2 * click.x() + b2:
-                # print ("2")
-                wdgts_child['labelPosition'] = 'right'
-                wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
-                star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
-                end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
-            elif click.y() < m1 * click.x() + b1 and click.y() < m2 * click.x() + b2:
-                # print ("3")
-                wdgts_child['labelPosition'] = 'top'
-                wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
-                star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
-                end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
+                if click.y() > m1 * click.x() + b1 and click.y() > m2 * click.x() + b2:
+                    # print ("1")
+                    wdgts_child['labelPosition'] = 'down'
+                    wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
+                    star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
+                    end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
+                elif click.y() < m1 * click.x() + b1 and click.y() > m2 * click.x() + b2:
+                    # print ("2")
+                    wdgts_child['labelPosition'] = 'right'
+                    wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
+                    star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
+                    end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
+                elif click.y() < m1 * click.x() + b1 and click.y() < m2 * click.x() + b2:
+                    # print ("3")
+                    wdgts_child['labelPosition'] = 'top'
+                    wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
+                    star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
+                    end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
+                else:
+                    # print ("4")
+                    wdgts_child['labelPosition'] = 'left'
+                    wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
+                    star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
+                    end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
+                
+                wdgts_child['labelText'] = self.text_in.text
+                anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
+
+            elif self.select_annt == "icon":
+                pass
+            elif self.select_annt == "text":
+                pass
             else:
-                # print ("4")
-                wdgts_child['labelPosition'] = 'left'
-                wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
-                star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
-                end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
+                pass
             
-            wdgts_child['labelText'] = self.text_in.text
-            anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
-
-        elif self.select_annt == "icon":
-            pass
-        elif self.select_annt == "text":
-            pass
-        else:
-            pass
-        
-        self.annotations[self.scree_prev].append(anotation)
-        self.annotations_json[self.scree_prev].append(wdgts_child)
-        # print("add annotatión on ", self.scree_prev, " screen")
-        self.draw_annotations()
+            if self.save_annotation == True:
+                self.annotations[self.scree_prev].append(anotation)
+                self.annotations_json[self.scree_prev].append(wdgts_child)
+                # print("add annotatión on ", self.scree_prev, " screen")
+                self.draw_annotations()
+            else:
+                self.draw_annotations()
+                self.draw_preview(anotation)
+            
     
     def find_widget(self, widgets_json, pnt_clk):
         w_match = []
@@ -675,6 +707,130 @@ class TutorialGUI(qt.QMainWindow):
                 font_small = qt.QFont("Arial", antts.tk)
                 painter.setFont(font_small)
                 painter.drawText(antts.ip.x(), antts.ip.y(), antts.tx)
+        
+        painter.end()
+        self.label_image.setPixmap(pixmap)
+
+    def draw_preview(self, antt):
+        print("draw annotation preview:", antt.tp)
+        pixmap = self.label_image.pixmap
+        # print("pixmap", pixmap)
+        painter = qt.QPainter(pixmap)
+        painter.drawPixmap(self.label_image.rect, self.background_image)
+        # painter.setRenderHint(qt.QPainter.Antialiasing)
+
+        for antts in self.annotations[self.scree_prev]:
+            pen = qt.QPen(antts.cl)
+            pen.setWidth(antts.tk)
+            painter.setPen(pen)
+            painter.setBrush(qt.QBrush()) if antts.fl == False else painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
+            if antts.tp == "rect":
+                painter.drawRect(qt.QRect(antts.ip, antts.fp))
+            elif antts.tp == "crcls":
+                painter.drawEllipse(antts.ip, self.Mdistance(antts.ip, antts.fp), self.Mdistance(antts.ip, antts.fp))
+            elif antts.tp == "click":
+                painter.drawImage(antts.ip, self.new_image)
+            elif antts.tp == "arwT":
+                painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
+                pen = qt.QPen(qt.QColor(255, 255, 255))
+                painter.setPen(pen)
+                painter.setBrush(qt.QBrush(qt.QColor(255, 255, 255)))
+                font_small = qt.QFont("Arial", 14)
+                painter.setFont(font_small)
+                if antts.ip.y() > antts.fp.y():
+                    #print("La flecha apunta hacia abajo")
+                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-20)
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+21, antts.tx)
+                elif antts.ip.y() < antts.fp.y():
+                    #print("La flecha apunta hacia arriba")
+                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+19, antts.tx)
+                elif antts.ip.x() > antts.fp.x():
+                    #print("La flecha apunta hacia la derecha")
+                    tb_i = qt.QPoint(antts.fp.x()-200, antts.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+19, antts.tx)
+                elif antts.ip.x() < antts.fp.x():
+                    #print("La flecha apunta hacia la izquierda")
+                    tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    painter.drawText(tb_i.x(), tb_i.y()+19, antts.tx)
+            elif antts.tp == "icon":
+                painter.drawImage(antts.ip, qt.QImage(antts.tx))
+            elif antts.tp == "text":
+                font_small = qt.QFont("Arial", antts.tk)
+                painter.setFont(font_small)
+                painter.drawText(antts.ip.x(), antts.ip.y(), antts.tx)
+
+        pen = qt.QPen(antt.cl)
+        pen.setWidth(antt.tk)
+        painter.setPen(pen)
+        painter.setBrush(qt.QBrush()) if antt.fl == False else painter.setBrush(qt.QBrush(qt.QColor(antt.cl)))
+        if antt.tp == "rect":
+            painter.drawRect(qt.QRect(antt.ip, antt.fp))
+        elif antt.tp == "crcls":
+            painter.drawEllipse(antt.ip, self.Mdistance(antt.ip, antt.fp), self.Mdistance(antt.ip, antt.fp))
+        elif antt.tp == "click":
+            painter.drawImage(antt.ip, self.new_image)
+        elif antt.tp == "arwT":
+            painter.drawPath(self.arrowPath(antt.tp, antt.ip, antt.fp))
+            pen = qt.QPen(qt.QColor(255, 255, 255))
+            painter.setPen(pen)
+            painter.setBrush(qt.QBrush(qt.QColor(255, 255, 255)))
+            font_small = qt.QFont("Arial", 14)
+            painter.setFont(font_small)
+            if antt.ip.y() > antt.fp.y():
+                #print("La flecha apunta hacia abajo")
+                tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y()-20)
+                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                painter.drawRect(qt.QRect(tb_i, tb_f))
+                pen = qt.QPen(qt.QColor(0, 0, 0))
+                painter.setPen(pen)
+                painter.drawText(tb_i.x(), tb_i.y()+21, antt.tx)
+            elif antt.ip.y() < antt.fp.y():
+                #print("La flecha apunta hacia arriba")
+                tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y())
+                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                painter.drawRect(qt.QRect(tb_i, tb_f))
+                pen = qt.QPen(qt.QColor(0, 0, 0))
+                painter.setPen(pen)
+                painter.drawText(tb_i.x(), tb_i.y()+19, antt.tx)
+            elif antt.ip.x() > antt.fp.x():
+                #print("La flecha apunta hacia la derecha")
+                tb_i = qt.QPoint(antt.fp.x()-200, antt.fp.y()-10)
+                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                painter.drawRect(qt.QRect(tb_i, tb_f))
+                pen = qt.QPen(qt.QColor(0, 0, 0))
+                painter.setPen(pen)
+                painter.drawText(tb_i.x(), tb_i.y()+19, antt.tx)
+            elif antt.ip.x() < antt.fp.x():
+                #print("La flecha apunta hacia la izquierda")
+                tb_i = qt.QPoint(antt.fp.x(), antt.fp.y()-10)
+                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+20)
+                painter.drawRect(qt.QRect(tb_i, tb_f))
+                pen = qt.QPen(qt.QColor(0, 0, 0))
+                painter.setPen(pen)
+                painter.drawText(tb_i.x(), tb_i.y()+19, antt.tx)
+        elif antt.tp == "icon":
+            painter.drawImage(antt.ip, qt.QImage(antt.tx))
+        elif antt.tp == "text":
+            font_small = qt.QFont("Arial", antt.tk)
+            painter.setFont(font_small)
+            painter.drawText(antt.ip.x(), antt.ip.y(), antt.tx)
         
         painter.end()
         self.label_image.setPixmap(pixmap)
@@ -832,6 +988,7 @@ class TutorialGUI(qt.QMainWindow):
 
     def save_json_file(self):
         # Create json file 
+        self.label_clicked(self.scree_prev) # Enrique line
         print("Create json file")
         json_out = []
         data = {}
@@ -866,6 +1023,7 @@ class TutorialGUI(qt.QMainWindow):
                         "color": color_rgb,
                         "labelText": wdg["labelText"],
                         "fontSize": "14",
+                        "direction_draw" : wdg["labelPosition"] #Enrique Line
                         #"offset": "({},{})".format(pos_off[0], pos_off[1]) # position tail
                     }
                 # elif annts.tp == "textBox":
@@ -890,4 +1048,14 @@ class TutorialGUI(qt.QMainWindow):
         with open(output_file_path, 'w', encoding='utf-8') as archivo:
             json.dump(data, archivo, indent=4)
 
-        # Create PDF file
+
+        # Create MD and HTML file
+        tutorialName = "fourMin_tutorial"
+        #Painter creates screenshot with annotations
+        AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName+".json")   
+        
+        # Crear markdown and html
+        markdown_creator = markdownHTMLCreator()  # Instancia de la clase
+        html_content = markdown_creator.markdown_to_html((os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName))
+        #html_content = markdownHTMLCreator.markdown_to_html((os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName))  
+      
