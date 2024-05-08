@@ -37,6 +37,7 @@ class TutorialGUI(qt.QMainWindow):
         self.save_annotation = False
 
         self.metadata_image = None
+        self.i_blank = 0
 
         # Load a UI file
         self.dir_path = os.path.dirname(__file__)
@@ -114,7 +115,7 @@ class TutorialGUI(qt.QMainWindow):
         actionSave = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/save.png'), "Save", self)
         actionBack = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png'), "Undo", self)
         actionDelete = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png'), "Delete", self)
-        # actionRemove = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png'), "Remove", self)
+        actionAdd = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png'), "Add", self)
         # actionSelect = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/selec.png'), "Selection", self)
         # actionSelect.setCheckable(True)
 
@@ -122,13 +123,14 @@ class TutorialGUI(qt.QMainWindow):
         toolbar.addAction(actionSave)
         toolbar.addAction(actionBack)
         toolbar.addAction(actionDelete)
-        # toolbar.addAction(actionRemove)
+        toolbar.addAction(actionAdd)
         # toolbar.addAction(actionSelect)
 
         actionOpen.triggered.connect(self.open_json_file_dialog)
         actionSave.triggered.connect(self.save_json_file)
         actionBack.triggered.connect(self.delete_annotation)
-        # actionRemove.triggered.connect(self.delete_screen)
+        actionDelete.triggered.connect(self.delete_screen)
+        actionAdd.triggered.connect(self.add_page)
         # actionSelect.triggered.connect(self.fill_figures)
 
         toolbar.setMovable(True)
@@ -237,8 +239,8 @@ class TutorialGUI(qt.QMainWindow):
         self.spin_box_txt.valueChanged.connect(self.actualizar_size)
 
         self.text_in = qt.QLineEdit()
-        self.text_in.setMaxLength(30)
-        self.text_in.setFixedWidth(250)
+        self.text_in.setMaxLength(70)
+        self.text_in.setFixedWidth(560)
         self.widget_action = qt.QWidgetAction(self)
         self.widget_action.setDefaultWidget(self.text_in)
         toolbar.addAction(self.widget_action)
@@ -279,10 +281,69 @@ class TutorialGUI(qt.QMainWindow):
             data = json.load(file)
         # print(data)
         self.load_all_images(data, directory_path)
+
+    def delete_screen(self):
+        pass
+
+    def add_page(self):
+        newListImages = self.images_list
+        self.labels = []
+        new_annotation = []
+        new_annotation_json = []
+        cont = 0
         
+        pos = self.scree_prev
+        new_path = self.dir_path+'/../Resources/NewSlide/white.png'
+
+        # Insert new_path at position pos
+        newListImages.insert(pos, new_path)
+        self.metadata_list.insert(pos, [])
+        self.annotations.insert(pos, new_annotation)
+        self.annotations_json.insert(pos, new_annotation_json)
+        self.steps.insert(pos, "")
+        self.widgets.insert(pos, "")
+        self.images_list = []
+
+        while self.gridLayout.count():
+            widget = self.gridLayout.itemAt(0).widget()
+            self.gridLayout.removeWidget(widget)
+            widget.deleteLater()
+
+        for img in newListImages:
+            print(img)
+            try:
+                image = qt.QImage(img)
+            except Exception as e:
+                print(f"An unexpected error occurred while opening file '{image}': {str(e)}")
+                exception_occurred = True
+                break
+
+            new_size = qt.QSize(280, 165)
+            scaled_image = image.scaled(new_size)
+            pixmap = qt.QPixmap.fromImage(scaled_image)
+
+            label = tmLabel("QLabel_{}".format(cont), cont)
+            label.setObjectName("QLabel_{}".format(cont))
+            label.clicked.connect(lambda index=cont: self.label_clicked(index))
+            label.setPixmap(pixmap)
+
+            self.gridLayout.addWidget(label)
+            self.labels.append(label)
+            self.images_list.append(img)
+            
+            cont += 1
+        
+        self.label_clicked(self.scree_prev)
+
+    def create_blank_image(self, width, height, color=(255, 255, 255)):
+        image = qt.QImage(width, height, qt.QImage.Format_RGB32)
+        image.fill(qt.QColor("white"))
+        return image
+
     def load_all_images(self, data, directory_path):
         self.annotations = []
         self.annotations_json = [] 
+#        self.annotations_json = [] Enrique line
         self.images_list = []
         self.metadata_list = []
         cont = 0
@@ -351,6 +412,8 @@ class TutorialGUI(qt.QMainWindow):
             if exception_occurred:
                 break
         #print(self.metadata_list)
+        print('self.annotations')
+        print(self.annotations)
         self.firts_screen()
 
     def firts_screen(self):
@@ -364,6 +427,7 @@ class TutorialGUI(qt.QMainWindow):
         #self.prev_name = label.objectName()
 
     def label_clicked(self, index):
+        print('index:',index)
         # Se actualiza el texto para cada uno de los screens
         if str(self.scree_prev) != -1:
             label = self.labels[self.scree_prev]
@@ -615,6 +679,9 @@ class TutorialGUI(qt.QMainWindow):
         label_width = self.label_image.width
         label_height = self.label_image.height
 
+        print('image size:', x, y)
+        print('label image size:', label_width, label_height)
+
         x_ratio = p.x() / label_width
         y_ratio = p.y() / label_height
         
@@ -633,11 +700,18 @@ class TutorialGUI(qt.QMainWindow):
         label_width = self.label_image.width
         label_height = self.label_image.height
 
+        print('image size:', x, y)
+        print('label image size:', label_width, label_height)
+
         rel_x = p.x() / x
         rel_y = p.y() / y
 
+        print('point:', p.x(), p.y())
+
         new_x = int(label_width * rel_x)
         new_y = int(label_height * rel_y)
+
+        print('new point:', new_x, new_y)
 
         new_point = qt.QPoint(new_x, new_y)
 
@@ -712,7 +786,7 @@ class TutorialGUI(qt.QMainWindow):
         self.label_image.setPixmap(pixmap)
 
     def draw_preview(self, antt):
-        print("draw annotation preview:", antt.tp)
+        #print("draw annotation preview:", antt.tp)
         pixmap = self.label_image.pixmap
         # print("pixmap", pixmap)
         painter = qt.QPainter(pixmap)
