@@ -78,7 +78,7 @@ class MousePressFilter(QtCore.QObject):
                                     "size": widgetSize_mainWindow,
                                     "path": root }
         metadataJson.append(metadataJsonUpdate)
-        with open(os.path.join("screenshot_new", "metadata.json"), "w") as file:
+        with open(os.path.join("screenshot_new", "metadata.json"), "w", encoding='utf-8') as file:
             json.dump(metadataJson, file)
         return metadataJson
 

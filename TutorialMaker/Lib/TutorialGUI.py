@@ -275,7 +275,7 @@ class TutorialGUI(qt.QMainWindow):
 
         directory_path = os.path.dirname(filepath)
         # Read the data from the file
-        with open(filepath, "r") as file:
+        with open(filepath, "r", encoding='utf-8') as file:
             data = json.load(file)
         # print(data)
         self.load_all_images(data, directory_path)
@@ -313,7 +313,7 @@ class TutorialGUI(qt.QMainWindow):
                 path_meta = directory_path+"/"+m_data["metadata"]
 
                 try:
-                    with open(path_meta, 'r') as file:
+                    with open(path_meta, 'r', encoding='utf-8') as file:
                         content = file.read()
                     image = qt.QImage(path_image)
                 except FileNotFoundError:

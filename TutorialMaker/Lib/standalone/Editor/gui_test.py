@@ -202,7 +202,7 @@ class MyApp(QMainWindow):
 
         if file_dialog.result() == QFileDialog.Accepted:
             selected_file = file_dialog.selectedFiles()[0]
-            with open(selected_file, "r") as file:
+            with open(selected_file, "r", encoding='utf-8') as file:
                 data = json.load(file)
                 #print("Contenido del archivo JSON:")
                 #print(data)
@@ -265,7 +265,7 @@ class MyApp(QMainWindow):
             }
         
         print(data)
-        with open("sample_edited.json", "w") as outfile:json.dump(data, outfile)
+        with open("sample_edited.json", "w", encoding='utf-8') as outfile:json.dump(data, outfile)
 
     def change_color(self):
         # print('vamos a cambiar color')

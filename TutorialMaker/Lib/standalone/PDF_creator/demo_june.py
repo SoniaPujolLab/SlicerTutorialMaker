@@ -1,7 +1,7 @@
 import json
 
 def convert_json_to_md(json_file, md_file, css_file=None):
-    with open(json_file, 'r') as file:
+    with open(json_file, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
     title = data['title']
@@ -15,7 +15,7 @@ def convert_json_to_md(json_file, md_file, css_file=None):
     md_content += "---\n\n"
     
     if css_file:
-        with open(css_file, 'r') as css_file:
+        with open(css_file, 'r', encoding='utf-8') as css_file:
             css_content = css_file.read()
         md_content += "<style>\n"
         md_content += css_content
@@ -39,7 +39,7 @@ def convert_json_to_md(json_file, md_file, css_file=None):
         
         
 
-    with open(md_file, 'w') as file:
+    with open(md_file, 'w', encoding='utf-8') as file:
         file.write(md_content)
 
 # Usage example

@@ -527,7 +527,7 @@ class JSONHandler:
     
     def parseJSON(path):
         import json
-        with open(path, "r") as file:
+        with open(path, "r", encoding='utf-8') as file:
             data = json.load(file)
         return data
         
