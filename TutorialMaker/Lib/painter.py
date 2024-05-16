@@ -1,4 +1,4 @@
-import qt
+codeimport qt
 import slicer
 import os
 
@@ -64,14 +64,24 @@ class ImageDrawer:
         if direction_draw == 'down':
             offset_x = 0;offset_y = 110;sizey = sizey;sizex = 0
             arrow_line = qt.QLineF(start_x, start_y + offset_y, end_x , end_y + sizey)
+        elif direction_draw == 'down-left':
+            offset_x = 0 - 100;offset_y = 110 + 100   ;sizey = sizey ;sizex = 0
+            arrow_line = qt.QLineF(start_x -100, start_y + offset_y, end_x + sizex , end_y + sizey)
+        elif direction_draw == 'down-right':
+            offset_x = 0 + 100 ;offset_y = 110 + 100 ;sizey = sizey ;sizex = 0
+            arrow_line = qt.QLineF(start_x +100, start_y + offset_y , end_x + sizex , end_y + sizey)
+        elif direction_draw == 'top-left':
+            offset_x = 0 - 100;offset_y = - 110 - 100   ;sizey = -sizey ;sizex = 0
+            arrow_line = qt.QLineF(start_x -100, start_y + offset_y, end_x + sizex , end_y + sizey)
+        elif direction_draw == 'top-right':
+            offset_x = 0 + 100 ;offset_y = -110 - 100 ;sizey = -sizey ;sizex = 0
+            arrow_line = qt.QLineF(start_x + 100, start_y + offset_y , end_x + sizex , end_y + sizey)
         elif direction_draw == 'top':
             offset_x = 0;offset_y = -100;sizey = -sizey;sizex = 0
             arrow_line = qt.QLineF(start_x, start_y + offset_y, end_x , end_y + sizey)
         elif direction_draw == 'left':
             sizex = -sizex;sizey = 0;offset_x = -200;offset_y = 0
             arrow_line = qt.QLineF(start_x + offset_x , start_y , end_x + sizex - 20 , end_y )
-            print(start_x + offset_x)
-            print(end_x + sizex - 20)
         elif direction_draw == 'right':
             sizex = sizex;sizey = 0;offset_x = 200;offset_y = 0
             arrow_line = qt.QLineF(start_x + offset_x , start_y , end_x + sizex + 20 , end_y )
