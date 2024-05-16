@@ -1,4 +1,4 @@
-codeimport qt
+import qt
 import slicer
 import os
 

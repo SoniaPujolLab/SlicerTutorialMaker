@@ -386,7 +386,7 @@ class TutorialGUI(qt.QMainWindow):
                     exception_occurred = True
                     break
                 except Exception as e:
-                    print(f"An unexpected error occurred while opening file '{path_image}': {str(e)}")
+                    print(f"An unexpected error occurred while opening file: {str(e)}")
                     exception_occurred = True
                     break
 
