@@ -7,11 +7,12 @@ class markdownHTMLCreator:
     def __init__(self) -> None:
         pass
 
-    def tutorial_to_markdown(self,path):
+    def tutorial_to_markdown(self,path,ListotalImages):
         tutorialName = "fourMin_tutorial"
         metadatos = self.getMetadatos(path)
         #path = path + '_WithoutStyle'
-        print(path)
+        #print(path)
+       # print(ListotalImages)
         with open(path + ".md", 'w', encoding='utf-8') as md_file:
             #Create main page
             md_file.write('<meta charset="UTF-8">\n')
@@ -25,31 +26,66 @@ class markdownHTMLCreator:
             md_file.write(f'</div>\n')
             md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_down.png">\n\n')
 
+            #cont = 0
             #Create pages of the tutorial with annotations
             for num,item in enumerate(metadatos):
                 #HEADER
-                num = int(item)-1 #Number of image-slide
+               # print('num',num)
+                #print('item',item)
+               # num = int(item)-1 #Number of image-slide
+               
                 numString = str(num)
-
-                md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_top.png">\n\n')
-                md_file.write(f'<img class="logo" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/slicer.png">\n\n')
+                numImage = str(ListotalImages[num])
+                #print('NumImage',numImage)
+                if (ListotalImages[num] == -1):
+                   # imgSS = cont
+                    md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_top.png">\n\n')
+                    md_file.write(f'<img class="logo" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/slicer.png">\n\n')
                 
-                md_file.write(f'<div class="titulo"><center><h2>{metadatos[item]["slide_title"]}</h2></center></div>\n\n')               
+                    md_file.write(f'<div class="titulo"><center><h2>{metadatos[item]["slide_title"]}</h2></center></div>\n\n')     
 
-                # Insert the image in Markdown with CSS styling
-                md_file.write(f'<img class="marginImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Outputs/Translation/output_image_{numString}.png"><br>\n\n')
-                #Insert text
-                md_file.write(f'<br>')
-                md_file.write(f'<div class="text"><center>{metadatos[item]["slide_text"]}</center></div><br>\n\n')
-                md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_down.png">\n\n')
-                
-                #Slide number
-                numString = str(num + 1)
-                totalSteps = str(len(metadatos) + 1)
+                     # Insert the image in Markdown with CSS styling
+                   # md_file.write(f'<div class = "containerWhite"><img class="marginImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/NewSlide/white.png"><br>\n\n')
+                    #Insert text
+                    #md_file.write(f'<br>')
+                    #md_file.write(f'<div class="textWhite"><center>{metadatos[item]["slide_text"]}</center></div><br></div>\n\n')
+                    md_file.write(f'<div class="containerWhite">\n')
+                    md_file.write(f'    <div class="textWhite">{metadatos[item]["slide_text"]}</div>\n')
+                    md_file.write(f'    <img class="marginImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/NewSlide/white.png">\n')
+                    md_file.write(f'</div>\n\n')
+                    md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_down.png">\n\n')
+                    
+                    #Slide number
+                    numString = str(num + 1)
+                    totalSteps = str(len(metadatos) + 1)
 
-                md_file.write(f'<div class="footerText"><center><small><small>Tutorial page {numString}/{totalSteps}</small></small></center>\n\n')
-                # Close the slide div
-                md_file.write('</div>\n')
+                    md_file.write(f'<div class="footerText"><center><small><small>Tutorial page {numString}/{totalSteps}</small></small></center>\n\n')
+                    # Close the slide div
+                    md_file.write('</div>\n')
+
+                   # if(cont < len(ListWhite)-1):
+                    #    cont = cont + 1 
+                else:                  
+                    md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_top.png">\n\n')
+                    md_file.write(f'<img class="logo" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/slicer.png">\n\n')
+                    
+                    md_file.write(f'<div class="titulo"><center><h2>{metadatos[item]["slide_title"]}</h2></center></div>\n\n')               
+
+                    # Insert the image in Markdown with CSS styling
+                    md_file.write(f'<img class="marginImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Outputs/Translation/output_image_{num}.png"><br>\n\n')
+                    print(num)
+                    #Insert text
+                    md_file.write(f'<br>')
+                    md_file.write(f'<div class="text"><center>{metadatos[item]["slide_text"]}</center></div><br>\n\n')
+                    md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_down.png">\n\n')
+                    
+                    #Slide number
+                    numString = str(num + 1)
+                    totalSteps = str(len(metadatos) + 1)
+
+                    md_file.write(f'<div class="footerText"><center><small><small>Tutorial page {numString}/{totalSteps}</small></small></center>\n\n')
+                    # Close the slide div
+                    md_file.write('</div>\n')
             
             #Create acknowledgments
             md_file.write('<meta charset="UTF-8">\n')
@@ -73,10 +109,11 @@ class markdownHTMLCreator:
                 webbrowser.open("file://" + path + ".md")
 
 
-    def markdown_to_html(self,path):
+    def markdown_to_html(self,path, ListTotalImages):
+        #ListWhite.sort()
         tutorialName = "fourMin_tutorial"
         #print(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/" + tutorialName)
-        self.tutorial_to_markdown(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/" + tutorialName)   
+        self.tutorial_to_markdown(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/" + tutorialName, ListTotalImages)   
         #Define CSS styles
         styles = """
         <style> 
@@ -104,6 +141,23 @@ class markdownHTMLCreator:
             .text {
                 font-size: 20px;
                 text-align:center;
+
+
+            }
+            .containerWhite {
+                position: relative;
+                display: inline-block;
+                width: 90%;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+             .textWhite {
+                font-size: 28px;
+                text-align:center;
+                position: absolute;
+                
             }
             .logo{
                 width:100%;

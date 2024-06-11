@@ -175,6 +175,7 @@ class ImageDrawer:
 
     def save_to_png(self, filename):
         if self.view is not None:
+            #print(filename)
             # Utilizar una ruta dinámica para guardar el archivo
             dynamic_path = os.path.join(os.getcwd(), filename)
             # Grab the contents of the view and save it to a PNG file
@@ -203,7 +204,7 @@ class ImageDrawer:
 
             for widget in screenshotData:
                 if widget["path"] == item["path"]:
-                    print(item)
+                    #print(item)
                     widgetPosX = widget["position"][0]
                     widgetPosY = widget["position"][1]
                     widgetSizeX = widget["size"][0]
@@ -245,7 +246,7 @@ class ImageDrawer:
                                 font_size=int(item['fontSize']),
                                 text_color=qt.Qt.black)
 
-    def StartPaint(path):
+    def StartPaint(path,ListPositionWhite, ListoTotalImages):
         import json
         # Example usage:
 
@@ -258,16 +259,44 @@ class ImageDrawer:
         tutorial = jsonHandler.parseTutorial(True)
         OutputAnnotator = utils.JSONHandler.parseJSON(path)
 
-        for i, annotateSteps in enumerate(OutputAnnotator):
-            screenshot = tutorial.steps[i].getImage()
-            screenshotData = tutorial.steps[i].getWidgets()
-            # Load the image
-            image_drawer.load_image(screenshot)
-            image_drawer.painter(OutputAnnotator[annotateSteps], screenshotData, 'es')
+        cont = 0
+        imgSS = 0
+        ListPositionWhite.sort()
+        #print(ListPositionWhite)
+        for i, annotateSteps in enumerate(OutputAnnotator): 
+            #print(i)
+            #print(imgSS)
+            #if ListPositionWhite: #Is not empty
+            #if( i ==  ListPositionWhite[cont]):
+            if(ListoTotalImages[i] == -1):
+            # print('Cont')
+                
+                #imgSS = cont
+                #print('imgSS')
+                
+                #print(len(ListPositionWhite))
+                if(cont < len(ListPositionWhite)-1):
+                    cont = cont + 1
+                #agregar imagen blanca y texto
+            else: 
+            
+                screenshot = tutorial.steps[ListoTotalImages[i]].getImage()
+                screenshotData = tutorial.steps[ListoTotalImages[i]].getWidgets()
+                # Load the image
+                image_drawer.load_image(screenshot)
+                #print(screenshot)
+                image_drawer.painter(OutputAnnotator[annotateSteps], screenshotData, 'es')
 
-            # Save the view to a PNG file with a dynamic path
-            image_drawer.save_to_png(
-                os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/output_image_' + str(
-                    i) + '.png')
+                # Save the view to a PNG file with a dynamic path
+                image_drawer.save_to_png(
+                    os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/output_image_' + str(i) + '.png')
+                
+                imgSS = imgSS + 1 
+                #print('Hola')
+                #print(i)
+            #if(cont != len(ListPositionWhite)-1):
+            #  imgSS = imgSS + 1
 
+                
             pass
+            
