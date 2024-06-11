@@ -5,8 +5,10 @@
 - Install the latest [Slicer Stable Release](https://download.slicer.org/) (currently Slicer-5.6.1);
 - Clone or Download(clicking in the button in the image above, don't forget to unzip the file before proceed) [this repository](https://github.com/SlicerLatinAmerica/TutorialMaker) to anywhere on your computer;
   ![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/5f41e18a-f384-49f8-9551-b85eeecbf6b1)
-- Open 3D Slicer and drag-and-drop the `TutorialMaker` folder to the Slicer application window, click OK to "Add Python scripted modules...", and click yes to load the module
+- For **Windows** users: Open 3D Slicer and drag-and-drop the `TutorialMaker` folder to the Slicer application window, click OK to "Add Python scripted modules...", and click yes to load the module
 ![TutorialMakerInstall](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
+- For **MacOs** users: Open 3D Slicer click on Edit and then click on Application settings, on the lateral menu select Module, then drag-and-drop `TutorialMaker.py` into the additional module path. Finally, click OK and restart Slicer.
+![TutorialMakerInstallMac](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
 
 
 ### Usage
