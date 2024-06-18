@@ -294,7 +294,7 @@ class TutorialGUI(qt.QMainWindow):
         
         directory_path = os.path.dirname(filepath)
         # Read the data from the file
-        with open(filepath, "r") as file:
+        with open(filepath, "r", encoding='utf-8') as file:
             data = json.load(file)
         # print(data)
         self.load_all_images(data, directory_path)
