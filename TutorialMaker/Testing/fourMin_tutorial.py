@@ -31,9 +31,9 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
 
         Currently testing 'Part 2' which covers volumes, models, visibility and clipping.
         """
-        self.Tutorial = utils.Tutorial( "title",
-            "author",
-            "date",
+        self.Tutorial = utils.Tutorial( "Slicer4 Minute",
+            "Sonia Pujol, Ph.D.",
+            "28/08/2024",
             "description")
 
         #Clear Output folder
@@ -41,10 +41,14 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
 
         self.Tutorial.beginTutorial()
         self.delayDisplay("Starting the test")
-        #logic = Slicer4MinuteLogic()
-        
-        # first, get some data
+        layoutManager = slicer.app.layoutManager()
+        # 1 shot: 
+        m = slicer.util.mainWindow()
+        m.moduleSelector().selectModule('Welcome')
+        layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutConventionalView)
+        self.Tutorial.nextScreenshot()
 
+        # 2 shot:
         import SampleData
 
         TESTING_DATA_URL = "https://github.com/Slicer/SlicerTestingData/releases/download/"
@@ -58,69 +62,71 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
             self.delayDisplay('Finished with download and loading')
         except:
             pass
-       
-       
-        # Testing "Part 2" of Tutorial
-        #
-        #
-        self.delayDisplay('Testing Part 2 of the Tutorial')
-        m = slicer.util.mainWindow()
-        m.moduleSelector().selectModule('Welcome')
 
-        # check volume is loaded out of scene
-        volumeNode = slicer.util.getNode(pattern="grayscale")
-        #self.assertIsNotNone(logic.hasImageData(volumeNode))
+        m.moduleSelector().selectModule('Models')
         self.Tutorial.nextScreenshot()
 
-
-        # check the slice planes
+        # 3 shot:
+        slicer.util.findChildren(name="PinButton")[3].click()
         red = slicer.util.getNode(pattern="vtkMRMLSliceNode1")
         red.SetSliceVisible(1)
 
-        green = slicer.util.getNode(pattern="vtkMRMLSliceNode3")
-        green.SetSliceVisible(1)    
-
+        self.Tutorial.nextScreenshot()
+        slicer.util.findChildren(name="PinButton")[3].click()
+        
+        # 4 shot:
+        red.SetSliceOffset(-57)
         self.Tutorial.nextScreenshot()
 
-        # rotate a bit
-        cam = slicer.util.getNode(pattern='vtkMRMLCameraNode1')
-        cam.GetCamera().Azimuth(90)
-        cam.GetCamera().Elevation(20)
-
-        self.Tutorial.nextScreenshot()
-
-        # turn off skin and skull
+        # 5 shot
         skin = slicer.util.getNode(pattern='Skin')
-        skin.GetDisplayNode().SetVisibility(0)
+        skin.GetDisplayNode().SetOpacity(0.5)
+        self.Tutorial.nextScreenshot()
 
+        # 6 shot
+        skin.GetDisplayNode().SetOpacity(0)
+        cam = slicer.util.getNode(pattern='vtkMRMLCameraNode1')
+        cam.GetCamera().Azimuth(60)
+        cam.GetCamera().Elevation(30)
+        cam.GetCamera().Zoom(1.3)
+        self.Tutorial.nextScreenshot()
+
+        # 7 shot
+        green = slicer.util.getNode(pattern="vtkMRMLSliceNode3")
+        green.SetSliceVisible(1)
+        self.Tutorial.nextScreenshot()
+
+        # 8 shot
         skull = slicer.util.getNode(pattern='skull_bone')
         skull.GetDisplayNode().SetVisibility(0)
-
         self.Tutorial.nextScreenshot()
 
-        # clip the model hemispheric_white_matter.vtk
-        m = slicer.util.mainWindow()
-        m.moduleSelector().selectModule('Models')
-
-        models = slicer.util.getModule('Models')
-        #logic = models.logic()
-
+        # 9 shot
         hemispheric_white_matter = slicer.util.getNode(pattern='hemispheric_white_matter')
         hemispheric_white_matter.GetDisplayNode().SetClipping(1)
-
         clip = slicer.util.getNode('ClipModelsParameters1')
         clip.SetRedSliceClipState(0)
         clip.SetYellowSliceClipState(0)
         clip.SetGreenSliceClipState(2)
+        self.Tutorial.nextScreenshot()
+
+        # 10 shot
+        cam.GetCamera().Elevation(10)
+        self.Tutorial.nextScreenshot()
         
+        # 11 shot
+        skin.GetDisplayNode().SetOpacity(0.5)
+        layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutOneUp3DView)
+        self.Tutorial.nextScreenshot()
+
+        # 12 shot
+        cam.GetCamera().Azimuth(-90)
+        cam.GetCamera().Elevation(0)
         self.Tutorial.nextScreenshot()
 
 
         self.Tutorial.endTutorial()
-        # Can we make this more than just a Smoke Test?
         self.delayDisplay('Optic chiasm should be visible. Front part of white matter should be clipped.')
         
         # Done
-        #
-        #
         self.delayDisplay('Test passed!')
