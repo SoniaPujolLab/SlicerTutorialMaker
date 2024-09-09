@@ -376,7 +376,7 @@ class ScreenshotTools():
         for w in slicer.app.topLevelWidgets():
             if hasattr(w, "isVisible") and not w.isVisible():
                 continue
-            print("test")
+            #print("test")
             openWindows.append(w)
             
             pass

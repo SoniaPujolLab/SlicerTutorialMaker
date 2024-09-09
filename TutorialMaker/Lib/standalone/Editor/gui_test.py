@@ -219,8 +219,8 @@ class MyApp(QMainWindow):
         description_tutorial = "This tutorial is a 4-minute introduction to Slicer."
         i = 0
         for x, y, z in zip(self.edit_screen, self.steps, self.widgets):
-            print(x)
-            print(len(self.anotations[i]))
+            #print(x)
+            #print(len(self.anotations[i]))
             imagen = QImage()
             if not imagen.load(x):  # Reemplaza "imagen_original.png" con tu ruta de archivo
                 print("Error al cargar la imagen.")
@@ -228,7 +228,7 @@ class MyApp(QMainWindow):
                 print("La imagen no se ha cargado correctamente.")
             painter = QPainter(imagen)
             for antts in self.anotations[i]:
-                print(antts.tp)
+                #print(antts.tp)
                 pen = QPen(antts.cl)
                 pen.setWidth(antts.tk)
                 painter.setPen(pen)
@@ -264,7 +264,7 @@ class MyApp(QMainWindow):
                 "instructions":json_out
             }
         
-        print(data)
+        #print(data)
         with open("sample_edited.json", "w", encoding='utf-8') as outfile:json.dump(data, outfile)
 
     def change_color(self):
@@ -290,7 +290,7 @@ class MyApp(QMainWindow):
         self.update()
     
     def delete_screen(self):
-        print('delete_screen: ', self.scree_prev)
+        #print('delete_screen: ', self.scree_prev)
         index = self.scree_prev
 
         # Verificar si el índice está dentro del rango válido
@@ -315,7 +315,7 @@ class MyApp(QMainWindow):
             self.action10.setIcon(QIcon('Resources/Icons/fill_p.png'))
     
     def load_icon(self):
-        print('load_icon')
+        #print('load_icon')
         file_dialog = QFileDialog()
         file_dialog.setNameFilter("Icons (*.png)")
         file_dialog.exec()
@@ -485,7 +485,7 @@ class MyApp(QMainWindow):
         a2 = p_ini.y()
         a3 = p_fin.x()
         a4 = p_fin.y()
-        print(a1, a2, a3, a4)
+        #print(a1, a2, a3, a4)
         return QRect(p_ini, p_fin)
 
     def Mdistance(self, p1, p2):
@@ -603,7 +603,7 @@ class MyApp(QMainWindow):
             new_anotation = []
             path = i["path"]
             image = cv2.imread(path)
-            print(path)
+            #print(path)
             cv2.rectangle(image, (i["position"]), (i["size"]), (0, 255, 255), 4)
             self.anotations.append(new_anotation)
             

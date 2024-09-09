@@ -26,7 +26,7 @@ def convert_json_to_md(json_file, md_file, css_file=None):
     md_content += f'<p class="tutorial_info">Authors: {authors}</p>\n\n'
 
     for instruction in instructions:
-        print(instruction)
+        #print(instruction)
         action = instruction['action']
         steps = ', '.join(instruction['steps-to-follow'])
         image = instruction['image'].replace(' ', '%20')

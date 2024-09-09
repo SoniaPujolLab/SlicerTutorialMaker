@@ -111,7 +111,7 @@ class TutorialEditorLogic():
 
 
     def NextWidget(self, widget):
-        print(widget)
+        #print(widget)
         if self.isRecording:
             self.SaveState(widget)
             self.widgetFinder.showFullSize()

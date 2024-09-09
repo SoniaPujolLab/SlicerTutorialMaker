@@ -73,7 +73,7 @@ class markdownHTMLCreator:
 
                     # Insert the image in Markdown with CSS styling
                     md_file.write(f'<img class="marginImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Outputs/Translation/output_image_{num}.png"><br>\n\n')
-                    print(num)
+                    #print(num)
                     #Insert text
                     md_file.write(f'<br>')
                     md_file.write(f'<div class="text"><center>{metadatos[item]["slide_text"]}</center></div><br>\n\n')
@@ -99,7 +99,7 @@ class markdownHTMLCreator:
             md_file.write(f'</div>\n')
             md_file.write(f'<img class="LineImage" src="{os.path.dirname(slicer.util.modulePath("TutorialMaker"))}/Resources/Icons/Painter/line_down.png">\n\n')
             md_file.write(f'<div class="footerText">Tutorial page {totalSteps}/{totalSteps}\n\n')
-            print(f"Markdown file has been generated at '{path}'")
+            #print(f"Markdown file has been generated at '{path}'")
 
 
             message = "Markdown file '{}' has been generated. Would you like to open it?".format(tutorialName)
@@ -203,7 +203,7 @@ class markdownHTMLCreator:
             html_file.write(contenido_html_con_estilos)
 
        
-        print(f"HTML file has been generated at '{path}'")
+        #print(f"HTML file has been generated at '{path}'")
         message = "HTML file '{}' has been generated. Would you like to open it?".format(tutorialName)
         confirm = qt.QMessageBox.question(slicer.util.mainWindow(), "HTML Generated", message,
                                            qt.QMessageBox.Yes | qt.QMessageBox.No)

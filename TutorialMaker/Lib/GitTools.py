@@ -45,7 +45,7 @@ class GitTools:
         
         root = GitFile("dir", "")
         for data in contents:
-            print(data)
+            #print(data)
             _file = GitFile(data["type"], data["path"])
             if _file.gitType == "dir":
                 _file.setFiles(GitTools.__parseRecursive__(repo, data["path"]))

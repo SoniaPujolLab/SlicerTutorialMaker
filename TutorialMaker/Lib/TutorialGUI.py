@@ -368,12 +368,12 @@ class TutorialGUI(qt.QMainWindow):
             
             cont += 1
 
-        print('self.annotations')
-        print(self.annotations)
+        #print('self.annotations')
+        #print(self.annotations)
         self.label_clicked(self.scree_prev)
 
     def copy_page(self):
-        print("copy a slice")
+        #print("copy a slice")
         newListImages = self.images_list
         self.labels = []
         new_annotation = []
@@ -385,7 +385,7 @@ class TutorialGUI(qt.QMainWindow):
        # print(newListImages)
         
         pos = self.scree_prev
-        print("pos:",pos)
+        #print("pos:",pos)
        
             
         for i, _ in enumerate(ListPositionWhite):
@@ -397,8 +397,8 @@ class TutorialGUI(qt.QMainWindow):
     
         #ListPositionWhite.append(pos)
         List_totalImages.insert(pos,List_totalImages[pos])
-        print('Copy')
-        print(List_totalImages)
+        #print('Copy')
+        #print(List_totalImages)
         #new_path = self.dir_path+'/../Resources/NewSlide/white.png'
         new_path = self.images_list[pos]
        
@@ -462,7 +462,7 @@ class TutorialGUI(qt.QMainWindow):
         self.edit_screen = []
         self.widgets = []
 
-        print("directory_path:",directory_path)
+        #print("directory_path:",directory_path)
         self.title = data["title"]
         self.author = data["author"]
         self.date = data["date"]
@@ -526,14 +526,14 @@ class TutorialGUI(qt.QMainWindow):
             if exception_occurred:
                 break
         #print(self.metadata_list)
-        print('self.annotations')
-        print(self.annotations)
+        #print('self.annotations')
+        #print(self.annotations)
         #print(List_totalImages)
         self.firts_screen()
 
     def firts_screen(self):
         self.scree_prev = 0
-        print('longitud:',len(self.images_list))
+        #print('longitud:',len(self.images_list))
         path = self.images_list[self.scree_prev]
         self.load_image(path)
         self.line_edit.setText(self.widgets[self.scree_prev])
@@ -543,7 +543,7 @@ class TutorialGUI(qt.QMainWindow):
         #self.prev_name = label.objectName()
 
     def label_clicked(self, index):
-        print('index:',index)
+        #print('index:',index)
         # Se actualiza el texto para cada uno de los screens
         if str(self.scree_prev) != -1:
             label = self.labels[self.scree_prev]
@@ -664,7 +664,7 @@ class TutorialGUI(qt.QMainWindow):
                 self.scroll_up_count += 1
                 self.scroll_down_count = 0
                 if self.scroll_up_count >= self.scroll_threshold:
-                    print("Scrolled up")
+                    #print("Scrolled up")
                     self.scroll_up_count = 0  # Reset the counter after confirmation
                     if self.w_i < len(self.widget_collection)-1:
                         self.w_i+=1
@@ -672,7 +672,7 @@ class TutorialGUI(qt.QMainWindow):
                 self.scroll_down_count += 1
                 self.scroll_up_count = 0
                 if self.scroll_down_count >= self.scroll_threshold:
-                    print("Scrolled down")
+                    #print("Scrolled down")
                     self.scroll_down_count = 0  # Reset the counter after confirmation
                     if self.w_i > 0:
                         self.w_i-=1
@@ -779,7 +779,7 @@ class TutorialGUI(qt.QMainWindow):
                     m5 = (p10[1] - p0[1]) / (p10[0] - p0[0])  # p0 to p10 
                     m6 = (p11[1] - p9[1]) / (p11[0] - p9[0])  # p9 to p11 
 
-                    print(m5, m6)
+                    #print(m5, m6)
 
                     b1 = p1[1] - m1 * p1[0]
                     b2 = p2[1] - m2 * p2[0]
@@ -788,79 +788,79 @@ class TutorialGUI(qt.QMainWindow):
                     b5 = p0[1] - m5 * p0[0]
                     b6 = p9[1] - m6 * p9[0]
 
-                    print(b5, b6)
+                    #print(b5, b6)
 
                     distance = 80
                     cat = math.sqrt(distance ** 2 / 2)
                     
                     if y > m1 * x + b1 and y > m2 * x + b2:
-                        print ("1")
+                        #print ("1")
                         wdgts_child['labelPosition'] = 'down'
                         wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                         star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                         end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
                     elif y < m2 * x + b2 and y > m6 * x + b6:
-                        print ("2")
+                        #print ("2")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [bottom_left[0]-cat, bottom_left[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_left[0], bottom_left[1]))
                         end = self.remap_point(qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat))
                     elif y < m6 * x + b6 and y > m3 * x + b3:
-                        print ("3")
+                        #print ("3")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [left_bottom[0]-cat, left_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(left_bottom[0], left_bottom[1]))
                         end = self.remap_point(qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat))
                     elif y > m4 * x + b4 and y < m3 * x + b3:
-                        print ("4")
+                        #print ("4")
                         wdgts_child['labelPosition'] = 'left'
                         wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                         star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                         end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
                     elif y < m4 * x + b4 and y > m5 * x + b5:
-                        print ("5")
+                        #print ("5")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [left_top[0]-cat, left_top[1]-cat]
                         star = self.remap_point(qt.QPoint(left_top[0], left_top[1]))
                         end = self.remap_point(qt.QPoint(left_top[0]-cat, left_top[1]-cat))
                     elif y < m5 * x + b5 and y > m1 * x + b1:
-                        print ("6")
+                        #print ("6")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [top_left[0]-cat, top_left[1]-cat]
                         star = self.remap_point(qt.QPoint(top_left[0], top_left[1]))
                         end = self.remap_point(qt.QPoint(top_left[0]-cat, top_left[1]-cat))
                     elif y < m1 * x + b1 and y < m2 * x + b2:
-                        print ("7")
+                        #print ("7")
                         wdgts_child['labelPosition'] = 'top'
                         wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                         star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                         end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
                     elif y > m2 * x + b2 and y < m6 * x + b6:
-                        print ("8")
+                        #print ("8")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [top_right[0]+cat, top_right[1]-cat]
                         star = self.remap_point(qt.QPoint(top_right[0], top_right[1]))
                         end = self.remap_point(qt.QPoint(top_right[0]+cat, top_right[1]-cat))
                     elif y > m6 * x + b6 and y < m3 * x + b3:
-                        print ("9")
+                        #print ("9")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [right_top[0]+cat, right_top[1]-cat]
                         star = self.remap_point(qt.QPoint(right_top[0], right_top[1]))
                         end = self.remap_point(qt.QPoint(right_top[0]+cat, right_top[1]-cat))
                     elif y < m4 * x + b4 and y > m3 * x + b3:
-                        print ("10")
+                        #print ("10")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                         star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                         end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
                     elif y > m4 * x + b4 and y < m5 * x + b5:
-                        print ("11")
+                        #print ("11")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_bottom[0]+cat, right_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(right_bottom[0], right_bottom[1]))
                         end = self.remap_point(qt.QPoint(right_bottom[0]+cat, right_bottom[1]+cat))
                     else:
-                        print ("12")
+                        #print ("12")
                         wdgts_child['labelPosition'] = 'down-right'
                         wdgts_child['position_tail'] = [bottom_right[0]+cat, bottom_right[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_right[0], bottom_right[1]))
@@ -983,7 +983,7 @@ class TutorialGUI(qt.QMainWindow):
                     m5 = (p10[1] - p0[1]) / (p10[0] - p0[0])  # p0 to p10 
                     m6 = (p11[1] - p9[1]) / (p11[0] - p9[0])  # p9 to p11 
 
-                    print(m5, m6)
+                    #(m5, m6)
 
                     b1 = p1[1] - m1 * p1[0]
                     b2 = p2[1] - m2 * p2[0]
@@ -992,79 +992,79 @@ class TutorialGUI(qt.QMainWindow):
                     b5 = p0[1] - m5 * p0[0]
                     b6 = p9[1] - m6 * p9[0]
 
-                    print(b5, b6)
+                    #(b5, b6)
 
                     distance = 80
                     cat = math.sqrt(distance ** 2 / 2)
                     
                     if y > m1 * x + b1 and y > m2 * x + b2:
-                        print ("1")
+                        #print ("1")
                         wdgts_child['labelPosition'] = 'down'
                         wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                         star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                         end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
                     elif y < m2 * x + b2 and y > m6 * x + b6:
-                        print ("2")
+                        #print ("2")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [bottom_left[0]-cat, bottom_left[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_left[0], bottom_left[1]))
                         end = self.remap_point(qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat))
                     elif y < m6 * x + b6 and y > m3 * x + b3:
-                        print ("3")
+                        #print ("3")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [left_bottom[0]-cat, left_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(left_bottom[0], left_bottom[1]))
                         end = self.remap_point(qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat))
                     elif y > m4 * x + b4 and y < m3 * x + b3:
-                        print ("4")
+                        #print ("4")
                         wdgts_child['labelPosition'] = 'left'
                         wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                         star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                         end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
                     elif y < m4 * x + b4 and y > m5 * x + b5:
-                        print ("5")
+                        #print ("5")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [left_top[0]-cat, left_top[1]-cat]
                         star = self.remap_point(qt.QPoint(left_top[0], left_top[1]))
                         end = self.remap_point(qt.QPoint(left_top[0]-cat, left_top[1]-cat))
                     elif y < m5 * x + b5 and y > m1 * x + b1:
-                        print ("6")
+                        #print ("6")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [top_left[0]-cat, top_left[1]-cat]
                         star = self.remap_point(qt.QPoint(top_left[0], top_left[1]))
                         end = self.remap_point(qt.QPoint(top_left[0]-cat, top_left[1]-cat))
                     elif y < m1 * x + b1 and y < m2 * x + b2:
-                        print ("7")
+                        #print ("7")
                         wdgts_child['labelPosition'] = 'top'
                         wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                         star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                         end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
                     elif y > m2 * x + b2 and y < m6 * x + b6:
-                        print ("8")
+                        #print ("8")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [top_right[0]+cat, top_right[1]-cat]
                         star = self.remap_point(qt.QPoint(top_right[0], top_right[1]))
                         end = self.remap_point(qt.QPoint(top_right[0]+cat, top_right[1]-cat))
                     elif y > m6 * x + b6 and y < m3 * x + b3:
-                        print ("9")
+                        #print ("9")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [right_top[0]+cat, right_top[1]-cat]
                         star = self.remap_point(qt.QPoint(right_top[0], right_top[1]))
                         end = self.remap_point(qt.QPoint(right_top[0]+cat, right_top[1]-cat))
                     elif y < m4 * x + b4 and y > m3 * x + b3:
-                        print ("10")
+                        #print ("10")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                         star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                         end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
                     elif y > m4 * x + b4 and y < m5 * x + b5:
-                        print ("11")
+                        #print ("11")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_bottom[0]+distance, right_bottom[1]]
                         star = self.remap_point(qt.QPoint(right_bottom[0], right_bottom[1]))
                         end = self.remap_point(qt.QPoint(right_bottom[0]+distance, right_bottom[1]))
                     else:
-                        print ("12")
+                        #print ("12")
                         wdgts_child['labelPosition'] = 'down-right'
                         wdgts_child['position_tail'] = [bottom_right[0]+cat, bottom_right[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_right[0], bottom_right[1]))
@@ -1475,7 +1475,7 @@ class TutorialGUI(qt.QMainWindow):
         a2 = p_ini.y()
         a3 = p_fin.x()
         a4 = p_fin.y()
-        print(a1, a2, a3, a4)
+        #print(a1, a2, a3, a4)
         return qt.QRect(p_ini, p_fin)
 
     def Mdistance(self, p1, p2):
@@ -1624,7 +1624,7 @@ class TutorialGUI(qt.QMainWindow):
     def save_json_file(self):
         # Create json file 
         self.label_clicked(self.scree_prev) # Enrique line
-        print("Create json file")
+        #print("Create json file")
         json_out = []
         data = {}
 
@@ -1634,7 +1634,7 @@ class TutorialGUI(qt.QMainWindow):
             #print(self.images_list)
             annotations = []
             for annts, wdg in zip(self.annotations[i-1], self.annotations_json[i-1]):
-                print("wdg ", wdg )
+                #print("wdg ", wdg )
                 color_rgb = f"{annts.cl.red()}, {annts.cl.green()}, {annts.cl.blue()}"
                 if annts.tp == "rect":
                     annotation = { #Convert all to string

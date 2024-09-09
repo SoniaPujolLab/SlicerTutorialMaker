@@ -25,7 +25,7 @@ class MousePressFilter(QtCore.QObject):
         root = os.path.join(screenshot_folder, f"{hora}.png")
         cap = pyautogui.screenshot()
         cap.save(root)
-        print("Captura de pantalla guardada.")
+        #print("Captura de pantalla guardada.")
 
 
         mainWindow = slicer.util.mainWindow()
@@ -39,7 +39,7 @@ class MousePressFilter(QtCore.QObject):
         compare_string = str(widget)
         for index, element in enumerate(my_list):
             if str(element) == compare_string:
-                print("El elemento", element,"en el índice", index)
+                #print("El elemento", element,"en el índice", index)
                 break
         wroot = " "    
         w = widget
@@ -86,7 +86,7 @@ class MousePressFilter(QtCore.QObject):
     def eventFilter(self, obj, event):
         if event.type() == QtCore.QEvent.MouseButtonRelease and event.button() == QtCore.Qt.LeftButton:
             slicer.app.processEvents()
-            print("Boton izquierdo del mouse presionado en:", event.pos())
+            #print("Boton izquierdo del mouse presionado en:", event.pos())
             widget = self.widgetAtPos(qt.QCursor().pos())
             if widget == self.last_widget:
                 return False
@@ -95,16 +95,16 @@ class MousePressFilter(QtCore.QObject):
 
 
             if event.modifiers() & QtCore.Qt.ControlModifier:
-                print("Se presionó la tecla Ctrl")
+                #print("Se presionó la tecla Ctrl")
                 self.BorderWidget(widget, True)
                 slicer.app.processEvents()
                 time.sleep(0.5)  
                 self.last_ctrl = True
             else:
                 if self.last_ctrl:
-                    print(self.last_ctrl)
+                    #print(self.last_ctrl)
                     self.metadata = self.screen_shot(widget, self.metadata, self.step)
-                print("Ctrl key is NOT pressed")
+                #("Ctrl key is NOT pressed")
                 for child_widget in slicer.util.mainWindow().findChildren(qt.QWidget):
                     self.BorderWidget(child_widget, 0)
                 self.BorderWidget(widget, True)
@@ -189,7 +189,7 @@ class TutorialMaker:
         if file_dialog.exec_():
             selected_files = file_dialog.selectedFiles()
             for file_path in selected_files:
-                print("Archivo seleccionado:", file_path)
+                #print("Archivo seleccionado:", file_path)
                 slicer.util.loadScene(file_path)
                 self.add_data_button.hide()
                 self.label.hide()
@@ -212,7 +212,7 @@ class TutorialMaker:
 
 
     def on_stop(self):
-        print("Stopped and saved tutorial")
+        #print("Stopped and saved tutorial")
         #self.app.removeEventFilter(self.mouse_press_filter)
         # Keep a reference to the MousePressFilter instance
         if self.mouse_press_filter:
