@@ -72,9 +72,10 @@ class GitTools:
             files[data["name"]] = _file
         return files
     
-    def donwloadRepoZip(fullrepo:str, saveToPath:str, branch:str):
+    def downloadRepoZip(fullrepo:str, saveToPath:str, branch:str):
         import SampleData
         fullurl = f"{fullrepo}/archive/refs/heads/{branch}"
         dataLogic = SampleData.SampleDataLogic()
         downloadedFile = dataLogic.downloadFile(fullurl, saveToPath, branch)
         return downloadedFile
+        
