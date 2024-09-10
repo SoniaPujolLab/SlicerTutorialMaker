@@ -7,15 +7,16 @@
   ![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/5f41e18a-f384-49f8-9551-b85eeecbf6b1)
 - For **Windows** users: Open 3D Slicer and drag-and-drop the `TutorialMaker` folder to the Slicer application window, click OK to "Add Python scripted modules...", and click yes to load the module
 ![TutorialMakerInstall](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
-- For **MacOs** users: Open 3D Slicer click on Edit and then click on Application settings, on the lateral menu select Module, then drag-and-drop `TutorialMaker.py` into the additional module path. Finally, click OK and restart Slicer.
+- For **MacOs** users: Open 3D Slicer click on Edit and then click on Application settings, on the lateral menu select Module, then drag and drop `TutorialMaker.py` into the additional module path. Finally, click OK and restart Slicer.
 ![TutorialMakerInstallMac](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
 
 
 ### Usage
 
-- Go to the Tutorial Maker module (under the TUTORIAL category)
-
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/27aacc36-289f-44ae-b683-379879ac6a4d)
+- Go to the Tutorial Maker module (under the Utilities category)
+![image](https://github.com/user-attachments/assets/881e77de-1778-445f-9d12-9ff7ed685a1c)
+> [!IMPORTANT]
+> Before running this tutorial, set the Slicer to FULLSCREEN and the font size to 14pt, so the screenshots can be readible.
 - Select `fourMin_tutorial`
 ![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/2679e958-9148-4a4f-9693-7ad7951dcdfe)
 - Click `Run and Annotate`
