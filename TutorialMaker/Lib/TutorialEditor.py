@@ -1,8 +1,8 @@
 import qt
 import slicer
 import os
-
 import Lib.utils as utils
+from slicer.i18n import tr as _
 
 #
 # Tutorial Editor Widget
@@ -14,7 +14,7 @@ class TutorialEditor(qt.QWidget):
         super().__init__(parent)
 
         self.logic = TutorialEditorLogic(self)
-        self.setWindowTitle("Tutorial Editor")     
+        self.setWindowTitle(_("Tutorial Editor"))
         self.setGeometry(0, 0, 300, 200)
 
         self.boxLayout = qt.QVBoxLayout()
@@ -59,7 +59,7 @@ class TutorialEditor(qt.QWidget):
         pass
     
     def onCellClicked(self, row, collumn):
-        self.currentCell = row #self.ui.tableWidgetStates.itemAt(row, collumn)
+        self.currentCell = row
     
     #
     # Use this method for add itens on table 
@@ -100,18 +100,16 @@ class TutorialEditorLogic():
 
     def StartRecording(self):
         self.gui.showMinimized()
-        self.gui.ui.pushButtonStartStopRecord.text = "Stop Recording" # needs TR directives
+        self.gui.ui.pushButtonStartStopRecord.text = _("Stop Recording")
         self.widgetFinder.showFullSize()
         pass
 
     def StopRecording(self):
-        self.gui.ui.pushButtonStartStopRecord.text = "Start Recording" # needs TR directives
+        self.gui.ui.pushButtonStartStopRecord.text = _("Start Recording")
         self.widgetFinder.hideOverlay()
         pass
 
-
     def NextWidget(self, widget):
-        #print(widget)
         if self.isRecording:
             self.SaveState(widget)
             self.widgetFinder.showFullSize()
@@ -123,9 +121,6 @@ class TutorialEditorLogic():
 
         self.stateManager.InsertState(_state)
         pass
-
-
-
 class StateManager():
     def __init__(self):
         self.states = []
@@ -156,7 +151,7 @@ class Annotator(qt.QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.logic = TutorialEditorLogic(self)
-        self.setWindowTitle("Widget Annotator")     
+        self.setWindowTitle(_("Widget Annotator"))
         self.setGeometry(0, 0, 600, 40)
 
         self.boxLayout = qt.QVBoxLayout()

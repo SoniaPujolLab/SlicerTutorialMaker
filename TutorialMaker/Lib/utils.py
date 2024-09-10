@@ -207,13 +207,11 @@ class WidgetFinder(qt.QWidget):
         self.hideOverlay()
 
     def mousePressEvent(self, event):
-        # Get widget at mouse position
         pos = qt.QCursor().pos()
         widget = self.widgetAtPos(pos)
         self.overlayOnWidget(widget)
         self.hideOverlay()
         self.showPointCursor(False)
-        #self.currentWidgetSelect = str(widget)
         self.sinalManager.emit(Widget(widget))
 
         self.currentWidget = widget
@@ -230,7 +228,6 @@ class Shapes(qt.QWidget):
         self.focusPolicy = qt.Qt.StrongFocus
         self.setAttribute(qt.Qt.WA_TransparentForMouseEvents)
         self.widget = None
-        #slicer.app.setOverrideCursor(qt.Qt.PointingHandCursor)
 
     def setTargetWidget(self, widget):
         if widget is None:
@@ -265,8 +262,6 @@ class Shapes(qt.QWidget):
         painter = qt.QPainter(self)
         painter.setPen(pen)
         painter.drawEllipse(pos.x() - (200/2) + widget.rect.width()/2, pos.y() - (200/2) + widget.rect.height()/2, 200, 200)
-    
-    
         
 class Widget():
     def __init__(self, widgetData) -> None:
@@ -376,7 +371,6 @@ class ScreenshotTools():
         for w in slicer.app.topLevelWidgets():
             if hasattr(w, "isVisible") and not w.isVisible():
                 continue
-            #print("test")
             openWindows.append(w)
             
             pass
@@ -387,7 +381,6 @@ class ScreenshotTools():
                 os.mkdir(path + str(index))
                 pass
 
-            
             screenshotData = TutorialScreenshot()
             screenshotData.screenshot = path + str(index) + "/" + str(wIndex) + ".png"
             screenshotData.metadata = path + str(index) + "/" + str(wIndex) + ".json"
@@ -404,8 +397,6 @@ class ScreenshotTools():
     def getPixmap(self, window):
         slicer.app.processEvents()
         pixmap = window.grab()
-
-        #return a qt object: QPixmap
         return pixmap
     
     def saveScreenshot(self, filename, window):

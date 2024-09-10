@@ -8,7 +8,5 @@ class tmLabel(qt.QLabel):
         self.index = index
 
     def mousePressEvent(self, event):
-        #print(event)
-        #print(f"Label {self.index} clicked!")
         self.clicked.emit()
         

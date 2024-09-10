@@ -8,5 +8,3 @@ class Notes:
         self.fl = fl    # fill (boolean)
         self.tx = tx    # text and path image
 
-    def metodo(self):
-        print("Hola desde MiClase")

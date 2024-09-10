@@ -1,6 +1,7 @@
 import qt
 import slicer
 import os
+from slicer.i18n import tr as _
 
 class ImageDrawer:
     def __init__(self):
@@ -25,7 +26,7 @@ class ImageDrawer:
 
     def draw_rectangle(self, x, y, width, height, text, font_size, color, text_color=qt.Qt.black, pen_width=5, pen_style=qt.Qt.SolidLine):
         if self.view is None:
-            print("Error: Load an image first.")
+            print(_("Error: Load an image first."))
             return
 
         # Create a QGraphicsRectItem (rectangle) and add it to the scene
@@ -39,7 +40,7 @@ class ImageDrawer:
             # Create a background rectangle for the text
             text_item = qt.QGraphicsTextItem(text)
             text_item.setDefaultTextColor(text_color)
-            font = qt.QFont()
+            font = qt.QFont("Arial")
             font.setPixelSize(font_size)
             text_item.setFont(font)
 
@@ -57,7 +58,7 @@ class ImageDrawer:
 
     def draw_arrow(self, sizex, sizey, start_x, start_y, end_x, end_y, direction_draw , color, text, font_size, pen_width=4, head_size=20, offset=5, text_color=qt.Qt.black):
         if self.view is None:
-            print("Error: Load an image first.")
+            print(_("Error: Load an image first."))
             return
 
         # Create a QLineF representing the arrow line
@@ -105,7 +106,7 @@ class ImageDrawer:
                                             arrowhead_pos.y() - direction_vector.dx() * head_size))
         arrowhead_polygon.append(qt.QPointF(arrowhead_pos.x() - direction_vector.dy() * head_size,
                                             arrowhead_pos.y() + direction_vector.dx() * head_size))
-        arrowhead_polygon.append(qt.QPointF(end_x + sizex , end_y + (-offset_y*0.05) + sizey))  # Agregar punto final para conectar
+        arrowhead_polygon.append(qt.QPointF(end_x + sizex , end_y + (-offset_y*0.05) + sizey)) 
 
         # Create a QGraphicsPolygonItem (arrowhead) and add it to the scene
         arrowhead_item = qt.QGraphicsPolygonItem(arrowhead_polygon)
@@ -119,7 +120,7 @@ class ImageDrawer:
             text_item = qt.QGraphicsTextItem(text)
             text_item.setDefaultTextColor(text_color)
             text_item.setPos(end_x, end_y)
-            font = qt.QFont()
+            font = qt.QFont("Arial")
             font.setPixelSize(font_size)
             text_item.setFont(font)
 
@@ -138,15 +139,12 @@ class ImageDrawer:
                               start_y - text_rect.height()/2 + offset_y)
             self.scene.addItem(text_item)
 
-
-
     def draw_click(self, x, y, text, font_size, text_color=qt.Qt.black):
         if self.view is None:
-            print("Error: Load an image first.")
+            print(_("Error: Load an image first."))
             return
         path = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Resources/Icons/Painter/click_icon.png'
         icon_pixmap = qt.QPixmap(path).scaledToWidth(30)
-        # icon_pixmap.invertPixels()
         icon_item = qt.QGraphicsPixmapItem(icon_pixmap)
         icon_item.setPos(x, y)
         self.scene.addItem(icon_item)
@@ -157,7 +155,7 @@ class ImageDrawer:
             # Create a background rectangle for the text
             text_item = qt.QGraphicsTextItem(text)
             text_item.setDefaultTextColor(text_color)
-            font = qt.QFont()
+            font = qt.QFont("Arial")
             font.setPixelSize(font_size)
             text_item.setFont(font)
 
@@ -172,24 +170,17 @@ class ImageDrawer:
             text_item.setPos(x + bounding_box.width(), y + bounding_box.height())
             self.scene.addItem(text_item)
 
-
     def save_to_png(self, filename):
         if self.view is not None:
-            #print(filename)
-            # Utilizar una ruta dinámica para guardar el archivo
             dynamic_path = os.path.join(os.getcwd(), filename)
             # Grab the contents of the view and save it to a PNG file
             image = self.view.showFullScreen()
             image = self.view.grab()
             image.save(dynamic_path, "PNG")
             self.view.close()
-            # print(f"Image saved to {dynamic_path}")
         else:
             print("Error: No view to save.")
-
-    # screenshotData: all widgets in a json
-    # metadata: Victors' outputs
-
+            
     # TODO: In that moment we will remove the translation and only show in English
     # after define the infrastructre with Weblate or GitHub we will use community translation
     def painter(self, metadata, screenshotData, language):
@@ -204,7 +195,6 @@ class ImageDrawer:
 
             for widget in screenshotData:
                 if widget["path"] == item["path"]:
-                    #print(item)
                     widgetPosX = widget["position"][0]
                     widgetPosY = widget["position"][1]
                     widgetSizeX = widget["size"][0]
@@ -247,56 +237,31 @@ class ImageDrawer:
                                 text_color=qt.Qt.black)
 
     def StartPaint(path,ListPositionWhite, ListoTotalImages):
-        import json
-        # Example usage:
-
-        image_drawer = ImageDrawer()
-
         import Lib.utils as utils
-
+        # Example usage:
+        image_drawer = ImageDrawer()
         jsonHandler = utils.JSONHandler()
-
         tutorial = jsonHandler.parseTutorial(True)
         OutputAnnotator = utils.JSONHandler.parseJSON(path)
 
         cont = 0
         imgSS = 0
         ListPositionWhite.sort()
-        #print(ListPositionWhite)
         for i, annotateSteps in enumerate(OutputAnnotator): 
-            #print(i)
-            #print(imgSS)
-            #if ListPositionWhite: #Is not empty
-            #if( i ==  ListPositionWhite[cont]):
             if(ListoTotalImages[i] == -1):
-            # print('Cont')
-                
-                #imgSS = cont
-                #print('imgSS')
-                
-                #print(len(ListPositionWhite))
                 if(cont < len(ListPositionWhite)-1):
                     cont = cont + 1
-                #agregar imagen blanca y texto
             else: 
-            
                 screenshot = tutorial.steps[ListoTotalImages[i]].getImage()
                 screenshotData = tutorial.steps[ListoTotalImages[i]].getWidgets()
                 # Load the image
                 image_drawer.load_image(screenshot)
-                #print(screenshot)
                 image_drawer.painter(OutputAnnotator[annotateSteps], screenshotData, 'es')
 
                 # Save the view to a PNG file with a dynamic path
                 image_drawer.save_to_png(
                     os.path.dirname(slicer.util.modulePath("TutorialMaker")) + '/Outputs/Translation/output_image_' + str(i) + '.png')
                 
-                imgSS = imgSS + 1 
-                #print('Hola')
-                #print(i)
-            #if(cont != len(ListPositionWhite)-1):
-            #  imgSS = imgSS + 1
-
-                
+                imgSS = imgSS + 1                
             pass
             

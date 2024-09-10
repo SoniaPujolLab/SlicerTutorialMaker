@@ -1,5 +1,6 @@
 import requests
 from dataclasses import dataclass
+from slicer.i18n import tr as _
 
 @dataclass
 class GitFile:
@@ -19,7 +20,7 @@ class GitFile:
     def getRaw(self, path:str) -> str:
         file = self.__file__(path)
         if file.gitType != "file":
-            raise IOError(f"Expected file type, got {file.gitType} type")
+            raise IOError(_("Expected file type, got {fileGitType} type".format(fileGitType=file.gitType)))
         return requests.get(file.url).text
 
     def __file__(self, path:str):
@@ -29,7 +30,7 @@ class GitFile:
         parent = self
         for seg in spath:
             if seg not in parent.files:
-                raise IOError("Path does not exist")
+                raise IOError(_("Path does not exist"))
             parent = parent.files[seg]
         return parent
 
@@ -40,12 +41,11 @@ class GitTools:
         contents = requests.get(endpoint).json()
         if not isinstance(contents, list) or not isinstance(contents[0], dict):
             if 'message' in contents:
-                raise Exception(f"Message from {endpoint}: {contents['message']}")
-            raise Exception(f"Malformed Response from {endpoint}")
+                raise Exception(_("Message from {endpoint}: {message}".format(endpoint=endpoint, message=contents['message'])))
+            raise Exception(_("Malformed Response from {endpoint}".format(endpoint=endpoint)))
         
         root = GitFile("dir", "")
         for data in contents:
-            #print(data)
             _file = GitFile(data["type"], data["path"])
             if _file.gitType == "dir":
                 _file.setFiles(GitTools.__parseRecursive__(repo, data["path"]))
@@ -59,8 +59,8 @@ class GitTools:
         contents = requests.get(endpoint).json()
         if not isinstance(contents, list) or not isinstance(contents[0], dict):
             if contents.has_key('message'):
-                raise Exception(f"Message from {endpoint}: {contents['message']}")
-            raise Exception(f"Malformed Response from {endpoint}")
+                raise Exception(_("Message from {endpoint}: {message}".format(endpoint=endpoint, message=contents['message'])))
+            raise Exception(_("Malformed Response from {endpoint}".format(endpoint=endpoint)))
         
         files = {}
         for data in contents:
@@ -73,8 +73,8 @@ class GitTools:
         return files
     
     def donwloadRepoZip(fullrepo:str, saveToPath:str, branch:str):
-        fullurl = f"{fullrepo}/archive/refs/heads/{branch}"
         import SampleData
+        fullurl = f"{fullrepo}/archive/refs/heads/{branch}"
         dataLogic = SampleData.SampleDataLogic()
         downloadedFile = dataLogic.downloadFile(fullurl, saveToPath, branch)
         return downloadedFile

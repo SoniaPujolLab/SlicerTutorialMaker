@@ -8,6 +8,7 @@ from Lib.Anotations import Notes
 from Lib.FileMDHTML import markdownHTMLCreator
 import Lib.painter as AnnotationPainter
 from slicer import qMRMLWidget
+from slicer.i18n import tr as _
 
 ListPositionWhite = []
 List_totalImages = []
@@ -59,17 +60,12 @@ class TutorialGUI(qt.QMainWindow):
         self.newlayout.addWidget(self.uiWidget)
 
         # Set self layout with UI components 
-        #self.setLayout(self.newlayout)
         self.setCentralWidget(self.uiWidget)
 
         width = 1250
         height = 780
 
         self.setFixedSize(width, height)
-
-        children = self.uiWidget.children()
-        # for child in children:
-        #     print(child)
 
         self.scrollAreaWidgetContents = qt.QWidget()
         self.gridLayout = qt.QGridLayout(self.scrollAreaWidgetContents)
@@ -85,7 +81,6 @@ class TutorialGUI(qt.QMainWindow):
         label_width = 900  
         label_height = 530 
         self.label_image = self.uiWidget.findChild(qt.QLabel, "label_imagen")
-        # print(type(self.label_image))
         self.label_image.setFixedSize(label_width, label_height)
 
         self.label_image.installEventFilter(self)
@@ -125,14 +120,12 @@ class TutorialGUI(qt.QMainWindow):
     def create_toolbar_menu(self):
         toolbar = qt.QToolBar("File", self)
 
-        actionOpen = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/open.png'), "Open", self)
-        actionSave = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/save.png'), "Save", self)
-        actionBack = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png'), "Undo", self)
-        actionDelete = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png'), "Delete", self)
-        actionAdd = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png'), "Add", self)
-        actionCopy = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/copy.png'), "Copy", self)
-        # actionSelect = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/selec.png'), "Selection", self)
-        # actionSelect.setCheckable(True)
+        actionOpen = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/open.png'), _("Open"), self)
+        actionSave = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/save.png'), _("Save"), self)
+        actionBack = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png'), _("Undo"), self)
+        actionDelete = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png'), _("Delete"), self)
+        actionAdd = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png'), _("Add"), self)
+        actionCopy = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/copy.png'), _("Copy"), self)
 
         toolbar.addAction(actionOpen)
         toolbar.addAction(actionSave)
@@ -140,7 +133,6 @@ class TutorialGUI(qt.QMainWindow):
         toolbar.addAction(actionDelete)
         toolbar.addAction(actionAdd)
         toolbar.addAction(actionCopy)
-        # toolbar.addAction(actionSelect)
 
         actionOpen.triggered.connect(self.open_json_file_dialog)
         actionSave.triggered.connect(self.save_json_file)
@@ -148,7 +140,6 @@ class TutorialGUI(qt.QMainWindow):
         actionDelete.triggered.connect(self.delete_screen)
         actionAdd.triggered.connect(self.add_page)
         actionCopy.triggered.connect(self.copy_page)
-        # actionSelect.triggered.connect(self.fill_figures)
 
         toolbar.setMovable(True)
         return toolbar
@@ -156,33 +147,26 @@ class TutorialGUI(qt.QMainWindow):
     def create_toolbar_actions(self):
         toolbar = qt.QToolBar("Actions", self)
         
-        self.square = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act1.png'), "Square", self)
+        self.square = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act1.png'), _("Square"), self)
         self.square.setCheckable(True)
         toolbar.addAction(self.square)
 
-        self.circle = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act2.png'), "Circle", self)
+        self.circle = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act2.png'), _("Circle"), self)
         self.circle.setCheckable(True)
-        #toolbar.addAction(self.circle)
 
-        self.clck = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/pointer.png'), "Click", self)
+        self.clck = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/pointer.png'), _("Click"), self)
         self.clck.setCheckable(True)
         toolbar.addAction(self.clck)
 
-        self.arrow = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act3.png'), "Arrow", self)
+        self.arrow = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act3.png'), _("Arrow"), self)
         self.arrow.setCheckable(True)
         toolbar.addAction(self.arrow)
 
-        self.icon_image = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act4.png'), "Icon", self)
+        self.icon_image = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act4.png'), _("Icon"), self)
         self.icon_image.setCheckable(True)
-        # toolbar.addAction(self.icon_image)
 
-        self.in_text = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act5.png'), "Text", self)
-        self.in_text.setCheckable(True)
-        # toolbar.addAction(self.in_text)
-
-        # self.select = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/selec.png'), "Selection", self)
-        # self.select.setCheckable(True)
-        # toolbar.addAction(self.select)  
+        self.in_text = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act5.png'), _("Text"), self)
+        self.in_text.setCheckable(True) 
 
         self.icons = {
             self.square: {
@@ -208,16 +192,11 @@ class TutorialGUI(qt.QMainWindow):
             self.in_text: {
                 'active': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act5_p.png'),
                 'inactive': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/act5.png')
-            },
-            # self.select: {
-            #     'active': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/selec_p.png'),
-            #     'inactive': qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/selec.png')
-            # }
+            }
         }
 
-        self.toolbar_actions = [self.square, self.circle, self.clck, self.arrow, self.icon_image, self.in_text] #, self.select]
+        self.toolbar_actions = [self.square, self.circle, self.clck, self.arrow, self.icon_image, self.in_text]
         for a in self.toolbar_actions:
-            # print(a)
             a.triggered.connect(lambda checked, a=a: self.on_action_triggered(a))
 
         toolbar.setMovable(True)
@@ -226,13 +205,13 @@ class TutorialGUI(qt.QMainWindow):
     def create_toolbar_edit(self):
         toolbar = qt.QToolBar("Edit", self)
         
-        self.action7 = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/color.png'), "color", self)
+        self.action7 = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/color.png'), _("color"), self)
         toolbar.addAction(self.action7)
         self.action7.triggered.connect(self.change_color)
 
         self.valor = 3
         self.spin_box = qt.QSpinBox()
-        self.spin_box.setSuffix(" thick.")
+        self.spin_box.setSuffix(_(" thick."))
         self.spin_box.setMinimum(1)
         self.spin_box.setMaximum(15)
         self.spin_box.setSingleStep(1)
@@ -240,7 +219,7 @@ class TutorialGUI(qt.QMainWindow):
         toolbar.addWidget(self.spin_box)
         self.spin_box.valueChanged.connect(self.actualizar_valor)
 
-        self.fill_annot = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/fill_u.png'), "Fill", self)
+        self.fill_annot = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/fill_u.png'), _("Fill"), self)
         self.fill_annot.setCheckable(True)
         self.fill = False
         toolbar.addAction(self.fill_annot)
@@ -262,9 +241,8 @@ class TutorialGUI(qt.QMainWindow):
         self.widget_action.setDefaultWidget(self.text_in)
         toolbar.addAction(self.widget_action)
 
-        self.load_icon = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/image.png'), "Load icon", self)
+        self.load_icon = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/image.png'), _("Load icon"), self)
         self.load_icon.setCheckable(True)
-        #toolbar.addAction(self.load_icon)
         self.new_image = qt.QPixmap(20, 20)
         self.dir_icon = None
         self.open_icon()
@@ -278,7 +256,7 @@ class TutorialGUI(qt.QMainWindow):
     
     def open_json_file_dialog(self):
         file_dialog = qt.QFileDialog()
-        file_dialog.setNameFilter("JSON Files (*.json)")
+        file_dialog.setNameFilter(_("JSON Files (*.json)"))
         file_dialog.exec()
 
         # Check the result of the file dialog
@@ -291,12 +269,10 @@ class TutorialGUI(qt.QMainWindow):
             print("The user canceled the file dialog")
 
     def open_json_file(self, filepath):
-        
         directory_path = os.path.dirname(filepath)
         # Read the data from the file
         with open(filepath, "r", encoding='utf-8') as file:
             data = json.load(file)
-        # print(data)
         self.load_all_images(data, directory_path)
         
     def delete_screen(self):
@@ -308,24 +284,16 @@ class TutorialGUI(qt.QMainWindow):
         new_annotation = []
         new_annotation_json = []
         cont = 0
-        indexNew = 0
-       # ListPositionWhite =self.PositionWhite
-        
-       # print(newListImages)
-        
+                
         pos = self.scree_prev
         if pos in ListPositionWhite:
-            
             for i, _ in enumerate(ListPositionWhite):
                 if ListPositionWhite[i] >= pos:
                     ListPositionWhite[i] = ListPositionWhite[i] +1
-                    #print(ListPositionWhite[i])
             
         ListPositionWhite.append(pos)
         List_totalImages.insert(pos,-1)
 
-        # print('Aquí')
-        # print(List_totalImages)
         new_path = self.dir_path+'/../Resources/NewSlide/white.png'
 
         # Insert new_path at position pos
@@ -336,7 +304,6 @@ class TutorialGUI(qt.QMainWindow):
         self.steps.insert(pos, "")
         self.widgets.insert(pos, "")
         self.images_list = []
-        #self.PositionWhite = []
 
         while self.gridLayout.count():
             widget = self.gridLayout.itemAt(0).widget()
@@ -344,13 +311,10 @@ class TutorialGUI(qt.QMainWindow):
             widget.deleteLater()
 
         for img in newListImages:
-            #print('Lista')
-            #print(img)
             try:
                 image = qt.QImage(img)
             except Exception as e:
-                print(f"An unexpected error occurred while opening file '{image}': {str(e)}")
-                exception_occurred = True
+                print(_("An unexpected error occurred while opening file '{image}': {error}".format(image=image, error=str(e))))
                 break
 
             new_size = qt.QSize(280, 165)
@@ -368,40 +332,23 @@ class TutorialGUI(qt.QMainWindow):
             
             cont += 1
 
-        #print('self.annotations')
-        #print(self.annotations)
         self.label_clicked(self.scree_prev)
 
     def copy_page(self):
-        #print("copy a slice")
         newListImages = self.images_list
         self.labels = []
         new_annotation = []
         new_annotation_json = []
         cont = 0
-        indexNew = 0
-       # ListPositionWhite =self.PositionWhite
-        
-       # print(newListImages)
-        
+
         pos = self.scree_prev
-        #print("pos:",pos)
-       
             
         for i, _ in enumerate(ListPositionWhite):
             if ListPositionWhite[i] >= pos:
                 ListPositionWhite[i] = ListPositionWhite[i] + 1
-               # print('Nuevo:', ListPositionWhite[i])
-        
-        
-    
-        #ListPositionWhite.append(pos)
+                
         List_totalImages.insert(pos,List_totalImages[pos])
-        #print('Copy')
-        #print(List_totalImages)
-        #new_path = self.dir_path+'/../Resources/NewSlide/white.png'
         new_path = self.images_list[pos]
-       
 
         # Insert new_path at position pos
         newListImages.insert(pos, new_path)
@@ -411,7 +358,6 @@ class TutorialGUI(qt.QMainWindow):
         self.steps.insert(pos, "")
         self.widgets.insert(pos, "")
         self.images_list = []
-        #self.PositionWhite = []
 
         while self.gridLayout.count():
             widget = self.gridLayout.itemAt(0).widget()
@@ -419,13 +365,10 @@ class TutorialGUI(qt.QMainWindow):
             widget.deleteLater()
 
         for img in newListImages:
-            #print('Lista')
-            #print(img)
             try:
                 image = qt.QImage(img)
             except Exception as e:
-                print(f"An unexpected error occurred while opening file '{image}': {str(e)}")
-                exception_occurred = True
+                print(_("An unexpected error occurred while opening file '{image}': {error}".format(image=image, error=str(e))))
                 break
 
             new_size = qt.QSize(280, 165)
@@ -452,8 +395,7 @@ class TutorialGUI(qt.QMainWindow):
 
     def load_all_images(self, data, directory_path):
         self.annotations = []
-        self.annotations_json = [] 
-#        self.annotations_json = [] Enrique line
+        self.annotations_json = []
         self.images_list = []
         self.metadata_list = []
         cont = 0
@@ -462,7 +404,6 @@ class TutorialGUI(qt.QMainWindow):
         self.edit_screen = []
         self.widgets = []
 
-        #print("directory_path:",directory_path)
         self.title = data["title"]
         self.author = data["author"]
         self.date = data["date"]
@@ -492,15 +433,15 @@ class TutorialGUI(qt.QMainWindow):
                         
                     image = qt.QImage(path_image)
                 except FileNotFoundError:
-                    print(f"File '{path_meta}' was not found.")
+                    print(_("File '{path_meta}' was not found.".format(path_meta=path_meta)))
                     exception_occurred = True   
                     break
                 except IOError:
-                    print(f"Could not open file '{path_meta}'.")
+                    print(_("Could not open file '{path_meta}'.".format(path_meta=path_meta)))
                     exception_occurred = True
                     break
                 except Exception as e:
-                    print(f"An unexpected error occurred while opening file '{path_image}': {str(e)}")
+                    print(_("An unexpected error occurred while opening file '{path_image}': {eror}".format(path_meta=path_meta, error=str(e))))
                     exception_occurred = True
                     break
 
@@ -519,32 +460,24 @@ class TutorialGUI(qt.QMainWindow):
                 self.metadata_list.append(content)
                 self.annotations.append(new_annotation)
                 self.annotations_json.append(new_annotation_json)
-                self.steps.append("Write a description here")
-                self.widgets.append("Add a tittle here")
+                self.steps.append(_("Write a description here"))
+                self.widgets.append(_("Add a tittle here"))
                 cont += 1
 
             if exception_occurred:
                 break
-        #print(self.metadata_list)
-        #print('self.annotations')
-        #print(self.annotations)
-        #print(List_totalImages)
         self.firts_screen()
 
     def firts_screen(self):
         self.scree_prev = 0
-        #print('longitud:',len(self.images_list))
         path = self.images_list[self.scree_prev]
         self.load_image(path)
         self.line_edit.setText(self.widgets[self.scree_prev])
         self.text_edit.append(self.steps[self.scree_prev])
         label = self.labels[self.scree_prev]
         label.setStyleSheet("border: 2px solid red;")
-        #self.prev_name = label.objectName()
 
     def label_clicked(self, index):
-        #print('index:',index)
-        # Se actualiza el texto para cada uno de los screens
         if str(self.scree_prev) != -1:
             label = self.labels[self.scree_prev]
             label.setStyleSheet("border: 0px")
@@ -559,19 +492,12 @@ class TutorialGUI(qt.QMainWindow):
         # Load the image to viewer from qlabel selected
         label = self.labels[index]
         label.setStyleSheet("border: 2px solid red;")
-        # print("ID de la QLabel:", self.labels.index(label))
-        # print("Path de la Imagen:", self.images_list[self.labels.index(label)])
         path = self.images_list[index]
         self.load_image(path)
         self.metadata_image = self.metadata_list[index]
         self.line_edit.setText(self.widgets[index])
         self.text_edit.append(self.steps[index])
-        # self.my_text_edit.setEnabled(True)
-        # self.draw_annotations()
         self.scree_prev = index
-        
-        # print("Paint Annotations in ", self.scree_prev)
-        # print(self.annotations[self.scree_prev])
         self.draw_annotations()
 
     def load_image(self, path):
@@ -597,7 +523,6 @@ class TutorialGUI(qt.QMainWindow):
         pass
 
     def mouse_press_event(self, event):
-        #print('press_event', event)
         self.start = event.pos()
         self.save_annotation = True
         if self.square.isChecked():
@@ -618,7 +543,6 @@ class TutorialGUI(qt.QMainWindow):
         else:
             print("No select annotation")  
 
-        # self.metadata_list[self.scree_prev] contend all widgets from scree_prev index
         if self.select_annt != False:
             if self.scroll_move == False:
                 self.calculate_annotation()
@@ -629,7 +553,6 @@ class TutorialGUI(qt.QMainWindow):
         self.start = event.pos()
         self.save_annotation = False
         self.scroll_move = False
-        #print('press_event', event)
         if self.square.isChecked():
             self.select_annt = "rect"
         elif self.circle.isChecked():
@@ -647,9 +570,7 @@ class TutorialGUI(qt.QMainWindow):
             self.end = event.pos()   
         else:
             pass
-            #print("No select annotation")  
 
-        # self.metadata_list[self.scree_prev] contend all widgets from scree_prev index
         if self.select_annt != False:
             self.calculate_annotation()
 
@@ -664,7 +585,6 @@ class TutorialGUI(qt.QMainWindow):
                 self.scroll_up_count += 1
                 self.scroll_down_count = 0
                 if self.scroll_up_count >= self.scroll_threshold:
-                    #print("Scrolled up")
                     self.scroll_up_count = 0  # Reset the counter after confirmation
                     if self.w_i < len(self.widget_collection)-1:
                         self.w_i+=1
@@ -672,7 +592,6 @@ class TutorialGUI(qt.QMainWindow):
                 self.scroll_down_count += 1
                 self.scroll_up_count = 0
                 if self.scroll_down_count >= self.scroll_threshold:
-                    #print("Scrolled down")
                     self.scroll_down_count = 0  # Reset the counter after confirmation
                     if self.w_i > 0:
                         self.w_i-=1
@@ -684,9 +603,7 @@ class TutorialGUI(qt.QMainWindow):
         if not widgets:
             pass
         else :
-            # print("Old point: ", self.start)
             pnt_clk = self.map_point(self.start)
-            # print("New point: ", pnt_clk)
             self.widget_collection = self.find_widget(widgets, pnt_clk)
             wdgts_child = self.select_widget_child(self.widget_collection)
             
@@ -779,8 +696,6 @@ class TutorialGUI(qt.QMainWindow):
                     m5 = (p10[1] - p0[1]) / (p10[0] - p0[0])  # p0 to p10 
                     m6 = (p11[1] - p9[1]) / (p11[0] - p9[0])  # p9 to p11 
 
-                    #print(m5, m6)
-
                     b1 = p1[1] - m1 * p1[0]
                     b2 = p2[1] - m2 * p2[0]
                     b3 = p7[1] - m3 * p7[0]
@@ -788,79 +703,65 @@ class TutorialGUI(qt.QMainWindow):
                     b5 = p0[1] - m5 * p0[0]
                     b6 = p9[1] - m6 * p9[0]
 
-                    #print(b5, b6)
-
                     distance = 80
                     cat = math.sqrt(distance ** 2 / 2)
                     
                     if y > m1 * x + b1 and y > m2 * x + b2:
-                        #print ("1")
                         wdgts_child['labelPosition'] = 'down'
                         wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                         star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                         end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
                     elif y < m2 * x + b2 and y > m6 * x + b6:
-                        #print ("2")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [bottom_left[0]-cat, bottom_left[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_left[0], bottom_left[1]))
                         end = self.remap_point(qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat))
                     elif y < m6 * x + b6 and y > m3 * x + b3:
-                        #print ("3")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [left_bottom[0]-cat, left_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(left_bottom[0], left_bottom[1]))
                         end = self.remap_point(qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat))
                     elif y > m4 * x + b4 and y < m3 * x + b3:
-                        #print ("4")
                         wdgts_child['labelPosition'] = 'left'
                         wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                         star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                         end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
                     elif y < m4 * x + b4 and y > m5 * x + b5:
-                        #print ("5")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [left_top[0]-cat, left_top[1]-cat]
                         star = self.remap_point(qt.QPoint(left_top[0], left_top[1]))
                         end = self.remap_point(qt.QPoint(left_top[0]-cat, left_top[1]-cat))
                     elif y < m5 * x + b5 and y > m1 * x + b1:
-                        #print ("6")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [top_left[0]-cat, top_left[1]-cat]
                         star = self.remap_point(qt.QPoint(top_left[0], top_left[1]))
                         end = self.remap_point(qt.QPoint(top_left[0]-cat, top_left[1]-cat))
                     elif y < m1 * x + b1 and y < m2 * x + b2:
-                        #print ("7")
                         wdgts_child['labelPosition'] = 'top'
                         wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                         star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                         end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
                     elif y > m2 * x + b2 and y < m6 * x + b6:
-                        #print ("8")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [top_right[0]+cat, top_right[1]-cat]
                         star = self.remap_point(qt.QPoint(top_right[0], top_right[1]))
                         end = self.remap_point(qt.QPoint(top_right[0]+cat, top_right[1]-cat))
                     elif y > m6 * x + b6 and y < m3 * x + b3:
-                        #print ("9")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [right_top[0]+cat, right_top[1]-cat]
                         star = self.remap_point(qt.QPoint(right_top[0], right_top[1]))
                         end = self.remap_point(qt.QPoint(right_top[0]+cat, right_top[1]-cat))
                     elif y < m4 * x + b4 and y > m3 * x + b3:
-                        #print ("10")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                         star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                         end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
                     elif y > m4 * x + b4 and y < m5 * x + b5:
-                        #print ("11")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_bottom[0]+cat, right_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(right_bottom[0], right_bottom[1]))
                         end = self.remap_point(qt.QPoint(right_bottom[0]+cat, right_bottom[1]+cat))
                     else:
-                        #print ("12")
                         wdgts_child['labelPosition'] = 'down-right'
                         wdgts_child['position_tail'] = [bottom_right[0]+cat, bottom_right[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_right[0], bottom_right[1]))
@@ -879,7 +780,6 @@ class TutorialGUI(qt.QMainWindow):
                 if self.save_annotation == True:
                     self.annotations[self.scree_prev].append(anotation)
                     self.annotations_json[self.scree_prev].append(wdgts_child)
-                    # print("add annotatión on ", self.scree_prev, " screen")
                     self.draw_annotations()
                 else:
                     self.draw_annotations()
@@ -891,7 +791,6 @@ class TutorialGUI(qt.QMainWindow):
         if not widgets:
             pass
         else :
-            # print("Old point: ", self.start)
             wdgts_child = self.widget_collection[self.w_i]
             
             star = None
@@ -983,8 +882,6 @@ class TutorialGUI(qt.QMainWindow):
                     m5 = (p10[1] - p0[1]) / (p10[0] - p0[0])  # p0 to p10 
                     m6 = (p11[1] - p9[1]) / (p11[0] - p9[0])  # p9 to p11 
 
-                    #(m5, m6)
-
                     b1 = p1[1] - m1 * p1[0]
                     b2 = p2[1] - m2 * p2[0]
                     b3 = p7[1] - m3 * p7[0]
@@ -992,79 +889,65 @@ class TutorialGUI(qt.QMainWindow):
                     b5 = p0[1] - m5 * p0[0]
                     b6 = p9[1] - m6 * p9[0]
 
-                    #(b5, b6)
-
                     distance = 80
                     cat = math.sqrt(distance ** 2 / 2)
                     
                     if y > m1 * x + b1 and y > m2 * x + b2:
-                        #print ("1")
                         wdgts_child['labelPosition'] = 'down'
                         wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                         star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                         end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
                     elif y < m2 * x + b2 and y > m6 * x + b6:
-                        #print ("2")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [bottom_left[0]-cat, bottom_left[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_left[0], bottom_left[1]))
                         end = self.remap_point(qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat))
                     elif y < m6 * x + b6 and y > m3 * x + b3:
-                        #print ("3")
                         wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [left_bottom[0]-cat, left_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(left_bottom[0], left_bottom[1]))
                         end = self.remap_point(qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat))
                     elif y > m4 * x + b4 and y < m3 * x + b3:
-                        #print ("4")
                         wdgts_child['labelPosition'] = 'left'
                         wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                         star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                         end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
                     elif y < m4 * x + b4 and y > m5 * x + b5:
-                        #print ("5")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [left_top[0]-cat, left_top[1]-cat]
                         star = self.remap_point(qt.QPoint(left_top[0], left_top[1]))
                         end = self.remap_point(qt.QPoint(left_top[0]-cat, left_top[1]-cat))
                     elif y < m5 * x + b5 and y > m1 * x + b1:
-                        #print ("6")
                         wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [top_left[0]-cat, top_left[1]-cat]
                         star = self.remap_point(qt.QPoint(top_left[0], top_left[1]))
                         end = self.remap_point(qt.QPoint(top_left[0]-cat, top_left[1]-cat))
                     elif y < m1 * x + b1 and y < m2 * x + b2:
-                        #print ("7")
                         wdgts_child['labelPosition'] = 'top'
                         wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                         star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                         end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
                     elif y > m2 * x + b2 and y < m6 * x + b6:
-                        #print ("8")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [top_right[0]+cat, top_right[1]-cat]
                         star = self.remap_point(qt.QPoint(top_right[0], top_right[1]))
                         end = self.remap_point(qt.QPoint(top_right[0]+cat, top_right[1]-cat))
                     elif y > m6 * x + b6 and y < m3 * x + b3:
-                        #print ("9")
                         wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [right_top[0]+cat, right_top[1]-cat]
                         star = self.remap_point(qt.QPoint(right_top[0], right_top[1]))
                         end = self.remap_point(qt.QPoint(right_top[0]+cat, right_top[1]-cat))
                     elif y < m4 * x + b4 and y > m3 * x + b3:
-                        #print ("10")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                         star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                         end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
                     elif y > m4 * x + b4 and y < m5 * x + b5:
-                        #print ("11")
                         wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_bottom[0]+distance, right_bottom[1]]
                         star = self.remap_point(qt.QPoint(right_bottom[0], right_bottom[1]))
                         end = self.remap_point(qt.QPoint(right_bottom[0]+distance, right_bottom[1]))
                     else:
-                        #print ("12")
                         wdgts_child['labelPosition'] = 'down-right'
                         wdgts_child['position_tail'] = [bottom_right[0]+cat, bottom_right[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_right[0], bottom_right[1]))
@@ -1083,7 +966,6 @@ class TutorialGUI(qt.QMainWindow):
                 if self.save_annotation == True:
                     self.annotations[self.scree_prev].append(anotation)
                     self.annotations_json[self.scree_prev].append(wdgts_child)
-                    # print("add annotatión on ", self.scree_prev, " screen")
                     self.draw_annotations()
                 else:
                     self.draw_annotations()
@@ -1094,25 +976,18 @@ class TutorialGUI(qt.QMainWindow):
         x = pnt_clk.x()
         y = pnt_clk.y()
         
-        # print("widgets_json:",widgets_json)
         widgets = json.loads(widgets_json)
 
         for id, info in widgets.items():
             rect_x, rect_y = info["position"]
             rect_width, rect_height = info["size"]
             if rect_x <= x <= rect_x + rect_width and rect_y <= y <= rect_y + rect_height:
-                # print("Widget ID:", id, " name:",info["name"])
-                # print("path:",info["path"])
-                # print("position:", info["position"], " size:",info["size"])
                 w_match.append(info)
         
         return w_match
     
     def select_widget_child(self, all_widgets):
         last_wdgt = None
-        # for w in all_widgets:
-        #     last_wdgt = w
-        # return last_wdgt
         if len(all_widgets) > 0:
             self.w_i = len(all_widgets)-1
         else :
@@ -1127,9 +1002,6 @@ class TutorialGUI(qt.QMainWindow):
         
         label_width = self.label_image.width
         label_height = self.label_image.height
-
-        # print('image size:', x, y)
-        # print('label image size:', label_width, label_height)
 
         x_ratio = p.x() / label_width
         y_ratio = p.y() / label_height
@@ -1149,30 +1021,20 @@ class TutorialGUI(qt.QMainWindow):
         label_width = self.label_image.width
         label_height = self.label_image.height
 
-        # print('image size:', x, y)
-        # print('label image size:', label_width, label_height)
-
         rel_x = p.x() / x
         rel_y = p.y() / y
 
-        #print('point:', p.x(), p.y())
-
         new_x = int(label_width * rel_x)
         new_y = int(label_height * rel_y)
-
-        #print('new point:', new_x, new_y)
 
         new_point = qt.QPoint(new_x, new_y)
 
         return new_point
 
     def draw_annotations(self):
-        # print("Paint annotation on ", self.scree_prev)
         pixmap = self.label_image.pixmap
-        # print("pixmap", pixmap)
         painter = qt.QPainter(pixmap)
         painter.drawPixmap(self.label_image.rect, self.background_image)
-        # painter.setRenderHint(qt.QPainter.Antialiasing)
 
         for antts in self.annotations[self.scree_prev]:
             pen = qt.QPen(antts.cl)
@@ -1195,7 +1057,6 @@ class TutorialGUI(qt.QMainWindow):
                 painter.setFont(font_small)
                 bg_h = 16 * len(txt) + 3
                 if antts.ip.y() > antts.fp.y():
-                    #print("La flecha apunta hacia abajo")
                     tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1206,7 +1067,6 @@ class TutorialGUI(qt.QMainWindow):
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                         y_position+=16
                 elif antts.ip.y() < antts.fp.y():
-                    #print("La flecha apunta hacia arriba")
                     tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1217,7 +1077,6 @@ class TutorialGUI(qt.QMainWindow):
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                         y_position+=16
                 elif antts.ip.x() > antts.fp.x():
-                    #print("La flecha apunta hacia la derecha")
                     tb_i = qt.QPoint(antts.fp.x()-200, antts.fp.y()-10)
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1228,7 +1087,6 @@ class TutorialGUI(qt.QMainWindow):
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                         y_position+=16
                 elif antts.ip.x() < antts.fp.x():
-                    #print("La flecha apunta hacia la izquierda")
                     tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1249,12 +1107,9 @@ class TutorialGUI(qt.QMainWindow):
         self.label_image.setPixmap(pixmap)
 
     def draw_preview(self, antt):
-        #print("draw annotation preview:", antt.tp)
         pixmap = self.label_image.pixmap
-        # print("pixmap", pixmap)
         painter = qt.QPainter(pixmap)
         painter.drawPixmap(self.label_image.rect, self.background_image)
-        # painter.setRenderHint(qt.QPainter.Antialiasing)
 
         for antts in self.annotations[self.scree_prev]:
             pen = qt.QPen(antts.cl)
@@ -1277,7 +1132,6 @@ class TutorialGUI(qt.QMainWindow):
                 painter.setFont(font_small)
                 bg_h = 16 * len(txt) + 3
                 if antts.ip.y() > antts.fp.y():
-                    #print("La flecha apunta hacia abajo")
                     tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1288,7 +1142,6 @@ class TutorialGUI(qt.QMainWindow):
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                         y_position+=16
                 elif antts.ip.y() < antts.fp.y():
-                    #print("La flecha apunta hacia arriba")
                     tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1299,7 +1152,6 @@ class TutorialGUI(qt.QMainWindow):
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                         y_position+=16
                 elif antts.ip.x() > antts.fp.x():
-                    #print("La flecha apunta hacia la derecha")
                     tb_i = qt.QPoint(antts.fp.x()-200, antts.fp.y()-10)
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1310,7 +1162,6 @@ class TutorialGUI(qt.QMainWindow):
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                         y_position+=16
                 elif antts.ip.x() < antts.fp.x():
-                    #print("La flecha apunta hacia la izquierda")
                     tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
                     tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1327,49 +1178,6 @@ class TutorialGUI(qt.QMainWindow):
                 painter.setFont(font_small)
                 painter.drawText(antts.ip.x(), antts.ip.y(), antts.tx)
 
-        # For preview annotations
-        wdgts_child = self.widget_collection[self.w_i]
-        x_i, y_i = wdgts_child["position"]
-        w, h = wdgts_child["size"]
-
-        # td = int(w / 3)
-        # bd = int(h / 3)
-
-        # p1 =  self.remap_point(qt.QPoint(x_i, y_i))
-        # p2 =  self.remap_point(qt.QPoint(x_i + td * 1, y_i))
-        # p3 =  self.remap_point(qt.QPoint(x_i + td * 2, y_i))
-        # p4 =  self.remap_point(qt.QPoint(x_i + w, y_i))
-        # p5 =  self.remap_point(qt.QPoint(x_i + w, y_i + bd * 1))
-        # p6 =  self.remap_point(qt.QPoint(x_i + w, y_i + bd * 2))
-        # p7 =  self.remap_point(qt.QPoint(x_i + w, y_i + h))
-        # p8 =  self.remap_point(qt.QPoint(x_i + td * 2, y_i + h))
-        # p9 =  self.remap_point(qt.QPoint(x_i + td * 1, y_i + h))
-        # p10 = self.remap_point(qt.QPoint(x_i, y_i + h))
-        # p11 = self.remap_point(qt.QPoint(x_i, y_i + bd * 2))
-        # p12 = self.remap_point(qt.QPoint(x_i, y_i + bd * 1))
-
-        # pen = qt.QPen(qt.QColor(255, 255, 255))
-        # painter.setPen(pen)
-        # painter.drawLine(p1, p7)
-        # pen = qt.QPen(qt.QColor(255, 0, 0))
-        # painter.setPen(pen)
-        # painter.drawLine(p2, p8)
-        # pen = qt.QPen(qt.QColor(255, 0, 0))
-        # painter.setPen(pen)
-        # painter.drawLine(p3, p9)
-        # pen = qt.QPen(qt.QColor(255, 255, 255))
-        # painter.setPen(pen)
-        # painter.drawLine(p4, p10)
-        # pen = qt.QPen(qt.QColor(255, 0, 0))
-        # painter.setPen(pen)
-        # painter.drawLine(p5, p11)
-        # pen = qt.QPen(qt.QColor(255, 0, 0))
-        # painter.setPen(pen)
-        # painter.drawLine(p6, p12)
-        # pen = qt.QPen(qt.QColor(0, 0, 255))
-        # painter.setPen(pen)
-        # painter.drawLine(p6, p12)
-
         pen = qt.QPen(antt.cl)
         pen.setWidth(antt.tk)
         painter.setPen(pen)
@@ -1382,8 +1190,6 @@ class TutorialGUI(qt.QMainWindow):
         elif antt.tp == "click":
             painter.drawImage(antt.ip, self.new_image)
         elif antt.tp == "arwT":
-            # print('antt.tx:',antt.tx)
-            # print('tamaño:',len(antt.tx))
             txt = self.split_string_to_dict(antt.tx)
             painter.drawPath(self.arrowPath(antt.tp, antt.ip, antt.fp))
             pen = qt.QPen(qt.QColor(255, 255, 255))
@@ -1393,7 +1199,6 @@ class TutorialGUI(qt.QMainWindow):
             painter.setFont(font_small)
             bg_h = 16 * len(txt) + 3
             if antt.ip.y() > antt.fp.y():
-                #print("La flecha apunta hacia abajo")
                 tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y()-bg_h)
                 tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                 painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1404,7 +1209,6 @@ class TutorialGUI(qt.QMainWindow):
                     painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                     y_position+=16
             elif antt.ip.y() < antt.fp.y():
-                #print("La flecha apunta hacia arriba")
                 tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y())
                 tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                 painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1415,7 +1219,6 @@ class TutorialGUI(qt.QMainWindow):
                     painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                     y_position+=16               
             elif antt.ip.x() > antt.fp.x():
-                #print("La flecha apunta hacia la derecha")
                 tb_i = qt.QPoint(antt.fp.x()-200, antt.fp.y()-10)
                 tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                 painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1426,7 +1229,6 @@ class TutorialGUI(qt.QMainWindow):
                     painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
                     y_position+=16
             elif antt.ip.x() < antt.fp.x():
-                #print("La flecha apunta hacia la izquierda")
                 tb_i = qt.QPoint(antt.fp.x(), antt.fp.y()-10)
                 tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
                 painter.drawRect(qt.QRect(tb_i, tb_f))
@@ -1447,24 +1249,17 @@ class TutorialGUI(qt.QMainWindow):
         self.label_image.setPixmap(pixmap)
     
     def split_string_to_dict(self, input_string):
-        # print(input_string)
-        words = input_string.split()  # Separar el string en palabras
+        words = input_string.split() 
         result_dict = []
         current_string = ""
-        # print('Se econtraron ', len(words), 'palabras')
         for word in words:
-            # Si agregar la palabra actual a current_string no supera los 30 caracteres
             if len(current_string) + len(word) + 1 < 30:
-                if current_string:  # Si current_string no está vacío, agregar un espacio antes de la palabra
+                if current_string:
                     current_string += " "
                 current_string += word
             else:
-                # Guardar el string actual en el diccionario
                 result_dict.append(current_string)
-                # Empezar un nuevo string con la palabra actual
                 current_string = word
-
-        # No olvidar agregar el último string construido al diccionario
         if current_string:
             result_dict.append(current_string)
 
@@ -1475,7 +1270,6 @@ class TutorialGUI(qt.QMainWindow):
         a2 = p_ini.y()
         a3 = p_fin.x()
         a4 = p_fin.y()
-        #print(a1, a2, a3, a4)
         return qt.QRect(p_ini, p_fin)
 
     def Mdistance(self, p1, p2):
@@ -1485,15 +1279,13 @@ class TutorialGUI(qt.QMainWindow):
         return d
     
     def arrowPath(self, ty, p1, p2):
-        # print("p1:", p1, "  p2:" ,p2)
         path = qt.QPainterPath()
         tip = abs(int((((p1.x() - p2.x()) ** 2 + (p1.y() - p2.y()) ** 2) ** 0.5)/4))
         tip = 10#tip if tip < 15 else 15
         x = p2.x() - p1.x()
         y = p2.y() - p1.y()
-        # print("x:", x, "  y:" ,y)
         if x >= 0 and y >= 0: # 4ro
-            path.moveTo(qt.QPointF(p1))  # Punto de inicio
+            path.moveTo(qt.QPointF(p1)) 
             path.lineTo(qt.QPointF(p2))
             pa1_x, pa1y = self.rotate_point((p1.x()-tip, p1.y()+tip), p1, self.angle(x, y)-90)
             pa2_x, pa2y = self.rotate_point((p1.x()+tip, p1.y()+tip), p1, self.angle(x, y)-90)
@@ -1501,7 +1293,7 @@ class TutorialGUI(qt.QMainWindow):
             path.lineTo(qt.QPointF(p1))
             path.lineTo(pa2_x, pa2y)
         elif x < 0 and y >= 0: # 3ro
-            path.moveTo(qt.QPointF(p1))  # Punto de inicio
+            path.moveTo(qt.QPointF(p1))  
             path.lineTo(qt.QPointF(p2))
             pa1_x, pa1y = self.rotate_point((p1.x()-tip, p1.y()+tip), p1, self.angle(x, y)+180)
             pa2_x, pa2y = self.rotate_point((p1.x()-tip, p1.y()-tip), p1, self.angle(x, y)+180)
@@ -1509,7 +1301,7 @@ class TutorialGUI(qt.QMainWindow):
             path.lineTo(qt.QPointF(p1))
             path.lineTo(pa2_x, pa2y)
         elif x < 0 and y < 0: # 3ro
-            path.moveTo(qt.QPointF(p1)) # Punto de inicio
+            path.moveTo(qt.QPointF(p1)) 
             path.lineTo(qt.QPointF(p2))
             pa1_x, pa1y = self.rotate_point((p1.x()+tip, p1.y()-tip), p1, self.angle(x, y)+90)
             pa2_x, pa2y = self.rotate_point((p1.x()-tip, p1.y()-tip), p1, self.angle(x, y)+90)
@@ -1517,7 +1309,7 @@ class TutorialGUI(qt.QMainWindow):
             path.lineTo(qt.QPointF(p1))
             path.lineTo(pa2_x, pa2y)
         else: # 1ro
-            path.moveTo(qt.QPointF(p1))  # Punto de inicio
+            path.moveTo(qt.QPointF(p1)) 
             path.lineTo(qt.QPointF(p2))
             pa1_x, pa1y = self.rotate_point((p1.x()+tip, p1.y()-tip), p1, self.angle(x, y))
             pa2_x, pa2y = self.rotate_point((p1.x()+tip, p1.y()+tip), p1, self.angle(x, y))
@@ -1532,23 +1324,18 @@ class TutorialGUI(qt.QMainWindow):
         return deg
     
     def rotate_point(self, point, center, angle):
-        # Convertir el ángulo a radianes
         angle_rad = math.radians(angle)
         
-        # Descomponer las coordenadas de los puntos
         x, y = point
         cx = center.x()
         cy = center.y()
 
-        # Calcular las diferencias
         dx = x - cx
         dy = y - cy
 
-        # Aplicar la rotación
         rotated_x = dx * math.cos(angle_rad) - dy * math.sin(angle_rad)
         rotated_y = dx * math.sin(angle_rad) + dy * math.cos(angle_rad)
 
-        # Calcular las nuevas coordenadas
         new_x = rotated_x + cx
         new_y = rotated_y + cy
 
@@ -1558,20 +1345,16 @@ class TutorialGUI(qt.QMainWindow):
         color_dialog = qt.QColorDialog()
         color_dialog.setCurrentColor(self.selected_color)
         if color_dialog.exec_():
-            # Obtener el color seleccionado
             color = color_dialog.selectedColor()
             self.selected_color = color
-            # self.sender().setIcon(self.createColorIcon(color))
 
     def createColorIcon(self, color):
-        # Crear un icono de color sólido
         pixmap = qt.QPixmap(20, 20)
         pixmap.fill(color)
 
         return qt.QIcon(pixmap)
     
     def delete_annotation(self):
-        # print("delete_annotation")
         if len(self.annotations[self.scree_prev]) != 0:
             self.annotations[self.scree_prev].pop()
             self.annotations_json[self.scree_prev].pop()
@@ -1579,42 +1362,33 @@ class TutorialGUI(qt.QMainWindow):
 
     def fill_figures(self):
         if self.fill == True:
-            # print('is Checked change not Checked')
             self.fill_annot.setChecked(False)
             self.fill = False
             self.fill_annot.setIcon(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/fill_u.png'))
         else:
-            # print('is not Checked change Checked')
             self.fill_annot.setChecked(True)
             self.fill = True
             self.fill_annot.setIcon(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/fill_p.png'))
 
     def open_icon(self):
-        # print('load_icon')
         selected_file = self.dir_path+'/../Resources/Icons/Painter/click_icon.png'
         self.new_image = qt.QImage(selected_file)
         self.new_image = self.new_image.scaled(20,30)  
         self.dir_icon = selected_file
-        #print("self.dir_icon:", self.dir_icon)
 
     def actualizar_valor(self, valor):
-        # Actualiza el valor de self cuando el QSpinBox cambia
         self.valor = valor
     
     def actualizar_size(self, valor):
         self.t_px = valor
 
     def on_action_triggered(self, sender):
-        # print(sender)
         self.annotation_selected = True
         for action, icons in self.icons.items():
-            # print(action.objectName)
             if action is sender:
-                # Activar QAction y cambiar su icono
                 action.setChecked(True)
                 action.setIcon(icons['active'])
             else:
-                # Desactivar QAction y restaurar su icono original
                 action.setChecked(False)
                 action.setIcon(icons['inactive'])
     
@@ -1623,18 +1397,13 @@ class TutorialGUI(qt.QMainWindow):
 
     def save_json_file(self):
         # Create json file 
-        self.label_clicked(self.scree_prev) # Enrique line
-        #print("Create json file")
+        self.label_clicked(self.scree_prev) 
         json_out = []
         data = {}
 
         for i, image in enumerate(self.images_list, start=1):
-            #newListImages = self.images_list
-            #print('Lista')
-            #print(self.images_list)
             annotations = []
             for annts, wdg in zip(self.annotations[i-1], self.annotations_json[i-1]):
-                #print("wdg ", wdg )
                 color_rgb = f"{annts.cl.red()}, {annts.cl.green()}, {annts.cl.blue()}"
                 if annts.tp == "rect":
                     annotation = { #Convert all to string
@@ -1643,7 +1412,6 @@ class TutorialGUI(qt.QMainWindow):
                         "color": color_rgb, # (r,g,b)
                         "labelText":"", #text on annotation
                         "fontSize": "14", # size of text on annotions 14px 
-                        #"offset": "()" # (x,y) distance bettewn center and text box
                     }
                 elif annts.tp == "click":
                     annotation = {
@@ -1651,7 +1419,6 @@ class TutorialGUI(qt.QMainWindow):
                         "type": "clickMark",
                         "labelText":"", #text on annotation
                         "fontSize": "14", # size of text on annotions 14px 
-                        #"offset": "" # (x,y) distance bettewn center and text box
                     }
                 elif annts.tp == "arwT":
                     pos_off = wdg["position_tail"]
@@ -1662,39 +1429,22 @@ class TutorialGUI(qt.QMainWindow):
                         "labelText": wdg["labelText"],
                         "fontSize": "14",
                         "direction_draw" : wdg["labelPosition"] #Enrique Line
-                        #"offset": "({},{})".format(pos_off[0], pos_off[1]) # position tail
                     }
-                # elif annts.tp == "textBox":
-                #     annotation = {
-                #         "type": "textBox",
-                #         "color": color_rgb, #optional
-                #         "labelText":"", #text on annotation
-                #         "fontSize": "14", # size of text on annotions 14px
-                #         "position": "(x,y)",
-                #     }
                 annotations.append(annotation)
 
             data[str(i)] = {
-                #"image:":image,
                 "slide_title":self.widgets[i-1],
                 "slide_text": self.steps[i-1],
                 "annotations":annotations
             }
 
         output_file_path = os.path.join(self.dir_path, '..', 'Outputs/Annotations', self.output_name + '.json')
-        #print("Data", data)
         with open(output_file_path, 'w', encoding='utf-8') as archivo:
             json.dump(data, archivo, indent=4)
 
 
         # Create MD and HTML file
         tutorialName = "fourMin_tutorial"
-        #Painter creates screenshot with annotations
-        #print(ListPositionWhite)
-        #print('Lista Aqui')
         AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName+".json",ListPositionWhite, List_totalImages)   
-        
-        # Crear markdown and html
-        markdown_creator = markdownHTMLCreator()  # Instancia de la clase
+        markdown_creator = markdownHTMLCreator()  
         html_content = markdown_creator.markdown_to_html((os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName), List_totalImages)
-        #html_content = markdownHTMLCreator.markdown_to_html((os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName))  

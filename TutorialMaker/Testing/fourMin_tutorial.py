@@ -66,13 +66,13 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay('Screenshot #2: In the Models screen with the sample data loaded.')
 
         # 3 shot:
-        slicer.util.findChildren(name="PinButton")[3].click()
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().toggle()
         red = slicer.util.getNode(pattern="vtkMRMLSliceNode1")
         red.SetSliceVisible(1)
-
         self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #3: With the red view panel opened.')
-        slicer.util.findChildren(name="PinButton")[3].click()
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().click()
+        slicer.app.processEvents()
         
         # 4 shot:
         red.SetSliceOffset(-57)
@@ -83,7 +83,7 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         skin = slicer.util.getNode(pattern='Skin')
         skin.GetDisplayNode().SetOpacity(0.5)
         nodeList = util.getNamedWidget("PanelDockWidget/dockWidgetContents/ModulePanel/ScrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ModelsModuleWidget/ResizableFrame/SubjectHierarchyTreeView").inner()
-        nodeList.inner().setCurrentNode(skin)
+        nodeList.setCurrentNode(skin)
         self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #5: With the skin node selected and opacity lowered to 0,5.')
 
@@ -99,12 +99,13 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         # 7 shot
         green = slicer.util.getNode(pattern="vtkMRMLSliceNode3")
         green.SetSliceVisible(1)
-        slicer.util.findChildren(name="PinButton")[3].click()
-        slicer.util.findChildren(name="PinButton")[2].click()
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().click()
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode3").sliceController().pinButton().click()
         self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #7: Set the visibility of the green view, showing the two view panel.')
-        slicer.util.findChildren(name="PinButton")[3].click()
-        slicer.util.findChildren(name="PinButton")[2].click()
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().click()
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode3").sliceController().pinButton().click()
+        slicer.app.processEvents()
 
         # 8 shot
         skull = slicer.util.getNode(pattern='skull_bone')
@@ -122,7 +123,7 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         clip.SetRedSliceClipState(0)
         clip.SetYellowSliceClipState(0)
         clip.SetGreenSliceClipState(2)
-        scrolBar = util.getNamedWidget("PanelDockWidget/dockWidgetContents/ModulePanel/ScrollArea")
+        scrolBar = util.getNamedWidget("PanelDockWidget/dockWidgetContents/ModulePanel/ScrollArea").inner()
         scrolBar.verticalScrollBar().setValue(scrolBar.height)
         self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #9: Select hemispheric_white_matter, click in the clipping and change the clip state of the node.')
@@ -143,8 +144,8 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         cam.GetCamera().Azimuth(-90)
         cam.GetCamera().Elevation(0)
         slicer.util.findChildren(name="PinButton")[3].click()
-        slicer.util.findChildren(name="SpinButton")[0].click()
         self.Tutorial.nextScreenshot()
+        slicer.util.findChildren(name="SpinButton")[0].click()
         self.delayDisplay('Screenshot #11: Active the 3D view spin button.')
 
 

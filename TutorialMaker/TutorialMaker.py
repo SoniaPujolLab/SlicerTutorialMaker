@@ -1,16 +1,17 @@
 import logging
 import os
 import qt
-
 import vtk
 import slicer
 import logging
 import importlib
-from slicer.ScriptedLoadableModule import *
-from slicer.util import VTKObservationMixin
 import Lib.utils as utils
 import Lib.painter as AnnotationPainter
 
+from slicer.ScriptedLoadableModule import *
+from slicer.util import VTKObservationMixin
+from slicer.i18n import tr as _
+from slicer.i18n import translate
 from Lib.TutorialEditor import TutorialEditor
 from Lib.TutorialGUI import TutorialGUI
 
@@ -25,19 +26,16 @@ class TutorialMaker(ScriptedLoadableModule):
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = "Tutorial Maker"  # TODO: make this more human readable by adding spaces
-        self.parent.categories = ["Utilities"]  # TODO: set categories (folders where the module shows up in the module selector)
+        self.parent.title = _("Tutorial Maker")  # TODO: make this more human readable by adding spaces
+        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Utilities")]  # TODO: set categories (folders where the module shows up in the module selector)
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
         self.parent.contributors = ["Douglas Gonçalves (USP)", "Enrique Hernández (UAEM)", "João Januário (USP)", "Lucas Silva (USP)", "Victor Montaño (UAEM)"]  # TODO: replace with "Firstname Lastname (Organization)"
         # TODO: update with short description of the module and a link to online module documentation
         self.parent.helpText = """help text"""
         # TODO: replace with organization, grant and thanks
-        self.parent.acknowledgementText = """
-Development of this module was funded by <a href="https://chanzuckerberg.com/eoss/proposals/3d-slicer-for-latin-america-localization-and-outreach/">CZI EOSS grant</a>.
-"""
-
-        # Additional initialization step after application startup is complete
-        #slicer.app.connect("startupCompleted()", registerSampleData)
+        self.parent.acknowledgementText = _("""
+        Development of this module was funded by <a href="https://chanzuckerberg.com/eoss/proposals/3d-slicer-for-latin-america-localization-and-outreach/">CZI EOSS grant</a>.
+        """)
 
 #
 # TutorialMakerWidget
@@ -163,16 +161,10 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         loadedTutorials = self.logic.loadTutorials()
         listWidget = self.ui.listWidgetTutorials
         listWidget.addItems(loadedTutorials)
-        
-
-
-    
-
 
 #
 # TutorialMakerLogic
 #
-
 class TutorialMakerLogic(ScriptedLoadableModuleLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
@@ -216,7 +208,6 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         pass
 
     def Annotate(self, tutorialName):
-        
         TutorialMakerTest().test_TutorialMaker1(tutorialName)
         
         Annotator = TutorialGUI()
@@ -227,7 +218,6 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
 
     def TestPainter(self, tutorialName):
         AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName+".json")
-
         pass
 
     def loadTutorials(self):
@@ -239,13 +229,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
             test_tutorials.append(content.replace(".py", ""))
         return test_tutorials
 
-                
-
-    
 #
 # TutorialMakerTest
 #
-
 class TutorialMakerTest(ScriptedLoadableModuleTest):
     """
     This is the test case for your scripted module.
@@ -265,7 +251,6 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
         #Annotator test
         #Screencapture test
         #Then run all the tutorials
-        
         tutorials_failed = 0
         test_tutorials = os.listdir(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Testing/")
         for unit_tutorials in test_tutorials:
@@ -273,20 +258,19 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
                 if(not (".py" in unit_tutorials)):
                     continue
                 unit_tutorials = unit_tutorials.replace(".py", "")
-                #Generate Screenshots and widget metadata
+                # Generate Screenshots and widget metadata
                 self.test_TutorialMaker1(unit_tutorials)
-                #Paint Screenshots with annotations
+                # Paint Screenshots with annotations
                 AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/" + unit_tutorials + ".json")
-                
             except:
-                logging.error("Tutorial Execution Failed: " + unit_tutorials)
+                logging.error(_("Tutorial Execution Failed: {unit_tutorials}".format(unit_tutorials=unit_tutorials)))
                 tutorials_failed = tutorials_failed + 1
                 pass
             finally:
-                self.delayDisplay("Tutorial Tested")
+                self.delayDisplay(_("Tutorial Tested"))
             pass
         if tutorials_failed > 0:
-            raise Exception(str(tutorials_failed) +" Tutorials failed to execute")
+            raise Exception(_("{tutorials_failed} tutorials failed to execute".format(tutorials_failed=tutorials_failed)))
 
 
     def test_TutorialMaker1(self, tutorial_name):
@@ -300,11 +284,6 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
         module.  For example, if a developer removes a feature that you depend on,
         your test should break so they know that the feature is needed.
         """
-
-        #Tutorial Example
-        #import Testing.fourMin_tutorial
-        #test = Testing.fourMin_tutorial.Slicer4MinuteTest()
-        #test.test_Slicer4Minute1()
         TutorialModule = importlib.import_module("Testing." + tutorial_name)
         for className in TutorialModule.__dict__:
             if(not ("Test" in className) or className == "ScriptedLoadableModuleTest"):
@@ -313,8 +292,8 @@ class TutorialMakerTest(ScriptedLoadableModuleTest):
             tutorial = testClass()
             tutorial.runTest()
             return
-        logging.error("No tests found in " + tutorial_name)
-        raise Exception("No Tests Found")
+        logging.error(_("No tests found in {tutorial_name}".format(tutorial_name=tutorial_name)))
+        raise Exception(_("No Tests Found"))
         pass
 
     def test_TutorialMaker2(self):
