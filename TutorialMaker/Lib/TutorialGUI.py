@@ -66,6 +66,7 @@ class TutorialGUI(qt.QMainWindow):
         height = 780
 
         self.setFixedSize(width, height)
+        self.setWindowTitle("TutorialMaker - Annotator")
 
         self.scrollAreaWidgetContents = qt.QWidget()
         self.gridLayout = qt.QGridLayout(self.scrollAreaWidgetContents)

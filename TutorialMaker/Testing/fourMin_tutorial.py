@@ -1,9 +1,8 @@
 import slicer
 import SampleData
+from slicer.ScriptedLoadableModule import *
 
 import Lib.utils as utils
-
-from slicer.ScriptedLoadableModule import *
 
 # Slicer4Minute
 
@@ -31,7 +30,7 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.Tutorial = utils.Tutorial( "Slicer4 Minute",
             "Sonia Pujol, Ph.D.",
             "28/08/2024",
-            "description")
+            "This tutorial is a 4-minute introduction to the 3D visualization capabilities of the Slicer4 software for medical image analysis.")
         
         util = utils.util()
         layoutManager = slicer.app.layoutManager()
@@ -66,13 +65,12 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay('Screenshot #2: In the Models screen with the sample data loaded.')
 
         # 3 shot:
-        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().toggle()
         red = slicer.util.getNode(pattern="vtkMRMLSliceNode1")
         red.SetSliceVisible(1)
+        slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().click()
         self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #3: With the red view panel opened.')
         slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().click()
-        slicer.app.processEvents()
         
         # 4 shot:
         red.SetSliceOffset(-57)
@@ -105,7 +103,6 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay('Screenshot #7: Set the visibility of the green view, showing the two view panel.')
         slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode1").sliceController().pinButton().click()
         slicer.app.layoutManager().sliceWidget("vtkMRMLSliceNode3").sliceController().pinButton().click()
-        slicer.app.processEvents()
 
         # 8 shot
         skull = slicer.util.getNode(pattern='skull_bone')
@@ -135,7 +132,9 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay('Screenshot #10: Rotate the camera to see the optical nerve.')
         
         # 11 shot
+        scrolBar.verticalScrollBar().setValue(0)
         skin.GetDisplayNode().SetOpacity(0.5)
+        nodeList.setCurrentNode(skin)
         layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutOneUp3DView)
         self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #11: Change the layout to 3D View only.')
@@ -144,9 +143,10 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         cam.GetCamera().Azimuth(-90)
         cam.GetCamera().Elevation(0)
         slicer.util.findChildren(name="PinButton")[3].click()
-        self.Tutorial.nextScreenshot()
         slicer.util.findChildren(name="SpinButton")[0].click()
+        self.Tutorial.nextScreenshot()
         self.delayDisplay('Screenshot #11: Active the 3D view spin button.')
+        slicer.util.findChildren(name="PinButton")[3].click()
 
 
         self.Tutorial.endTutorial()

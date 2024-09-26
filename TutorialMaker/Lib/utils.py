@@ -395,7 +395,7 @@ class ScreenshotTools():
 
 
     def getPixmap(self, window):
-        slicer.app.processEvents(qt.QEventLoop.AllEvents, 20)
+        slicer.app.processEvents(qt.QEventLoop.AllEvents, 69)
         pixmap = window.grab()
         return pixmap
     
