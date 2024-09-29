@@ -14,6 +14,7 @@ from slicer.i18n import tr as _
 from slicer.i18n import translate
 from Lib.TutorialEditor import TutorialEditor
 from Lib.TutorialGUI import TutorialGUI
+from Lib.CreateTutorial import CreateTutorial
 
 #
 # TutorialMaker
@@ -89,6 +90,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonSave.connect('clicked(bool)', self.logic.Save)
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
+        self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
         #Static Tutorial Handlers
@@ -151,6 +153,9 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     
     def testPainterButton(self):
         self.logic.TestPainter(self.__selectedTutorial)
+
+    def CreateTutorialButton(self):
+        self.logic.CreateNewTutorial()
 
     def annotateButton(self):
         self.logic.Annotate(self.__selectedTutorial)
@@ -223,6 +228,12 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
 
     def TestPainter(self, tutorialName):
         AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName+".json")
+        pass
+
+    def CreateNewTutorial(self):
+        folderName = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Testing/"
+        Tutorial_Win = CreateTutorial(folderName)
+        Tutorial_Win.show()
         pass
 
     def loadTutorials(self):
