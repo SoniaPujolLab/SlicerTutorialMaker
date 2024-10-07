@@ -39,7 +39,7 @@ class SlicerWelcomeTest(ScriptedLoadableModuleTest):
         )
 
         self.Tutorial = utils.Tutorial(
-            "Slicer4 Minute", "Sonia Pujol, Ph.D.", "28/08/2024", "description"
+            "Slicer	Welcome", "Sonia Pujol, Ph.D.", "28/08/2024", "description"
         )
 
         util = utils.util()
@@ -58,7 +58,6 @@ class SlicerWelcomeTest(ScriptedLoadableModuleTest):
         self.delayDisplay("Screenshot #1: In the Welcome screen.")
 
         # 2 shot:
-
         about_button = util.getNamedWidget(
             f"{WELCOME_BUTTONS_PATH}/WelcomeAndAboutCollapsibleWidget"
         ).inner()
