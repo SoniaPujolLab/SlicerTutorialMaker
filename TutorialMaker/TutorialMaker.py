@@ -58,7 +58,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._updatingGUIFromParameterNode = False
         self.__tableSize = 0
         self.__selectedTutorial = None
-        self.isDebug = True
+        self.isDebug = False
 
         #PROTOTYPE FOR PLAYBACK
 
