@@ -358,8 +358,8 @@ class TutorialGUI(qt.QMainWindow):
         self.metadata_list.insert(pos, [])
         self.annotations.insert(pos, new_annotation)
         self.annotations_json.insert(pos, new_annotation_json)
-        self.steps.insert(pos, _(" - Add the author name  and her/him institution here"))
-        self.widgets.insert(pos, _("Add a title here"))
+        self.steps.insert(pos, (" - Add the author name  and her/him institution here"))
+        self.widgets.insert(pos, ("Add a title here"))
 
         # Clear the existing grid layout
         while self.gridLayout.count():
@@ -473,14 +473,13 @@ class TutorialGUI(qt.QMainWindow):
         k = 0
         for step in data["steps"]:
             # Load files 
-            List_totalImages.append(k)
-            k = k+1
             for m_data in step:
                 new_annotation = []
                 new_annotation_json = []
                 path_image = directory_path+"/"+m_data["window"]
                 path_meta = directory_path+"/"+m_data["metadata"]
-
+                List_totalImages.append(k)
+                k = k+1
                 try:
                     with open(path_meta, 'r', encoding='utf-8') as file:
                         content = file.read()
@@ -520,6 +519,7 @@ class TutorialGUI(qt.QMainWindow):
 
             if exception_occurred:
                 break
+        self.add_first_page()
         self.firts_screen()
 
     def firts_screen(self):
