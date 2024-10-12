@@ -29,7 +29,7 @@ class TutorialMaker(ScriptedLoadableModule):
         self.parent.title = _("Tutorial Maker")  # TODO: make this more human readable by adding spaces
         self.parent.categories = [translate("qSlicerAbstractCoreModule", "Utilities")]  # TODO: set categories (folders where the module shows up in the module selector)
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-        self.parent.contributors = ["Douglas Gonçalves (USP)", "Enrique Hernández (UAEM)", "João Januário (USP)", "Lucas Silva (USP)", "Victor Montaño (UAEM)"]  # TODO: replace with "Firstname Lastname (Organization)"
+        self.parent.contributors = ["Douglas Gonçalves (USP)", "Enrique Hernández (UAEM)", "João Januário (USP)", "Lucas Silva (USP)", "Paulo Pereira (USP)", "Victor Montaño (UAEM)"]  # TODO: replace with "Firstname Lastname (Organization)"
         # TODO: update with short description of the module and a link to online module documentation
         self.parent.helpText = """help text"""
         # TODO: replace with organization, grant and thanks
