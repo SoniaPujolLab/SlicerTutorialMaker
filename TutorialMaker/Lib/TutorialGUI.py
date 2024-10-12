@@ -30,7 +30,7 @@ class TutorialGUI(qt.QMainWindow):
 
         self.drawing = False
         self.scree_prev = -1
-        self.selected_color = qt.QColor(254, 254, 254)
+        self.selected_color = qt.QColor(255, 128, 0)
 
         self.title = ""
         self.author = ""
@@ -236,7 +236,7 @@ class TutorialGUI(qt.QMainWindow):
         self.spin_box_txt.valueChanged.connect(self.actualizar_size)
 
         self.text_in = qt.QLineEdit()
-        self.text_in.setMaxLength(100)
+        self.text_in.setMaxLength(500)
         self.text_in.setFixedWidth(590)
         self.widget_action = qt.QWidgetAction(self)
         self.widget_action.setDefaultWidget(self.text_in)
@@ -334,6 +334,59 @@ class TutorialGUI(qt.QMainWindow):
             cont += 1
 
         self.label_clicked(self.scree_prev)
+
+    
+    def add_first_page(self):
+        newListImages = self.images_list.copy()  # Create a copy to avoid modifying the original
+        self.labels = []
+        new_annotation = []
+        new_annotation_json = []
+        cont = 0
+        
+        pos = 0
+        if pos in ListPositionWhite:
+            for i, _ in enumerate(ListPositionWhite):
+                if ListPositionWhite[i] >= pos:
+                    ListPositionWhite[i] = ListPositionWhite[i] + 1
+        
+        ListPositionWhite.append(pos)
+        List_totalImages.insert(pos, -1)
+        new_path = self.dir_path + '/../Resources/NewSlide/cover_page.png'
+
+        # Insert new_path at position pos
+        newListImages.insert(pos, new_path)
+        self.metadata_list.insert(pos, [])
+        self.annotations.insert(pos, new_annotation)
+        self.annotations_json.insert(pos, new_annotation_json)
+        self.steps.insert(pos, _(" - Add the author name  and her/him institution here"))
+        self.widgets.insert(pos, _("Add a title here"))
+
+        # Clear the existing grid layout
+        while self.gridLayout.count():
+            widget = self.gridLayout.itemAt(0).widget()
+            self.gridLayout.removeWidget(widget)
+            widget.deleteLater()
+
+        # Repopulate the grid layout with the updated images
+        for img in newListImages:
+            try:
+                image = qt.QImage(img)
+                new_size = qt.QSize(280, 165)
+                scaled_image = image.scaled(new_size)
+                pixmap = qt.QPixmap.fromImage(scaled_image)
+                label = tmLabel("QLabel_{}".format(cont), cont)
+                label.setObjectName("QLabel_{}".format(cont))
+                label.clicked.connect(lambda index=cont: self.label_clicked(index))
+                label.setPixmap(pixmap)
+                self.gridLayout.addWidget(label)
+                self.labels.append(label)
+                cont += 1
+            except Exception as e:
+                print(f"An unexpected error occurred while opening file '{img}': {str(e)}")
+                break
+
+        self.images_list = newListImages  # Update the original images_list
+        self.label_clicked(0)
 
     def copy_page(self):
         newListImages = self.images_list
@@ -708,66 +761,79 @@ class TutorialGUI(qt.QMainWindow):
                     cat = math.sqrt(distance ** 2 / 2)
                     
                     if y > m1 * x + b1 and y > m2 * x + b2:
-                        wdgts_child['labelPosition'] = 'down'
                         wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                         star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                         end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
+                        star_painter = qt.QPoint(bottom_center[0], bottom_center[1])
+                        end_painter = qt.QPoint(bottom_center[0], bottom_center[1]+distance)
                     elif y < m2 * x + b2 and y > m6 * x + b6:
-                        wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [bottom_left[0]-cat, bottom_left[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_left[0], bottom_left[1]))
                         end = self.remap_point(qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat))
+                        star_painter = qt.QPoint(bottom_left[0], bottom_left[1])
+                        end_painter = qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat)
                     elif y < m6 * x + b6 and y > m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [left_bottom[0]-cat, left_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(left_bottom[0], left_bottom[1]))
                         end = self.remap_point(qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat))
+                        star_painter = qt.QPoint(left_bottom[0], left_bottom[1])
+                        end_painter = qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat)
                     elif y > m4 * x + b4 and y < m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'left'
                         wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                         star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                         end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
+                        star_painter = qt.QPoint(left_center[0], left_center[1])
+                        end_painter = qt.QPoint(left_center[0]-distance, left_center[1])
                     elif y < m4 * x + b4 and y > m5 * x + b5:
-                        wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [left_top[0]-cat, left_top[1]-cat]
                         star = self.remap_point(qt.QPoint(left_top[0], left_top[1]))
                         end = self.remap_point(qt.QPoint(left_top[0]-cat, left_top[1]-cat))
+                        star_painter = qt.QPoint(left_top[0], left_top[1])
+                        end_painter = qt.QPoint(left_top[0]-cat, left_top[1]-cat)
                     elif y < m5 * x + b5 and y > m1 * x + b1:
-                        wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [top_left[0]-cat, top_left[1]-cat]
                         star = self.remap_point(qt.QPoint(top_left[0], top_left[1]))
                         end = self.remap_point(qt.QPoint(top_left[0]-cat, top_left[1]-cat))
+                        star_painter = qt.QPoint(top_left[0], top_left[1])
+                        end_painter = qt.QPoint(top_left[0]-cat, top_left[1]-cat)
                     elif y < m1 * x + b1 and y < m2 * x + b2:
-                        wdgts_child['labelPosition'] = 'top'
                         wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                         star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                         end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
+                        star_painter = qt.QPoint(top_center[0], top_center[1])
+                        end_painter = qt.QPoint(top_center[0], top_center[1]-distance)
                     elif y > m2 * x + b2 and y < m6 * x + b6:
-                        wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [top_right[0]+cat, top_right[1]-cat]
                         star = self.remap_point(qt.QPoint(top_right[0], top_right[1]))
                         end = self.remap_point(qt.QPoint(top_right[0]+cat, top_right[1]-cat))
+                        star_painter = qt.QPoint(top_right[0], top_right[1])
+                        end_painter = qt.QPoint(top_right[0]+cat, top_right[1]-cat)
                     elif y > m6 * x + b6 and y < m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [right_top[0]+cat, right_top[1]-cat]
                         star = self.remap_point(qt.QPoint(right_top[0], right_top[1]))
                         end = self.remap_point(qt.QPoint(right_top[0]+cat, right_top[1]-cat))
+                        star_painter = qt.QPoint(right_top[0], right_top[1])
+                        end_painter = qt.QPoint(right_top[0]+cat, right_top[1]-cat)
                     elif y < m4 * x + b4 and y > m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                         star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                         end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
+                        star_painter = qt.QPoint(right_center[0], right_center[1])
+                        end_painter = qt.QPoint(right_center[0]+distance, right_center[1])
                     elif y > m4 * x + b4 and y < m5 * x + b5:
-                        wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_bottom[0]+cat, right_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(right_bottom[0], right_bottom[1]))
                         end = self.remap_point(qt.QPoint(right_bottom[0]+cat, right_bottom[1]+cat))
+                        star_painter = qt.QPoint(right_bottom[0], right_bottom[1])
+                        end_painter = qt.QPoint(right_bottom[0]+cat, right_bottom[1]+cat)
                     else:
-                        wdgts_child['labelPosition'] = 'down-right'
                         wdgts_child['position_tail'] = [bottom_right[0]+cat, bottom_right[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_right[0], bottom_right[1]))
                         end = self.remap_point(qt.QPoint(bottom_right[0]+cat, bottom_right[1]+cat))
-                    
+                        star_painter = qt.QPoint(bottom_right[0], bottom_right[1])
+                        end_painter = qt.QPoint(bottom_right[0]+cat, bottom_right[1]+cat)
+
+                    wdgts_child['labelPosition'] = [ float(star_painter.x()), float(star_painter.y()), float(end_painter.x()), float(end_painter.y())]
                     wdgts_child['labelText'] = self.text_in.text
                     anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
 
@@ -894,66 +960,79 @@ class TutorialGUI(qt.QMainWindow):
                     cat = math.sqrt(distance ** 2 / 2)
                     
                     if y > m1 * x + b1 and y > m2 * x + b2:
-                        wdgts_child['labelPosition'] = 'down'
                         wdgts_child['position_tail'] = [bottom_center[0], bottom_center[1]+distance]
                         star = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]))
                         end = self.remap_point(qt.QPoint(bottom_center[0], bottom_center[1]+distance))
+                        star_painter = qt.QPoint(bottom_center[0], bottom_center[1])
+                        end_painter = qt.QPoint(bottom_center[0], bottom_center[1]+distance)
                     elif y < m2 * x + b2 and y > m6 * x + b6:
-                        wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [bottom_left[0]-cat, bottom_left[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_left[0], bottom_left[1]))
                         end = self.remap_point(qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat))
+                        star_painter = qt.QPoint(bottom_left[0], bottom_left[1])
+                        end_painter = qt.QPoint(bottom_left[0]-cat, bottom_left[1]+cat)
                     elif y < m6 * x + b6 and y > m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'down-left'
                         wdgts_child['position_tail'] = [left_bottom[0]-cat, left_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(left_bottom[0], left_bottom[1]))
                         end = self.remap_point(qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat))
+                        star_painter = qt.QPoint(left_bottom[0], left_bottom[1])
+                        end_painter = qt.QPoint(left_bottom[0]-cat, left_bottom[1]+cat)
                     elif y > m4 * x + b4 and y < m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'left'
                         wdgts_child['position_tail'] = [left_center[0]-distance, left_center[1]]
                         star = self.remap_point(qt.QPoint(left_center[0], left_center[1]))
                         end = self.remap_point(qt.QPoint(left_center[0]-distance, left_center[1]))
+                        star_painter = qt.QPoint(left_center[0], left_center[1])
+                        end_painter = qt.QPoint(left_center[0]-distance, left_center[1])
                     elif y < m4 * x + b4 and y > m5 * x + b5:
-                        wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [left_top[0]-cat, left_top[1]-cat]
                         star = self.remap_point(qt.QPoint(left_top[0], left_top[1]))
                         end = self.remap_point(qt.QPoint(left_top[0]-cat, left_top[1]-cat))
+                        star_painter = qt.QPoint(left_top[0], left_top[1])
+                        end_painter = qt.QPoint(left_top[0]-cat, left_top[1]-cat)
                     elif y < m5 * x + b5 and y > m1 * x + b1:
-                        wdgts_child['labelPosition'] = 'top-left'
                         wdgts_child['position_tail'] = [top_left[0]-cat, top_left[1]-cat]
                         star = self.remap_point(qt.QPoint(top_left[0], top_left[1]))
                         end = self.remap_point(qt.QPoint(top_left[0]-cat, top_left[1]-cat))
+                        star_painter = qt.QPoint(top_left[0], top_left[1])
+                        end_painter = qt.QPoint(top_left[0]-cat, top_left[1]-cat)
                     elif y < m1 * x + b1 and y < m2 * x + b2:
-                        wdgts_child['labelPosition'] = 'top'
                         wdgts_child['position_tail'] = [top_center[0], top_center[1]-distance]
                         star = self.remap_point(qt.QPoint(top_center[0], top_center[1]))
                         end = self.remap_point(qt.QPoint(top_center[0], top_center[1]-distance))
+                        star_painter = qt.QPoint(top_center[0], top_center[1])
+                        end_painter = qt.QPoint(top_center[0], top_center[1]-distance)
                     elif y > m2 * x + b2 and y < m6 * x + b6:
-                        wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [top_right[0]+cat, top_right[1]-cat]
                         star = self.remap_point(qt.QPoint(top_right[0], top_right[1]))
                         end = self.remap_point(qt.QPoint(top_right[0]+cat, top_right[1]-cat))
+                        star_painter = qt.QPoint(top_right[0], top_right[1])
+                        end_painter = qt.QPoint(top_right[0]+cat, top_right[1]-cat)
                     elif y > m6 * x + b6 and y < m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'top-right'
                         wdgts_child['position_tail'] = [right_top[0]+cat, right_top[1]-cat]
                         star = self.remap_point(qt.QPoint(right_top[0], right_top[1]))
                         end = self.remap_point(qt.QPoint(right_top[0]+cat, right_top[1]-cat))
+                        star_painter = qt.QPoint(right_top[0], right_top[1])
+                        end_painter = qt.QPoint(right_top[0]+cat, right_top[1]-cat)
                     elif y < m4 * x + b4 and y > m3 * x + b3:
-                        wdgts_child['labelPosition'] = 'right'
                         wdgts_child['position_tail'] = [right_center[0]+distance, right_center[1]]
                         star = self.remap_point(qt.QPoint(right_center[0], right_center[1]))
                         end = self.remap_point(qt.QPoint(right_center[0]+distance, right_center[1]))
+                        star_painter = qt.QPoint(right_center[0], right_center[1])
+                        end_painter = qt.QPoint(right_center[0]+distance, right_center[1])
                     elif y > m4 * x + b4 and y < m5 * x + b5:
-                        wdgts_child['labelPosition'] = 'right'
-                        wdgts_child['position_tail'] = [right_bottom[0]+distance, right_bottom[1]]
+                        wdgts_child['position_tail'] = [right_bottom[0]+cat, right_bottom[1]+cat]
                         star = self.remap_point(qt.QPoint(right_bottom[0], right_bottom[1]))
-                        end = self.remap_point(qt.QPoint(right_bottom[0]+distance, right_bottom[1]))
+                        end = self.remap_point(qt.QPoint(right_bottom[0]+cat, right_bottom[1]+cat))
+                        star_painter = qt.QPoint(right_bottom[0], right_bottom[1])
+                        end_painter = qt.QPoint(right_bottom[0]+cat, right_bottom[1]+cat)
                     else:
-                        wdgts_child['labelPosition'] = 'down-right'
                         wdgts_child['position_tail'] = [bottom_right[0]+cat, bottom_right[1]+cat]
                         star = self.remap_point(qt.QPoint(bottom_right[0], bottom_right[1]))
                         end = self.remap_point(qt.QPoint(bottom_right[0]+cat, bottom_right[1]+cat))
-                    
+                        star_painter = qt.QPoint(bottom_right[0], bottom_right[1])
+                        end_painter = qt.QPoint(bottom_right[0]+cat, bottom_right[1]+cat)
+
+                    wdgts_child['labelPosition'] = [ float(star_painter.x()), float(star_painter.y()), float(end_painter.x()), float(end_painter.y())]
                     wdgts_child['labelText'] = self.text_in.text
                     anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
 
@@ -1053,50 +1132,51 @@ class TutorialGUI(qt.QMainWindow):
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
                 pen = qt.QPen(qt.QColor(255, 255, 255))
                 painter.setPen(pen)
-                painter.setBrush(qt.QBrush(qt.QColor(255, 255, 255)))
-                font_small = qt.QFont("Arial", 14)
+                painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
+                font_small = qt.QFont("Arial", 13)
                 painter.setFont(font_small)
-                bg_h = 16 * len(txt) + 3
-                if antts.ip.y() > antts.fp.y():
-                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
-                elif antts.ip.y() < antts.fp.y():
-                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
-                elif antts.ip.x() > antts.fp.x():
-                    tb_i = qt.QPoint(antts.fp.x()-200, antts.fp.y()-10)
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
-                elif antts.ip.x() < antts.fp.x():
-                    tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
+                if len(txt) > 0:
+                    bg_h = 16 * len(txt) + 3
+                    if antts.ip.y() > antts.fp.y():
+                        tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
+                    elif antts.ip.y() < antts.fp.y():
+                        tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
+                    elif antts.ip.x() > antts.fp.x():
+                        tb_i = qt.QPoint(antts.fp.x()-250, antts.fp.y()-10)
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
+                    elif antts.ip.x() < antts.fp.x():
+                        tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
             elif antts.tp == "icon":
                 painter.drawImage(antts.ip, qt.QImage(antts.tx))
             elif antts.tp == "text":
@@ -1128,50 +1208,51 @@ class TutorialGUI(qt.QMainWindow):
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
                 pen = qt.QPen(qt.QColor(255, 255, 255))
                 painter.setPen(pen)
-                painter.setBrush(qt.QBrush(qt.QColor(255, 255, 255)))
-                font_small = qt.QFont("Arial", 14)
+                painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
+                font_small = qt.QFont("Arial", 13)
                 painter.setFont(font_small)
-                bg_h = 16 * len(txt) + 3
-                if antts.ip.y() > antts.fp.y():
-                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
-                elif antts.ip.y() < antts.fp.y():
-                    tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
-                elif antts.ip.x() > antts.fp.x():
-                    tb_i = qt.QPoint(antts.fp.x()-200, antts.fp.y()-10)
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
-                elif antts.ip.x() < antts.fp.x():
-                    tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
-                    tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                    painter.drawRect(qt.QRect(tb_i, tb_f))
-                    pen = qt.QPen(qt.QColor(0, 0, 0))
-                    painter.setPen(pen)
-                    y_position = 16
-                    for r in txt:
-                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
+                if len(txt) > 0:
+                    bg_h = 16 * len(txt) + 3
+                    if antts.ip.y() > antts.fp.y():
+                        tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
+                    elif antts.ip.y() < antts.fp.y():
+                        tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
+                    elif antts.ip.x() > antts.fp.x():
+                        tb_i = qt.QPoint(antts.fp.x()-250, antts.fp.y()-10)
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
+                    elif antts.ip.x() < antts.fp.x():
+                        tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
+                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        painter.drawRect(qt.QRect(tb_i, tb_f))
+                        pen = qt.QPen(qt.QColor(0, 0, 0))
+                        painter.setPen(pen)
+                        y_position = 16
+                        for r in txt:
+                            painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                            y_position+=16
             elif antts.tp == "icon":
                 painter.drawImage(antts.ip, qt.QImage(antts.tx))
             elif antts.tp == "text":
@@ -1195,50 +1276,51 @@ class TutorialGUI(qt.QMainWindow):
             painter.drawPath(self.arrowPath(antt.tp, antt.ip, antt.fp))
             pen = qt.QPen(qt.QColor(255, 255, 255))
             painter.setPen(pen)
-            painter.setBrush(qt.QBrush(qt.QColor(255, 255, 255)))
-            font_small = qt.QFont("Arial", 14)
+            painter.setBrush(qt.QBrush(self.selected_color)) #self.selected_color
+            font_small = qt.QFont("Arial", 13)
             painter.setFont(font_small)
-            bg_h = 16 * len(txt) + 3
-            if antt.ip.y() > antt.fp.y():
-                tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y()-bg_h)
-                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                painter.drawRect(qt.QRect(tb_i, tb_f))
-                pen = qt.QPen(qt.QColor(0, 0, 0))
-                painter.setPen(pen)
-                y_position = 16
-                for r in txt:
-                    painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                    y_position+=16
-            elif antt.ip.y() < antt.fp.y():
-                tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y())
-                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                painter.drawRect(qt.QRect(tb_i, tb_f))
-                pen = qt.QPen(qt.QColor(0, 0, 0))
-                painter.setPen(pen)
-                y_position = 16
-                for r in txt:
-                    painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                    y_position+=16               
-            elif antt.ip.x() > antt.fp.x():
-                tb_i = qt.QPoint(antt.fp.x()-200, antt.fp.y()-10)
-                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                painter.drawRect(qt.QRect(tb_i, tb_f))
-                pen = qt.QPen(qt.QColor(0, 0, 0))
-                painter.setPen(pen)
-                y_position = 16
-                for r in txt:
-                    painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                    y_position+=16
-            elif antt.ip.x() < antt.fp.x():
-                tb_i = qt.QPoint(antt.fp.x(), antt.fp.y()-10)
-                tb_f = qt.QPoint(tb_i.x()+200, tb_i.y()+bg_h)
-                painter.drawRect(qt.QRect(tb_i, tb_f))
-                pen = qt.QPen(qt.QColor(0, 0, 0))
-                painter.setPen(pen)
-                y_position = 16
-                for r in txt:
-                    painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                    y_position+=16
+            if len(txt) > 0:
+                bg_h = 16 * len(txt) + 3
+                if antt.ip.y() > antt.fp.y():
+                    tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y()-bg_h)
+                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    y_position = 16
+                    for r in txt:
+                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                        y_position+=16
+                elif antt.ip.y() < antt.fp.y():
+                    tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y())
+                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    y_position = 16
+                    for r in txt:
+                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                        y_position+=16               
+                elif antt.ip.x() > antt.fp.x():
+                    tb_i = qt.QPoint(antt.fp.x()-250, antt.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    y_position = 16
+                    for r in txt:
+                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                        y_position+=16
+                elif antt.ip.x() < antt.fp.x():
+                    tb_i = qt.QPoint(antt.fp.x(), antt.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    painter.drawRect(qt.QRect(tb_i, tb_f))
+                    pen = qt.QPen(qt.QColor(0, 0, 0))
+                    painter.setPen(pen)
+                    y_position = 16
+                    for r in txt:
+                        painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
+                        y_position+=16
         elif antt.tp == "icon":
             painter.drawImage(antt.ip, qt.QImage(antt.tx))
         elif antt.tp == "text":
