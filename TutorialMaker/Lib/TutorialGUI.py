@@ -361,6 +361,19 @@ class TutorialGUI(qt.QMainWindow):
         self.steps.insert(pos, (" - Add the author name  and her/him institution here"))
         self.widgets.insert(pos, ("Add a title here"))
 
+        #Add the acknowledments page
+        new_path = self.dir_path + '/../Resources/NewSlide/Acknowledgments.png'
+    
+        i = len(newListImages) 
+        ListPositionWhite.append(i)
+        List_totalImages.insert(i,-1)
+        newListImages.insert(i, new_path)
+        self.metadata_list.insert(i, [])
+        self.annotations.insert(i, new_annotation)
+        self.annotations_json.insert(i, new_annotation_json)
+        self.steps.insert(i, (" - Acknowledgments"))
+        self.widgets.insert(i, ("Add the acknowledgments here"))
+
         # Clear the existing grid layout
         while self.gridLayout.count():
             widget = self.gridLayout.itemAt(0).widget()

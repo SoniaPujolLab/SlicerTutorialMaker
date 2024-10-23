@@ -29,13 +29,14 @@ class markdownHTMLCreator:
     def tutorial_to_markdown(self,path,ListotalImages):
         tutorialName = "fourMin_tutorial"
         metadata = self.getMetadata(path)
+        i = len(ListotalImages) -1
         
         with open(path + ".md", 'w', encoding='utf-8') as md_file:
             #Create pages of the tutorial with annotations
             for num,item in enumerate(metadata):            
                 numString = str(num)
                 if (ListotalImages[num] == -1):
-                    if (num == 0):
+                    if (num == 0 or num ==i):
                         md_file.write('<meta charset="UTF-8">\n')
                         md_file.write('<meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
                         md_file.write(f'<div class="containerPage" style="max-width: 100%; margin: 0 auto;">\n')
