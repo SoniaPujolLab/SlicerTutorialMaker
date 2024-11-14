@@ -288,9 +288,7 @@ class ImageDrawer:
 
     def draw_arrow(self, start_x, start_y, end_x, end_y, color, text, font_size, pen_width=4, text_color=qt.Qt.black):
         """
-        Draw an arrow on the image with optional text.
-
-        Title: Draw Arrow
+        Draw an arrow on the image with optional text positioned based on arrow direction.
 
         Inputs:
             - start_x (int): The x-coordinate of the starting point of the arrow.
@@ -305,24 +303,15 @@ class ImageDrawer:
 
         Outputs:
             None
-
-        Description:
-            This method draws an arrow from a starting point to an ending point on an image.
-            It also optionally displays a text label near the arrow. The arrow is drawn with
-            a specified color, pen width, and arrowhead size. The text is displayed with a
-            specified font size and color.
         """
-        
+
         if self.view is None:
             print(_("Error: Load an image first."))
             return
 
-
-        # Create a QPainterPath representing the arrow path
-        p1 = (qt.QPointF(start_x  , start_y))
-        p2 = (qt.QPointF(end_x , end_y))
-
-        # Create a QGraphicsPathItem (arrow path) and add it to the scene
+        # Create the arrow path and add it to the scene
+        p1 = qt.QPointF(start_x, start_y)
+        p2 = qt.QPointF(end_x, end_y)
         arrow_path = self.arrowPath(p1, p2)
         path_item = qt.QGraphicsPathItem(arrow_path)
         pen = qt.QPen(qt.QColor.fromRgb(*color))
@@ -331,35 +320,51 @@ class ImageDrawer:
         self.scene.addItem(path_item)
 
         if text:
-            # Calculate direction and set text offset accordingly
-            offset_x = 0
-            offset_y = 0
-            size_len_text = len(text) 
-            offset_text = 0.56
-            if(len(text)>30):
-                # Condicional para flecha que va a la derecha
-                if end_x > start_x and abs(end_y - start_y) <= abs(end_x - start_x):
-                    offset_x =  size_len_text * offset_text
-                    offset_y =  0
-                # Condicional para flecha que va a la izquierda
-                elif end_x < start_x and abs(end_y - start_y) <= abs(end_x - start_x):
-                    offset_x = - size_len_text * offset_text
-                    offset_y = 0 
+            # Wrap and justify the text before calculating its size
+            wrapped_text = self.wrap_text(text)
 
-                # Condicional para flecha que va hacia abajo
-                elif end_y > start_y and abs(end_y - start_y) > abs(end_x - start_x):
-                    offset_x = 0 
-                    offset_y = size_len_text * offset_text  
+            # Create a temporary QGraphicsTextItem with the wrapped text to calculate the bounding rectangle size
+            temp_text_item = qt.QGraphicsTextItem(wrapped_text)
+            font = qt.QFont("Arial")
+            font.setPixelSize(font_size + 10)
+            temp_text_item.setFont(font)
+            text_rect = temp_text_item.boundingRect()
 
-                # Condicional para flecha que va hacia arriba
-                elif end_y < start_y and abs(end_y - start_y) > abs(end_x - start_x):
-                    offset_x = 0 
-                    offset_y = - size_len_text * offset_text
+            # Calculate offset dynamically based on text rectangle dimensions
+            offset_x, offset_y = 0, 0
+            text_width = text_rect.width()
+            text_height = text_rect.height()
 
-            # Add text with offset
-            self.add_text_with_background(self.wrap_text(text), end_x + offset_x, end_y + offset_y, font_size + 10, qt.QColor.fromRgb(*color), qt.Qt.black)
+            # Check if arrow direction is straight (horizontal or vertical)
+            if end_x == start_x:  # Vertical arrow
+                if end_y > start_y:  # Arrow pointing down
+                    offset_y = text_height / 2  # Place below the arrow tip
+                else:  # Arrow pointing up
+                    offset_y = -text_height / 2   # Place above the arrow tip
+            elif end_y == start_y:  # Horizontal arrow
+                if end_x > start_x:  # Arrow pointing right
+                    offset_x = text_width / 2   # Place to the right of the arrow tip
+                else:  # Arrow pointing left
+                    offset_x = -text_width / 2  # Place to the left of the arrow tip
+            else:  # Diagonal arrow
+                if end_x > start_x and end_y > start_y:  # Arrow down-right
+                    offset_x, offset_y = text_width / 2, text_height / 2 
+                elif end_x < start_x and end_y < start_y:  # Arrow up-left
+                    offset_x, offset_y = -text_width / 2 , -text_height / 2 
+                elif end_x > start_x and end_y < start_y:  # Arrow up-right
+                    offset_x, offset_y = text_width / 2 , -text_height / 2 
+                elif end_x < start_x and end_y > start_y:  # Arrow down-left
+                    offset_x, offset_y = -text_width / 2 , text_height / 2 
 
-
+            # Add text with calculated dynamic offset
+            self.add_text_with_background(
+                wrapped_text, 
+                end_x + offset_x, 
+                end_y + offset_y, 
+                font_size + 10, 
+                qt.QColor.fromRgb(*color), 
+                qt.Qt.black
+            )
 
     def draw_click(self, x, y, text, font_size, text_color=qt.Qt.black):
 
