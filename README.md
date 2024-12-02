@@ -2,21 +2,33 @@
 
 ### Installation
 
-- Install the latest [Slicer Stable Release](https://download.slicer.org/) (currently Slicer-5.6.2);
-- Clone or Download(clicking in the button in the image above, don't forget to unzip the file before proceed) [this repository](https://github.com/SlicerLatinAmerica/TutorialMaker) to anywhere on your computer;
-  ![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/5f41e18a-f384-49f8-9551-b85eeecbf6b1)
-- For **Windows** users: Open 3D Slicer and drag-and-drop the `TutorialMaker` folder to the Slicer application window, click OK to "Add Python scripted modules...", and click yes to load the module
+- Install the latest [3D Slicer Stable Release](https://download.slicer.org/) (currently 3D Slicer-5.6.2);
+- Open the [Tutorial Maker repository on GitHub](https://github.com/SlicerLatinAmerica/TutorialMaker)
+- Clone the green button Code' and select the option 'Download ZIP' as displayed in the image below to download the file 'TutorialMaker.zip' on your computer
+- Unzip the 'TutorialMaker.zip' archive to access the 'TutorialMaker-main' directory
+- **Windows users** :
+  1. Start 3D Slicer
+  2. Drag and drop the `TutorialMaker` folder to the Slicer application window
+  3. A first pop-up window, 'Select a reader,' appears. Select 'Add Python scripted modules to the application' and click OK.
+  4. A second pop-up window appears to load the Tutorial Maker module. Click on 'Yes'.
 ![TutorialMakerInstall](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
-- For **MacOs** users: Open 3D Slicer click on Edit and then click on Application settings, on the lateral menu select Module, then drag and drop `TutorialMaker.py` into the additional module path. Finally, click OK and restart Slicer.
+
+- **MacOs users**:
+   1. Start 3D Slicer
+   2. Select 'Edit' in the main menu
+   3. Select 'Application settings'
+   4. A 'Parameters' window appears: select 'Modules' in the left panel
+   5. Select the file 'TutoriaMaker.py' 
+   6. Drag and drop the file `TutorialMaker.py` located in the sub-directory 'TutorialMaker-main/TutorialMaker/'into the field 'Additional module paths' and click on OK to restart Slicer
 ![TutorialMakerInstallMac](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
 
 
-### Usage
+### How to use Tutorial Maker
 
-- Go to the Tutorial Maker module (under the Utilities category)
+- Select the 'Tutorial Maker' module from the 'Utilities' category in the list of modules in Slicer
 ![image](https://github.com/user-attachments/assets/881e77de-1778-445f-9d12-9ff7ed685a1c)
 > [!IMPORTANT]
-> Before running this tutorial, set the Slicer to FULLSCREEN and the font size to 14pt, so the screenshots can be readable.
+> Before starting this tutorial, switch Slicer to Full-Screen mode and set the font size to 14pt to ensure the screenshots are easy to read.
 - Select `fourMin_tutorial`
 ![image](https://github.com/user-attachments/assets/1e15971b-eb7e-4a72-8ba4-d8f5a9aabdad)
 - Click `Run and Annotate`
@@ -27,11 +39,11 @@
 
 - The screenshots will appear on the left
 ![image](https://github.com/user-attachments/assets/bea6fe9f-6a0e-41ca-ae0f-7cde252b46d7)
-- Each screenshot have a Title(green arrow) and a Comment(red arrow)
+- Each screenshot includes a title section (green arrow) and a Comments section (red arrow)
 ![image](https://github.com/user-attachments/assets/3023d6cd-3fcb-41a1-9a51-8f4b66d5e7f2)
-- Select one of the three tools to annotate
+- Select one of the three annotation tools
 ![image](https://github.com/user-attachments/assets/61e8f816-1c7c-4b7c-813c-257338de0c6d)
-- After selecting a tool, define the style and the text of the annotation
+- After selecting a tool, specify the style and the text of the annotation
 ![image](https://github.com/user-attachments/assets/0dfcace2-cacb-4c09-8f5e-d01bbadbc82f)
 - Then click on the element that will receive the annotation
 ![TutorialMakenAnnotation](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/49ef485f-c880-4a96-b4b5-75304752e5dc)
