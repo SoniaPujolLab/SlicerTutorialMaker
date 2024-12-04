@@ -27,15 +27,22 @@ class TutorialMaker(ScriptedLoadableModule):
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = _("Tutorial Maker")  # TODO: make this more human readable by adding spaces
-        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Utilities")]  # TODO: set categories (folders where the module shows up in the module selector)
+        self.parent.title = _("Tutorial Maker")  
+        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Utilities")]
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-        self.parent.contributors = ["Douglas Gonçalves (USP)", "Enrique Hernández (UAEM)", "João Januário (USP)", "Lucas Silva (USP)", "Paulo Pereira (USP)", "Victor Montaño (UAEM)"]  # TODO: replace with "Firstname Lastname (Organization)"
+        self.parent.contributors = ["Douglas Gonçalves (Universidade de São Paulo)", "Enrique Hernández (Universidad Autónoma del Estado de México)",
+                                    "João Januário (Universidade de São Paulo)", "Lucas Silva (Universidade de São Paulo)",
+                                    "Paulo Pereira (Universidade de São Paulo)", "Victor Montaño (Universidad Autónoma del Estado de México)",
+                                    "Paulo Eduardo de Barros Veiga (Universidade de São Paulo)", "Valeria Gomez-Valdes (Universidad Autónoma del Estado de México)",
+                                    "Monserrat Rıos-Hernandez (Universidad Autónoma del Estado de México)", "Fatou Bintou N’Diaye (University Cheikh Anta Diop)",
+                                    "Mohamed Alalli Bilal (University Cheikh Anta Diop)", "Steve Pieper (Isomics Inc.)",
+                                    "Adriana Vilchis-Gonzalez (Universidad Autónoma del Estado de México)", "Luiz Otavio Murta Junior (Universidade de São Paulo)",
+                                    "Andras Lasso (Queen’s University)", "Sonia Pujol (Brigham and Women’s Hospital, Harvard Medical School)"] 
         # TODO: update with short description of the module and a link to online module documentation
         self.parent.helpText = """help text"""
         # TODO: replace with organization, grant and thanks
         self.parent.acknowledgementText = _("""
-        Development of this module was funded by <a href="https://chanzuckerberg.com/eoss/proposals/3d-slicer-for-latin-america-localization-and-outreach/">CZI EOSS grant</a>.
+        The development of this module has been made possible in part by a grant from the Chan Zuckerberg Initiative
         """)
 
 #
