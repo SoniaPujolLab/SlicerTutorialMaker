@@ -1,15 +1,27 @@
 cmake_minimum_required(VERSION 3.16.3...3.19.7 FATAL_ERROR)
 
-project(Tutorial Maker)
+project(TutorialMaker)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
-set(EXTENSION_HOMEPAGE "https://www.slicer.org/wiki/Documentation/Nightly/Extensions/Tutorial")
-set(EXTENSION_CATEGORY "Examples")
-set(EXTENSION_CONTRIBUTORS "John Doe (AnyWare Corp.)")
-set(EXTENSION_DESCRIPTION "This is an example of a simple extension")
-set(EXTENSION_ICONURL "https://www.example.com/Slicer/Extensions/Tutorial.png")
-set(EXTENSION_SCREENSHOTURLS "https://www.example.com/Slicer/Extensions/Tutorial/Screenshots/1.png")
+set(EXTENSION_HOMEPAGE "https://github.com/SlicerLatinAmerica/SlicerTutorialMaker")
+set(EXTENSION_CATEGORY "Developer Tools")
+set(EXTENSION_CONTRIBUTORS
+    "Douglas Goncalves (USP)"
+    "Enrique Hernandez (UAEM)"
+    "Joao Januario (USP)"
+    "Lucas Silva (USP)"
+    "Paulo Pereira (USP)"
+    "Victor Montano (UAEM)"
+    )
+set(EXTENSION_DESCRIPTION "Tools for creating tutorials for 3D Slicer that can be automatically translated to multiple languages.")
+set(EXTENSION_ICONURL "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/TutorialMaker.png")
+set(EXTENSION_SCREENSHOTURLS
+    "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/annotations.png"
+    "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/annotations2.png"
+    "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/GUIdeveloped.png"
+    "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/pdf.png"
+    )
 set(EXTENSION_DEPENDS "NA") # Specified as a list or "NA" if no dependencies
 
 #-----------------------------------------------------------------------------
