@@ -2,7 +2,7 @@
 
 ### Installation
 
-- Install the latest [3D Slicer Stable Release](https://download.slicer.org/) (currently 3D Slicer-5.6.2);
+- Install the latest [3D Slicer Stable Release](https://download.slicer.org/) (currently 3D Slicer-5.6.2) or [3D Slicer Preview Release version 5.7 or higher](https://download.slicer.org/) 
 - Open the [Tutorial Maker repository on GitHub](https://github.com/SlicerLatinAmerica/TutorialMaker)
 - Clone the green button Code' and select the option 'Download ZIP' as displayed in the image below to download the file 'TutorialMaker.zip' on your computer
 - Unzip the 'TutorialMaker.zip' archive to access the 'TutorialMaker-main' directory
