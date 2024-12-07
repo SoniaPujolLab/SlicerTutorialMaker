@@ -1,5 +1,7 @@
 ## Tutorial Maker Prototype
 
+This is an extension for 3D Slicer that contain tools for creating tutorials that can be automatically translated to multiple languages.
+
 ### Installation
 
 - Install the latest [3D Slicer Stable Release](https://download.slicer.org/) (currently 3D Slicer-5.6.2);
