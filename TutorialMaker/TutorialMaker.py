@@ -66,7 +66,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.__tableSize = 0
         self.__selectedTutorial = None
         self.isDebug = False
-
+        
         #PROTOTYPE FOR PLAYBACK
 
         self.actionList = []
@@ -98,6 +98,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
         self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
+        self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.logic.OpenAnnotator)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
         #Static Tutorial Handlers
@@ -241,6 +242,12 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         folderName = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Testing/"
         Tutorial_Win = CreateTutorial(folderName)
         Tutorial_Win.show()
+        pass
+    
+    def OpenAnnotator(Self):
+        Annotator = TutorialGUI()
+        Annotator.open_json_file(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/Tutorial.json")
+        Annotator.show()
         pass
 
     def loadTutorials(self):
