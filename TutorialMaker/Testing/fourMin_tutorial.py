@@ -117,9 +117,15 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         slicer.util.findChildren(name="ClippingButton")[0].click()
         hemispheric_white_matter.GetDisplayNode().SetClipping(1)
         clip = slicer.util.getNode('ClipModelsParameters1')
-        clip.SetRedSliceClipState(0)
-        clip.SetYellowSliceClipState(0)
-        clip.SetGreenSliceClipState(2)
+        if int(slicer.app.revision) >= 33142: # Clipping API has changed around Slicer 5.7.0-2024-12-06
+            nodeID = "vtkMRMLSliceNodeGreen"
+            clip.AddAndObserveClippingNodeID(nodeID)
+            nodeIndex = clip.GetClippingNodeIndex(nodeID)
+            clip.SetNthClippingNodeState(nodeIndex, 2)
+        else:
+            clip.SetRedSliceClipState(0)
+            clip.SetYellowSliceClipState(0)
+            clip.SetGreenSliceClipState(2)
         scrolBar = util.getNamedWidget("PanelDockWidget/dockWidgetContents/ModulePanel/ScrollArea").inner()
         scrolBar.verticalScrollBar().setValue(scrolBar.height)
         self.Tutorial.nextScreenshot()
