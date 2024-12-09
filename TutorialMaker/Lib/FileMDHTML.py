@@ -29,13 +29,14 @@ class markdownHTMLCreator:
     def tutorial_to_markdown(self,path,ListotalImages):
         tutorialName = "fourMin_tutorial"
         metadata = self.getMetadata(path)
+        i = len(ListotalImages) -1
         
         with open(path + ".md", 'w', encoding='utf-8') as md_file:
             #Create pages of the tutorial with annotations
             for num,item in enumerate(metadata):            
                 numString = str(num)
                 if (ListotalImages[num] == -1):
-                    if (num == 0):
+                    if (num == 0 or num ==i):
                         md_file.write('<meta charset="UTF-8">\n')
                         md_file.write('<meta name="viewport" content="width=device-width, initial-scale=1.0">\n')
                         md_file.write(f'<div class="containerPage" style="max-width: 100%; margin: 0 auto;">\n')
@@ -48,7 +49,7 @@ class markdownHTMLCreator:
 
                         # Slide Title
                         md_file.write(f'<div class="mainPage" style="text-align: center; width: 100%;">\n')
-                        md_file.write(f'  <div class="header" style="background-color: #a8d0e6; padding: 10px; color: white; font-size: 40px; font-weight: bold; text-align: center; max-width: 90%; margin: 0 auto;">{metadatos[item]["slide_title"]}</div>\n')
+                        md_file.write(f'  <div class="header" style="background-color: #a8d0e6; padding: 10px; color: white; font-size: 40px; font-weight: bold; text-align: center; max-width: 90%; margin: 0 auto;">{metadata[item]["slide_title"]}</div>\n')
                         md_file.write(f'<br>\n')
 
                         # White container with text
@@ -237,7 +238,7 @@ class markdownHTMLCreator:
                                            qt.QMessageBox.Yes | qt.QMessageBox.No)
         if confirm == qt.QMessageBox.Yes:
             webbrowser.open("file://" + output_html_file)
-
+        self.html_to_pdf(path, output_html_file, tutorialName)
 
     def getMetadata(self,path):
         import Lib.utils as utils

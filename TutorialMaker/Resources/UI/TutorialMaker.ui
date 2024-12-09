@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>293</height>
+    <height>308</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -102,6 +102,13 @@
      </property>
      <property name="text">
       <string>Create a new Tutorial</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButtonOpenAnnotator">
+     <property name="text">
+      <string>Open Annotator</string>
      </property>
     </widget>
    </item>

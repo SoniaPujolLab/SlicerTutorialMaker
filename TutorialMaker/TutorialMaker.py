@@ -27,15 +27,22 @@ class TutorialMaker(ScriptedLoadableModule):
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = _("Tutorial Maker")
-        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Utilities")]  # TODO: set categories (folders where the module shows up in the module selector)
+        self.parent.title = _("Tutorial Maker")  
+        self.parent.categories = [translate("qSlicerAbstractCoreModule", "Utilities")]
         self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-        self.parent.contributors = ["Douglas Gonçalves (USP)", "Enrique Hernández (UAEM)", "João Januário (USP)", "Lucas Silva (USP)", "Paulo Pereira (USP)", "Victor Montaño (UAEM)"]
+        self.parent.contributors = ["Douglas Gonçalves (Universidade de São Paulo)", "Enrique Hernández (Universidad Autónoma del Estado de México)",
+                                    "João Januário (Universidade de São Paulo)", "Lucas Silva (Universidade de São Paulo)",
+                                    "Paulo Pereira (Universidade de São Paulo)", "Victor Montaño (Universidad Autónoma del Estado de México)",
+                                    "Paulo Eduardo de Barros Veiga (Universidade de São Paulo)", "Valeria Gomez-Valdes (Universidad Autónoma del Estado de México)",
+                                    "Monserrat Rıos-Hernandez (Universidad Autónoma del Estado de México)", "Fatou Bintou N’Diaye (University Cheikh Anta Diop)",
+                                    "Mohamed Alalli Bilal (University Cheikh Anta Diop)", "Steve Pieper (Isomics Inc.)",
+                                    "Adriana Vilchis-Gonzalez (Universidad Autónoma del Estado de México)", "Luiz Otavio Murta Junior (Universidade de São Paulo)",
+                                    "Andras Lasso (Queen’s University)", "Sonia Pujol (Brigham and Women’s Hospital, Harvard Medical School)"] 
         # TODO: update with short description of the module and a link to online module documentation
         self.parent.helpText = """help text"""
         # TODO: replace with organization, grant and thanks
         self.parent.acknowledgementText = _("""
-        Development of this module was funded by <a href="https://chanzuckerberg.com/eoss/proposals/3d-slicer-for-latin-america-localization-and-outreach/">CZI EOSS grant</a>.
+        The development of this module has been made possible in part by a grant from the Chan Zuckerberg Initiative
         """)
 
 #
@@ -59,7 +66,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.__tableSize = 0
         self.__selectedTutorial = None
         self.isDebug = False
-
+        
         #PROTOTYPE FOR PLAYBACK
 
         self.actionList = []
@@ -91,6 +98,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
         self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
+        self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.logic.OpenAnnotator)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
         #Static Tutorial Handlers
@@ -234,6 +242,12 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         folderName = os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Testing/"
         Tutorial_Win = CreateTutorial(folderName)
         Tutorial_Win.show()
+        pass
+    
+    def OpenAnnotator(Self):
+        Annotator = TutorialGUI()
+        Annotator.open_json_file(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/Tutorial.json")
+        Annotator.show()
         pass
 
     def loadTutorials(self):

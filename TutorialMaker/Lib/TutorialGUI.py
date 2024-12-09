@@ -205,6 +205,9 @@ class TutorialGUI(qt.QMainWindow):
     
     def create_toolbar_edit(self):
         toolbar = qt.QToolBar("Edit", self)
+
+        label_c = qt.QLabel("Color")
+        toolbar.addWidget(label_c)
         
         self.action7 = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/color.png'), _("color"), self)
         toolbar.addAction(self.action7)
@@ -220,16 +223,18 @@ class TutorialGUI(qt.QMainWindow):
         toolbar.addWidget(self.spin_box)
         self.spin_box.valueChanged.connect(self.actualizar_valor)
 
+        label_t = qt.QLabel("Text: ")
+        toolbar.addWidget(label_t)
         self.fill_annot = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/fill_u.png'), _("Fill"), self)
         self.fill_annot.setCheckable(True)
         self.fill = False
-        toolbar.addAction(self.fill_annot)
+        #toolbar.addAction(self.fill_annot)
 
         self.t_px = 13
         self.spin_box_txt = qt.QSpinBox()
         self.spin_box_txt.setSuffix(" px")
         self.spin_box_txt.setMinimum(5)
-        self.spin_box_txt.setMaximum(25)
+        self.spin_box_txt.setMaximum(30)
         self.spin_box_txt.setSingleStep(1)
         self.spin_box_txt.setValue(self.t_px)
         toolbar.addWidget(self.spin_box_txt)
@@ -358,8 +363,21 @@ class TutorialGUI(qt.QMainWindow):
         self.metadata_list.insert(pos, [])
         self.annotations.insert(pos, new_annotation)
         self.annotations_json.insert(pos, new_annotation_json)
-        self.steps.insert(pos, _(" - Add the author name  and her/him institution here"))
-        self.widgets.insert(pos, _("Add a title here"))
+        self.steps.insert(pos, (" - Add the author name  and her/him institution here"))
+        self.widgets.insert(pos, ("Add a title here"))
+
+        #Add the acknowledments page
+        new_path = self.dir_path + '/../Resources/NewSlide/Acknowledgments.png'
+    
+        i = len(newListImages) 
+        ListPositionWhite.append(i)
+        List_totalImages.insert(i,-1)
+        newListImages.insert(i, new_path)
+        self.metadata_list.insert(i, [])
+        self.annotations.insert(i, new_annotation)
+        self.annotations_json.insert(i, new_annotation_json)
+        self.steps.insert(i, (" - Acknowledgments"))
+        self.widgets.insert(i, ("Add the acknowledgments here"))
 
         # Clear the existing grid layout
         while self.gridLayout.count():
@@ -473,14 +491,13 @@ class TutorialGUI(qt.QMainWindow):
         k = 0
         for step in data["steps"]:
             # Load files 
-            List_totalImages.append(k)
-            k = k+1
             for m_data in step:
                 new_annotation = []
                 new_annotation_json = []
                 path_image = directory_path+"/"+m_data["window"]
                 path_meta = directory_path+"/"+m_data["metadata"]
-
+                List_totalImages.append(k)
+                k = k+1
                 try:
                     with open(path_meta, 'r', encoding='utf-8') as file:
                         content = file.read()
@@ -520,6 +537,7 @@ class TutorialGUI(qt.QMainWindow):
 
             if exception_occurred:
                 break
+        self.add_first_page()
         self.firts_screen()
 
     def firts_screen(self):
@@ -630,6 +648,18 @@ class TutorialGUI(qt.QMainWindow):
 
     def mouse_release_event(self, event):
         pass
+
+    def keyPressEvent(self, event):
+        print("Tecla")
+        if event.key() == qt.Qt.Key_Escape:
+            print("ESC")
+            self.select_annt = False
+            for action, icons in self.icons.items():
+                action.setChecked(False)  
+                action.setIcon(icons['inactive'])
+            self.draw_annotations()
+        elif event.key() == qt.Qt.Key_Z and (event.modifiers() & qt.Qt.ControlModifier or event.modifiers() & qt.Qt.MetaModifier):
+            self.delete_annotation()
 
     def wheel_event(self, event):
         delta = event.angleDelta().y()
@@ -835,7 +865,7 @@ class TutorialGUI(qt.QMainWindow):
 
                     wdgts_child['labelPosition'] = [ float(star_painter.x()), float(star_painter.y()), float(end_painter.x()), float(end_painter.y())]
                     wdgts_child['labelText'] = self.text_in.text
-                    anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
+                    anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text, self.t_px)
 
                 elif self.select_annt == "icon":
                     pass
@@ -1034,7 +1064,7 @@ class TutorialGUI(qt.QMainWindow):
 
                     wdgts_child['labelPosition'] = [ float(star_painter.x()), float(star_painter.y()), float(end_painter.x()), float(end_painter.y())]
                     wdgts_child['labelText'] = self.text_in.text
-                    anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text)
+                    anotation = Notes(self.select_annt, star, end, self.selected_color, self.valor, self.fill, self.text_in.text, self.t_px)
 
                 elif self.select_annt == "icon":
                     pass
@@ -1133,50 +1163,54 @@ class TutorialGUI(qt.QMainWindow):
                 pen = qt.QPen(qt.QColor(255, 255, 255))
                 painter.setPen(pen)
                 painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
-                font_small = qt.QFont("Arial", 13)
+                sbv = antts.sz
+                font_small = qt.QFont("Arial", sbv)
+                font_metrics = qt.QFontMetrics(font_small)
+                texto=self.long_string(txt)
+                l_box = font_metrics.horizontalAdvance(texto) + 10
                 painter.setFont(font_small)
                 if len(txt) > 0:
-                    bg_h = 16 * len(txt) + 3
+                    bg_h = font_metrics.height() * len(txt) + 3
                     if antts.ip.y() > antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
                     elif antts.ip.y() < antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
                     elif antts.ip.x() > antts.fp.x():
-                        tb_i = qt.QPoint(antts.fp.x()-250, antts.fp.y()-10)
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_i = qt.QPoint(antts.fp.x()-l_box, antts.fp.y()-10)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
                     elif antts.ip.x() < antts.fp.x():
                         tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
             elif antts.tp == "icon":
                 painter.drawImage(antts.ip, qt.QImage(antts.tx))
             elif antts.tp == "text":
@@ -1204,55 +1238,61 @@ class TutorialGUI(qt.QMainWindow):
             elif antts.tp == "click":
                 painter.drawImage(antts.ip, self.new_image)
             elif antts.tp == "arwT":
+                print("Prev")
                 txt = self.split_string_to_dict(antts.tx)
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
                 pen = qt.QPen(qt.QColor(255, 255, 255))
                 painter.setPen(pen)
                 painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
-                font_small = qt.QFont("Arial", 13)
+                sbv = antts.sz
+                print("Size:",sbv)
+                font_small = qt.QFont("Arial", sbv)
+                font_metrics = qt.QFontMetrics(font_small)
+                texto=self.long_string(txt)
+                l_box = font_metrics.horizontalAdvance(texto) + 10
                 painter.setFont(font_small)
                 if len(txt) > 0:
-                    bg_h = 16 * len(txt) + 3
+                    bg_h = font_metrics.height() * len(txt) + 3
                     if antts.ip.y() > antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
                     elif antts.ip.y() < antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y())
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
                     elif antts.ip.x() > antts.fp.x():
-                        tb_i = qt.QPoint(antts.fp.x()-250, antts.fp.y()-10)
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_i = qt.QPoint(antts.fp.x()-l_box, antts.fp.y()-10)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
                     elif antts.ip.x() < antts.fp.x():
                         tb_i = qt.QPoint(antts.fp.x(), antts.fp.y()-10)
-                        tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                        tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                         painter.drawRect(qt.QRect(tb_i, tb_f))
                         pen = qt.QPen(qt.QColor(0, 0, 0))
                         painter.setPen(pen)
-                        y_position = 16
+                        y_position = font_metrics.height()
                         for r in txt:
                             painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                            y_position+=16
+                            y_position+=font_metrics.height()
             elif antts.tp == "icon":
                 painter.drawImage(antts.ip, qt.QImage(antts.tx))
             elif antts.tp == "text":
@@ -1277,50 +1317,54 @@ class TutorialGUI(qt.QMainWindow):
             pen = qt.QPen(qt.QColor(255, 255, 255))
             painter.setPen(pen)
             painter.setBrush(qt.QBrush(self.selected_color)) #self.selected_color
-            font_small = qt.QFont("Arial", 13)
+            sbv = self.t_px
+            font_small = qt.QFont("Arial", sbv)
+            font_metrics = qt.QFontMetrics(font_small)
+            texto=self.long_string(txt)
+            l_box = font_metrics.horizontalAdvance(texto) + 10
             painter.setFont(font_small)
             if len(txt) > 0:
-                bg_h = 16 * len(txt) + 3
+                bg_h = font_metrics.height() * len(txt) + 3
                 if antt.ip.y() > antt.fp.y():
                     tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y()-bg_h)
-                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
                     pen = qt.QPen(qt.QColor(0, 0, 0))
                     painter.setPen(pen)
-                    y_position = 16
+                    y_position = font_metrics.height()
                     for r in txt:
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
+                        y_position+=font_metrics.height()
                 elif antt.ip.y() < antt.fp.y():
                     tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y())
-                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
                     pen = qt.QPen(qt.QColor(0, 0, 0))
                     painter.setPen(pen)
-                    y_position = 16
+                    y_position = font_metrics.height()
                     for r in txt:
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16               
+                        y_position+=font_metrics.height()               
                 elif antt.ip.x() > antt.fp.x():
-                    tb_i = qt.QPoint(antt.fp.x()-250, antt.fp.y()-10)
-                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    tb_i = qt.QPoint(antt.fp.x()-l_box, antt.fp.y()-10)
+                    tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
                     pen = qt.QPen(qt.QColor(0, 0, 0))
                     painter.setPen(pen)
-                    y_position = 16
+                    y_position = font_metrics.height()
                     for r in txt:
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
+                        y_position+=font_metrics.height()
                 elif antt.ip.x() < antt.fp.x():
                     tb_i = qt.QPoint(antt.fp.x(), antt.fp.y()-10)
-                    tb_f = qt.QPoint(tb_i.x()+250, tb_i.y()+bg_h)
+                    tb_f = qt.QPoint(tb_i.x()+l_box+sbv, tb_i.y()+bg_h)
                     painter.drawRect(qt.QRect(tb_i, tb_f))
                     pen = qt.QPen(qt.QColor(0, 0, 0))
                     painter.setPen(pen)
-                    y_position = 16
+                    y_position = font_metrics.height()
                     for r in txt:
                         painter.drawText(tb_i.x()+5, tb_i.y()+y_position, r)
-                        y_position+=16
+                        y_position+=font_metrics.height()
         elif antt.tp == "icon":
             painter.drawImage(antt.ip, qt.QImage(antt.tx))
         elif antt.tp == "text":
@@ -1347,6 +1391,15 @@ class TutorialGUI(qt.QMainWindow):
             result_dict.append(current_string)
 
         return result_dict
+    
+    def long_string(self, tex):
+        longest_string = ""
+        for r in tex:
+            if len(r) > len(longest_string):
+                longest_string = r
+
+        return longest_string
+
 
     def figure_form(self, p_ini, p_fin):
         a1 = p_ini.x()
@@ -1510,7 +1563,7 @@ class TutorialGUI(qt.QMainWindow):
                         "type": "arrow",
                         "color": color_rgb,
                         "labelText": wdg["labelText"],
-                        "fontSize": "14",
+                        "fontSize": annts.sz,
                         "direction_draw" : wdg["labelPosition"] #Enrique Line
                     }
                 annotations.append(annotation)
