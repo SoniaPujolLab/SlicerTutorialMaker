@@ -213,7 +213,7 @@ class TutorialGUI(qt.QMainWindow):
         toolbar.addAction(self.action7)
         self.action7.triggered.connect(self.change_color)
 
-        self.valor = 3
+        self.valor = 4
         self.spin_box = qt.QSpinBox()
         self.spin_box.setSuffix(_(" thick."))
         self.spin_box.setMinimum(1)
@@ -230,7 +230,7 @@ class TutorialGUI(qt.QMainWindow):
         self.fill = False
         #toolbar.addAction(self.fill_annot)
 
-        self.t_px = 13
+        self.t_px = 14
         self.spin_box_txt = qt.QSpinBox()
         self.spin_box_txt.setSuffix(" px")
         self.spin_box_txt.setMinimum(5)
@@ -246,6 +246,7 @@ class TutorialGUI(qt.QMainWindow):
         self.widget_action = qt.QWidgetAction(self)
         self.widget_action.setDefaultWidget(self.text_in)
         toolbar.addAction(self.widget_action)
+        self.text_in.setText("Add text to accompany an arrow here.")
 
         self.load_icon = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/image.png'), _("Load icon"), self)
         self.load_icon.setCheckable(True)
@@ -363,7 +364,7 @@ class TutorialGUI(qt.QMainWindow):
         self.metadata_list.insert(pos, [])
         self.annotations.insert(pos, new_annotation)
         self.annotations_json.insert(pos, new_annotation_json)
-        self.steps.insert(pos, (" - Add the author name  and her/him institution here"))
+        self.steps.insert(pos, (" - Add the author's name  and institution here"))
         self.widgets.insert(pos, ("Add a title here"))
 
         #Add the acknowledments page
@@ -524,6 +525,35 @@ class TutorialGUI(qt.QMainWindow):
                 label.setObjectName("QLabel_{}".format(cont))
                 label.clicked.connect(lambda index=cont: self.label_clicked(index))
                 label.setPixmap(pixmap)
+                
+                print(path_image)
+                #print(content)
+                last_wdg = self.find_bottom_right_widget(content)
+                print(last_wdg)
+                if not last_wdg:
+                    pass
+                else:
+                    widget_x, widget_y = last_wdg['position']
+                    widget_width, widget_height = last_wdg['size']
+
+                    widget_end_x = widget_x + widget_width
+                    widget_end_y = widget_y + widget_height
+
+                    image = qt.QImage(path_image)
+                    image_width = image.width()
+                    image_height = image.height()
+                    print(image_width,",",image_height)
+
+                    if widget_end_x == image_width:
+                        pass
+                    else:
+                        esc = image_width/widget_end_x
+                        new_width = widget_end_x
+                        new_height = image_height / esc
+                        print(new_width,",",new_height)
+                        
+                        resized_image = image.scaled(new_width, new_height, qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
+                        resized_image.save(path_image)
 
                 self.gridLayout.addWidget(label)
                 self.labels.append(label)
@@ -532,8 +562,9 @@ class TutorialGUI(qt.QMainWindow):
                 self.annotations.append(new_annotation)
                 self.annotations_json.append(new_annotation_json)
                 self.steps.append(_("Write a description here"))
-                self.widgets.append(_("Add a tittle here"))
+                self.widgets.append(_("Add a title here"))
                 cont += 1
+
 
             if exception_occurred:
                 break
@@ -548,6 +579,29 @@ class TutorialGUI(qt.QMainWindow):
         self.text_edit.append(self.steps[self.scree_prev])
         label = self.labels[self.scree_prev]
         label.setStyleSheet("border: 2px solid red;")
+
+    def find_bottom_right_widget(self, content):
+        max_x = 0
+        max_y = 0
+        bottom_right_widget = None
+
+        widgets = json.loads(content)
+
+        for key, widget in widgets.items():
+            pos_x, pos_y = widget["position"]
+            width, height = widget["size"]
+            
+            # Calcular la esquina inferior derecha
+            bottom_right_x = pos_x + width
+            bottom_right_y = pos_y + height
+            
+            # Comparar con el máximo actual
+            if bottom_right_x > max_x or (bottom_right_x == max_x and bottom_right_y > max_y):
+                max_x = bottom_right_x
+                max_y = bottom_right_y
+                bottom_right_widget = widget
+
+        return bottom_right_widget 
 
     def label_clicked(self, index):
         if str(self.scree_prev) != -1:
@@ -590,6 +644,7 @@ class TutorialGUI(qt.QMainWindow):
 
         self.background_image = pixmap
         self.label_image.setPixmap(self.background_image)
+        self.text_in.setText("Add text to accompany an arrow here.")
 
     def showEvent(self, event):
         pass
@@ -652,7 +707,7 @@ class TutorialGUI(qt.QMainWindow):
     def keyPressEvent(self, event):
         print("Tecla")
         if event.key() == qt.Qt.Key_Escape:
-            print("ESC")
+            #print("ESC")
             self.select_annt = False
             for action, icons in self.icons.items():
                 action.setChecked(False)  
@@ -1161,7 +1216,7 @@ class TutorialGUI(qt.QMainWindow):
                 txt = self.split_string_to_dict(antts.tx)
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
                 pen = qt.QPen(qt.QColor(255, 255, 255))
-                painter.setPen(pen)
+                painter.setPen(qt.Qt.NoPen)
                 painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
                 sbv = antts.sz
                 font_small = qt.QFont("Arial", sbv)
@@ -1169,7 +1224,7 @@ class TutorialGUI(qt.QMainWindow):
                 texto=self.long_string(txt)
                 l_box = font_metrics.horizontalAdvance(texto) + 10
                 painter.setFont(font_small)
-                if len(txt) > 0:
+                if len(txt)  > 0 and antts.tx!="Add text to accompany an arrow here.":
                     bg_h = font_metrics.height() * len(txt) + 3
                     if antts.ip.y() > antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
@@ -1242,7 +1297,7 @@ class TutorialGUI(qt.QMainWindow):
                 txt = self.split_string_to_dict(antts.tx)
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
                 pen = qt.QPen(qt.QColor(255, 255, 255))
-                painter.setPen(pen)
+                painter.setPen(qt.Qt.NoPen)
                 painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
                 sbv = antts.sz
                 print("Size:",sbv)
@@ -1251,7 +1306,7 @@ class TutorialGUI(qt.QMainWindow):
                 texto=self.long_string(txt)
                 l_box = font_metrics.horizontalAdvance(texto) + 10
                 painter.setFont(font_small)
-                if len(txt) > 0:
+                if len(txt) > 0 and antts.tx!="Add text to accompany an arrow here.":
                     bg_h = font_metrics.height() * len(txt) + 3
                     if antts.ip.y() > antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
@@ -1315,7 +1370,7 @@ class TutorialGUI(qt.QMainWindow):
             txt = self.split_string_to_dict(antt.tx)
             painter.drawPath(self.arrowPath(antt.tp, antt.ip, antt.fp))
             pen = qt.QPen(qt.QColor(255, 255, 255))
-            painter.setPen(pen)
+            painter.setPen(qt.Qt.NoPen)
             painter.setBrush(qt.QBrush(self.selected_color)) #self.selected_color
             sbv = self.t_px
             font_small = qt.QFont("Arial", sbv)
@@ -1323,7 +1378,7 @@ class TutorialGUI(qt.QMainWindow):
             texto=self.long_string(txt)
             l_box = font_metrics.horizontalAdvance(texto) + 10
             painter.setFont(font_small)
-            if len(txt) > 0:
+            if len(txt) > 0 and antt.tx!="Add text to accompany an arrow here.":
                 bg_h = font_metrics.height() * len(txt) + 3
                 if antt.ip.y() > antt.fp.y():
                     tb_i = qt.QPoint(antt.fp.x()-100, antt.fp.y()-bg_h)
