@@ -7,6 +7,7 @@ import logging
 import importlib
 import Lib.utils as utils
 import Lib.painter as AnnotationPainter
+import Lib.GitTools as GitTools
 
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
@@ -99,6 +100,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
         self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
         self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.logic.OpenAnnotator)
+        self.ui.pushButtonFetchFromGithub.connect('clicked(bool)', self.getFromGithub)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
         #Static Tutorial Handlers
@@ -174,10 +176,16 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         if self.isDebug:
             self.ui.pushButtonTestPainter.setEnabled(not (self.__selectedTutorial is None))
 
+    def getFromGithub(self):
+        self.logic.loadTutorialsFromRepos()
+        self.populateTutorialList()
+        pass
+
     
     def populateTutorialList(self):
         loadedTutorials = self.logic.loadTutorials()
         listWidget = self.ui.listWidgetTutorials
+        listWidget.clear()
         listWidget.addItems(loadedTutorials)
 
 #
@@ -199,6 +207,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         """
         ScriptedLoadableModuleLogic.__init__(self)
         self.tutorialEditor = TutorialEditor()
+        self.TutorialRepos = [
+            "SlicerLatinAmerica/TestSlicerTutorials"
+        ]
 
 
     def setDefaultParameters(self, parameterNode):
@@ -248,6 +259,23 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic):
         Annotator = TutorialGUI()
         Annotator.open_json_file(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Raw/Tutorial.json")
         Annotator.show()
+        pass
+
+    def loadTutorialsFromRepos(self):
+        modulePath = os.path.dirname(slicer.util.modulePath("TutorialMaker"))
+        for repo in self.TutorialRepos:
+            files = GitTools.GitTools.ParseRepo(repo)
+            for TutorialRoot in files.dir("Tutorials"):
+                for TutorialFile in files.dir(f"Tutorials/{TutorialRoot}"):
+                    if TutorialFile.endswith(".py"):
+                        try:
+                            pyRaw = files.getRaw(f"Tutorials/{TutorialRoot}/{TutorialFile}")
+                            fd = open(f"{modulePath}/Testing/{TutorialFile}", "w")
+                            fd.write(pyRaw)
+                            fd.close()
+                        except Exception as e:
+                            print(f"Failed to Fetch {TutorialFile} from {repo}")
+                            print(e)
         pass
 
     def loadTutorials(self):

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>308</height>
+    <height>339</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -70,6 +70,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButtonFetchFromGithub">
+     <property name="text">
+      <string>Fetch From Github</string>
+     </property>
     </widget>
    </item>
    <item>
