@@ -66,5 +66,6 @@ The Screenshots with Annotations are now saved in the Module folder under Output
 
 ![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
 
-### Writing tutorials
+<!-- ### Writing tutorials
 TODO: Create the "developer manual" to create new tutorials.
+-->
