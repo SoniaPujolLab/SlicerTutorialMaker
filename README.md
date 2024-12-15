@@ -1,6 +1,6 @@
-## Tutorial Maker Prototype
+## Slicer Tutorial Maker
 
-This is an extension for 3D Slicer that contain tools for creating tutorials that can be automatically translated to multiple languages.
+The Slicer Tutorial Maker is an extension to 3D Slicer to streamline the creation of 3D Slicer tutorials in multiple languages. The sections below provide a user guide to the tool.
 
 ### Installation
 
