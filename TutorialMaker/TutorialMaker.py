@@ -107,6 +107,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.ui.pushButtonAnnotate.connect('clicked(bool)', self.annotateButton)
         if not self.isDebug:
             self.ui.CollapsibleButtonTutorialMaking.setVisible(0)
+            self.ui.pushButtonNewTutorial.setVisible(0)
             self.ui.pushButtonTestPainter.connect('clicked(bool)', self.testPainterButton)
             self.ui.pushButtonTestPainter.setVisible(0)
 
