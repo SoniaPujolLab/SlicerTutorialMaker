@@ -2,6 +2,9 @@
 
 The Slicer Tutorial Maker is an extension to 3D Slicer to streamline the creation of 3D Slicer tutorials in multiple languages. The sections below provide a user guide to the tool.
 
+[Documentação em Português](https://github.com/SlicerLatinAmerica/SlicerTutorialMaker/blob/main/README_pt-br.md)
+
+
 ### Installation
 
 - Install the latest [3D Slicer Stable Release](https://download.slicer.org/) (currently 3D Slicer-5.6.2) or [3D Slicer Preview Release version 5.7 or higher](https://download.slicer.org/) 
@@ -28,14 +31,13 @@ The Slicer Tutorial Maker is an extension to 3D Slicer to streamline the creatio
 ### How to use Tutorial Maker
 
 - Select the 'Tutorial Maker' module from the 'Utilities' category in the list of modules in Slicer
-![image](https://github.com/user-attachments/assets/881e77de-1778-445f-9d12-9ff7ed685a1c)
+![image](https://github.com/user-attachments/assets/61f70e02-fd7c-4f0b-b2ec-b190021eaf5d)
 > [!IMPORTANT]
 > Before starting this tutorial, switch Slicer to Full-Screen mode and set the font size to 14pt to ensure the screenshots are easy to read.
-- Select `fourMin_tutorial`
-![image](https://github.com/user-attachments/assets/1e15971b-eb7e-4a72-8ba4-d8f5a9aabdad)
+- Select `FourMinuteTutorial`
+![image](https://github.com/user-attachments/assets/21d18144-e147-4572-bd06-a1057ecad8cf)
 - Click `Run and Annotate`
-![image](https://github.com/user-attachments/assets/a9fed061-e0c1-474f-8678-d992efeeecc9)
-
+![image](https://github.com/user-attachments/assets/b6f40a4b-84c2-4891-8c61-cf722d709fa0)
 
 ### Annotation Tool
 
