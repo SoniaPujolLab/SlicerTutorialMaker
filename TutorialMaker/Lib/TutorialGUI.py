@@ -246,7 +246,7 @@ class TutorialGUI(qt.QMainWindow):
         self.widget_action = qt.QWidgetAction(self)
         self.widget_action.setDefaultWidget(self.text_in)
         toolbar.addAction(self.widget_action)
-        self.text_in.setText("Add text to accompany an arrow here.")
+        self.text_in.setPlaceholderText("Add text to accompany an arrow here.")
 
         self.load_icon = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/image.png'), _("Load icon"), self)
         self.load_icon.setCheckable(True)
@@ -652,7 +652,7 @@ class TutorialGUI(qt.QMainWindow):
 
         self.background_image = pixmap
         self.label_image.setPixmap(self.background_image)
-        self.text_in.setText("Add text to accompany an arrow here.")
+        self.text_in.setPlaceholderText("Add text to accompany an arrow here.")
 
     def showEvent(self, event):
         pass
@@ -1231,7 +1231,7 @@ class TutorialGUI(qt.QMainWindow):
                 texto=self.long_string(txt)
                 l_box = font_metrics.horizontalAdvance(texto) + 10
                 painter.setFont(font_small)
-                if len(txt)  > 0 and antts.tx!="Add text to accompany an arrow here.":
+                if len(txt)  > 0:
                     bg_h = font_metrics.height() * len(txt) + 3
                     if antts.ip.y() > antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
@@ -1311,7 +1311,7 @@ class TutorialGUI(qt.QMainWindow):
                 texto=self.long_string(txt)
                 l_box = font_metrics.horizontalAdvance(texto) + 10
                 painter.setFont(font_small)
-                if len(txt) > 0 and antts.tx!="Add text to accompany an arrow here.":
+                if len(txt) > 0:
                     bg_h = font_metrics.height() * len(txt) + 3
                     if antts.ip.y() > antts.fp.y():
                         tb_i = qt.QPoint(antts.fp.x()-100, antts.fp.y()-bg_h)
