@@ -68,6 +68,8 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self.__selectedTutorial = None
         self.isDebug = False
         
+        print("Version Date: 12/19/2024")
+        
         #PROTOTYPE FOR PLAYBACK
 
         self.actionList = []
