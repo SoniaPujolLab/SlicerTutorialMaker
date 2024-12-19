@@ -242,7 +242,7 @@ class TutorialGUI(qt.QMainWindow):
 
         self.text_in = qt.QLineEdit()
         self.text_in.setMaxLength(500)
-        self.text_in.setFixedWidth(590)
+        self.text_in.setMaximumWidth(590)
         self.widget_action = qt.QWidgetAction(self)
         self.widget_action.setDefaultWidget(self.text_in)
         toolbar.addAction(self.widget_action)
