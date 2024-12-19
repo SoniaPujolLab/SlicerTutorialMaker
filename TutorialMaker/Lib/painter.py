@@ -79,7 +79,7 @@ class ImageDrawer:
         self.scene.addItem(rectangle)
 
         # Add text below the rectangle
-        if text:
+        if text and text != "Add text to accompany an arrow here.":
             # Create a background rectangle for the text
             text_item = qt.QGraphicsTextItem(self.wrap_text(text))
             text_item.setDefaultTextColor(text_color)
@@ -319,7 +319,7 @@ class ImageDrawer:
         path_item.setPen(pen)
         self.scene.addItem(path_item)
 
-        if text:
+        if text and text != "Add text to accompany an arrow here.":
             # Wrap and justify the text before calculating its size
             wrapped_text = self.wrap_text(text)
 
@@ -400,7 +400,7 @@ class ImageDrawer:
         bounding_box = icon_item.boundingRect()
 
         # Add text below the rectangle
-        if text:
+        if text and text != "Add text to accompany an arrow here.":
             # Create a background rectangle for the text
             text_item = qt.QGraphicsTextItem(text)
             text_item.setDefaultTextColor(text_color)
