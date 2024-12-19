@@ -713,7 +713,6 @@ class TutorialGUI(qt.QMainWindow):
         pass
 
     def keyPressEvent(self, event):
-        print("Tecla")
         if event.key() == qt.Qt.Key_Escape:
             #print("ESC")
             self.select_annt = False
@@ -1301,14 +1300,12 @@ class TutorialGUI(qt.QMainWindow):
             elif antts.tp == "click":
                 painter.drawImage(antts.ip, self.new_image)
             elif antts.tp == "arwT":
-                print("Prev")
                 txt = self.split_string_to_dict(antts.tx)
                 painter.drawPath(self.arrowPath(antts.tp, antts.ip, antts.fp))
                 pen = qt.QPen(qt.QColor(255, 255, 255))
                 painter.setPen(qt.Qt.NoPen)
                 painter.setBrush(qt.QBrush(qt.QColor(antts.cl)))
                 sbv = antts.sz
-                print("Size:",sbv)
                 font_small = qt.QFont("Arial", sbv)
                 font_metrics = qt.QFontMetrics(font_small)
                 texto=self.long_string(txt)
@@ -1643,7 +1640,7 @@ class TutorialGUI(qt.QMainWindow):
 
 
         # Create MD and HTML file
-        tutorialName = "fourMin_tutorial"
+        tutorialName = self.output_name
         AnnotationPainter.ImageDrawer.StartPaint(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName+".json",ListPositionWhite, List_totalImages)   
         markdown_creator = markdownHTMLCreator()  
-        html_content = markdown_creator.markdown_to_html((os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+tutorialName), List_totalImages)
+        html_content = markdown_creator.markdown_to_html((os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/"+ tutorialName), List_totalImages, tutorialName)

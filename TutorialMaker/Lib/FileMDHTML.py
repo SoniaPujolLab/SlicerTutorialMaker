@@ -4,6 +4,7 @@ import webbrowser
 import qt
 from slicer.i18n import tr as _
 
+
 class markdownHTMLCreator:
     def __init__(self) -> None:
         self.ensure_pdfkit_installed()
@@ -140,8 +141,7 @@ class markdownHTMLCreator:
                 webbrowser.open("file://" + path + ".md")
 
 
-    def markdown_to_html(self,path, ListTotalImages):
-        tutorialName = "fourMin_tutorial"
+    def markdown_to_html(self,path, ListTotalImages,tutorialName):
         self.tutorial_to_markdown(os.path.dirname(slicer.util.modulePath("TutorialMaker")) + "/Outputs/Annotations/" + tutorialName, ListTotalImages)   
         # Define CSS styles
         styles = """
