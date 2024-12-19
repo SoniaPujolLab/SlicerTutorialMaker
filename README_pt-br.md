@@ -45,7 +45,7 @@
 -	Depois de selecionar uma ferramenta, defina o estilo e o texto da anotação
 ![image](https://github.com/user-attachments/assets/524d6814-7601-4a22-ba30-0fcf222572ec)
 -	Em seguida, clique no elemento que receberá a anotação
-![TutorialMakenAnnotation](https://github.com/user-attachments/assets/d73d72f5-7598-43d9-b5ee-e473dea60625)
+![item8](https://github.com/user-attachments/assets/70f71f19-29ed-4f4b-9df5-70247f07fd5d)
 
 > [!WARNING]
 > Para pessoas com epilepsia, a tela piscará a cada captura de tela.
