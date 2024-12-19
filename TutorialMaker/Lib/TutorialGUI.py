@@ -471,7 +471,6 @@ class TutorialGUI(qt.QMainWindow):
         self.annotations_json = []
         self.images_list = []
         self.metadata_list = []
-        cont = 0
         self.labels = []
         self.steps = []
         self.edit_screen = []
@@ -491,19 +490,37 @@ class TutorialGUI(qt.QMainWindow):
         # Load all directories for images and metadata
         k = 0
         for step in data["steps"]:
+            joinedImage = None
+            joinedJson = None
+            windowJson = None
+            new_annotation = []
+            new_annotation_json = []
+            k = k+1
+            
             # Load files 
             for m_data in step:
-                new_annotation = []
-                new_annotation_json = []
                 path_image = directory_path+"/"+m_data["window"]
                 path_meta = directory_path+"/"+m_data["metadata"]
                 List_totalImages.append(k)
-                k = k+1
                 try:
-                    with open(path_meta, 'r', encoding='utf-8') as file:
-                        content = file.read()
-                        
-                    image = qt.QImage(path_image)
+                    if joinedImage == None:
+                        with open(path_meta, 'r', encoding='utf-8') as fileT:
+                            joinedJson = json.loads(fileT.read())
+                            fileT.close()
+
+                        joinedImage = qt.QImage(path_image)
+                    else:
+                        with open(path_meta, 'r', encoding='utf-8') as fileP:
+                            fileOp = fileP.read()
+                            windowJson = json.loads(fileOp)
+                            joinedJson= {**joinedJson, **windowJson}
+                            windowJson = windowJson[next(iter(windowJson))]
+                            fileP.close()
+
+                        painter = qt.QPainter(joinedImage)
+                        windowImage = qt.QImage(path_image)
+                        painter.drawImage(qt.QRect(windowJson["position"][0], windowJson["position"][1], windowImage.width(), windowImage.height()), windowImage)
+                        painter.end()
                 except FileNotFoundError:
                     print(_("File '{path_meta}' was not found.".format(path_meta=path_meta)))
                     exception_occurred = True   
@@ -513,58 +530,51 @@ class TutorialGUI(qt.QMainWindow):
                     exception_occurred = True
                     break
                 except Exception as e:
-                    print(_("An unexpected error occurred while opening file '{path_image}': {eror}".format(path_meta=path_meta, error=str(e))))
+                    print(_("An unexpected error occurred while opening file '{path_meta}': {error}".format(path_meta=path_meta, error=str(e))))
                     exception_occurred = True
                     break
 
-                new_size = qt.QSize(280, 165)
-                scaled_image = image.scaled(new_size)
-                pixmap = qt.QPixmap.fromImage(scaled_image)
+            new_size = qt.QSize(280, 165)
+            scaled_image = joinedImage.scaled(new_size)
+            pixmap = qt.QPixmap.fromImage(scaled_image)
 
-                label = tmLabel("QLabel_{}".format(cont), cont)
-                label.setObjectName("QLabel_{}".format(cont))
-                label.clicked.connect(lambda index=cont: self.label_clicked(index))
-                label.setPixmap(pixmap)
+            label = tmLabel("QLabel_{}".format(k), k)
+            label.setObjectName("QLabel_{}".format(k))
+            label.clicked.connect(lambda index=k: self.label_clicked(index))
+            label.setPixmap(pixmap)
                 
-                print(path_image)
-                #print(content)
-                last_wdg = self.find_bottom_right_widget(content)
-                print(last_wdg)
-                if not last_wdg:
+            last_wdg = self.find_bottom_right_widget(joinedJson)
+            if not last_wdg:
+                   pass
+            else:
+                widget_x, widget_y = last_wdg['position']
+                widget_width, widget_height = last_wdg['size']
+
+                widget_end_x = widget_x + widget_width
+                widget_end_y = widget_y + widget_height
+
+                image = qt.QImage(joinedImage)
+                image_width = image.width()
+                image_height = image.height()
+
+                if widget_end_x == image_width:
                     pass
                 else:
-                    widget_x, widget_y = last_wdg['position']
-                    widget_width, widget_height = last_wdg['size']
-
-                    widget_end_x = widget_x + widget_width
-                    widget_end_y = widget_y + widget_height
-
-                    image = qt.QImage(path_image)
-                    image_width = image.width()
-                    image_height = image.height()
-                    print(image_width,",",image_height)
-
-                    if widget_end_x == image_width:
-                        pass
-                    else:
-                        esc = image_width/widget_end_x
-                        new_width = widget_end_x
-                        new_height = image_height / esc
-                        print(new_width,",",new_height)
+                    esc = image_width/widget_end_x
+                    new_width = widget_end_x
+                    new_height = image_height / esc
                         
-                        resized_image = image.scaled(new_width, new_height, qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
-                        resized_image.save(path_image)
+                    resized_image = image.scaled(new_width, new_height, qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
+                    resized_image.save(path_image)
 
-                self.gridLayout.addWidget(label)
-                self.labels.append(label)
-                self.images_list.append(path_image)
-                self.metadata_list.append(content)
-                self.annotations.append(new_annotation)
-                self.annotations_json.append(new_annotation_json)
-                self.steps.append(_("Write a description here"))
-                self.widgets.append(_("Add a title here"))
-                cont += 1
-
+            self.gridLayout.addWidget(label)
+            self.labels.append(label)
+            self.images_list.append(joinedImage)
+            self.metadata_list.append(joinedJson)
+            self.annotations.append(new_annotation)
+            self.annotations_json.append(new_annotation_json)
+            self.steps.append(_("Write a description here"))
+            self.widgets.append(_("Add a title here"))
 
             if exception_occurred:
                 break
@@ -585,9 +595,7 @@ class TutorialGUI(qt.QMainWindow):
         max_y = 0
         bottom_right_widget = None
 
-        widgets = json.loads(content)
-
-        for key, widget in widgets.items():
+        for key, widget in content.items():
             pos_x, pos_y = widget["position"]
             width, height = widget["size"]
             
@@ -1141,7 +1149,7 @@ class TutorialGUI(qt.QMainWindow):
         x = pnt_clk.x()
         y = pnt_clk.y()
         
-        widgets = json.loads(widgets_json)
+        widgets = widgets_json
 
         for id, info in widgets.items():
             rect_x, rect_y = info["position"]

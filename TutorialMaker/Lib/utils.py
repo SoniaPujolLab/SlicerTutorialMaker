@@ -371,8 +371,10 @@ class ScreenshotTools():
         for w in slicer.app.topLevelWidgets():
             if hasattr(w, "isVisible") and not w.isVisible():
                 continue
-            openWindows.append(w)
-            
+            if w.objectName == "qSlicerMainWindow":
+                openWindows.insert(0,w)
+            else:
+                openWindows.append(w)
             pass
 
         windows = []
