@@ -266,3 +266,4 @@ class markdownHTMLCreator:
                 webbrowser.open("file://" + path + ".pdf")
         except IOError as e:
             print(f"Error al crear PDF: {e}")
+            
