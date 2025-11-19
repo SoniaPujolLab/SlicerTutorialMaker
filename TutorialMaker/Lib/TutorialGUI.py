@@ -357,6 +357,10 @@ class TutorialGUI(qt.QMainWindow):
         if not os.path.exists(jsonPath):
             return
         
+        self.selectedAnnotator = None
+        self.selectedAnnotation = None
+        self.selectedIndexes = [0, 0]
+        
         [tInfo, tSlides, tPaths] = AnnotatedTutorial.LoadAnnotatedTutorial(jsonPath)
         for step in self.steps:
             self.gridLayout.removeWidget(step)
@@ -394,6 +398,12 @@ class TutorialGUI(qt.QMainWindow):
 
         self._regenerateCoverPixmap()
         self._regenerateAcknowledgmentPixmap()
+        
+        if len(self.steps) > 0 and len(self.steps[0].Slides) > 0:
+            self.changeSelectedSlide(0, 0)
+        else:
+            self.slideTitleWidget.setText("")
+            self.slideBodyWidget.setText("")
 
 
 
@@ -551,21 +561,15 @@ class TutorialGUI(qt.QMainWindow):
         self.selectedSlide.setPixmap(selectedScreenshot.GetResized(*self.selectedSlideSize, keepAspectRatio=True))
         self.selectedAnnotator = selectedScreenshot
 
-        # Load text from slideAnnotator
-        self.slideTitleWidget.setText(self.selectedAnnotator.SlideTitle)
-        self.slideBodyWidget.setText(self.selectedAnnotator.SlideBody)
-
-         # Bind editors depending on layout
         layout = getattr(selectedScreenshot, "SlideLayout", "")
+        self._unbindEditorsFromCover()
+        self._unbindEditorsFromAcknowledgment()
+
         if layout == "CoverPage":
             self._bindEditorsToCover()
-            self._unbindEditorsFromAcknowledgment()
         elif layout == "Acknowledgment":
             self._bindEditorsToAcknowledgment()
-            self._unbindEditorsFromCover()
         else:
-            self._unbindEditorsFromCover()
-            self._unbindEditorsFromAcknowledgment()
             self.slideTitleWidget.setText(self.selectedAnnotator.SlideTitle)
             self.slideBodyWidget.setText(self.selectedAnnotator.SlideBody)
 
