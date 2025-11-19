@@ -409,6 +409,11 @@ class TutorialGUI(qt.QMainWindow):
 
     def saveAnnotationsAsJSON(self):
         import re
+        
+        if self.selectedAnnotator is not None:
+            self.selectedAnnotator.SlideTitle = self.slideTitleWidget.text
+            self.selectedAnnotator.SlideBody = self.slideBodyWidget.toPlainText()
+        
         outputFileAnnotations = {**self.tutorialInfo}
         outputFileTextDict = {}
         outputFileOld = []
