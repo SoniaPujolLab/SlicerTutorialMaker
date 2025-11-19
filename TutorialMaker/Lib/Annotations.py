@@ -517,7 +517,7 @@ class AnnotatedTutorial:
         for slideData in rawData["slides"]:
             slideStep, slideImg = slideData['SlideCode'].split("/")
             slideStep = str(int(slideStep) - rawDataOffsetCounter)
-            rawStepPath = f"{outputFolder}/raw/{slideStep}/{slideImg}"
+            rawStepPath = f"{outputFolder}/Raw/{slideStep}/{slideImg}"
             slideMetadata = []
             slideImage : qt.QImage = None
 
@@ -531,7 +531,7 @@ class AnnotatedTutorial:
 
                     slideImage = qt.QImage(rawStepPath + ".png")
                 except FileNotFoundError:
-                    stepPath = f"{outputFolder}/raw/{slideStep}"
+                    stepPath = f"{outputFolder}/Raw/{slideStep}"
                     slideMetadata = []
                     test_contents = os.listdir(stepPath)
                     for content in test_contents:
