@@ -530,6 +530,9 @@ class TutorialGUI(qt.QMainWindow):
         if acknowledgments_pm is not None:
             self.addBlankPage(False, len(self.steps), "", type_="Acknowledgment", pixmap=acknowledgments_pm)
             self.ackStepIndex = len(self.steps) - 1
+        
+        if len(self.steps) > 0 and len(self.steps[0].Slides) > 0:
+            self.changeSelectedSlide(0, 0)
         pass
 
     def swapStepPosition(self, index, swapTo):
