@@ -735,7 +735,7 @@ class TutorialPainter:
         for slideData in rawData["slides"]:
             slideStep, slideImg = slideData['SlideCode'].split("/")
             slideStep = str(int(slideStep) - rawDataOffsetCounter)
-            rawStepPath = f"{self.outputFolder}/raw/{slideStep}/{slideImg}"
+            rawStepPath = f"{self.outputFolder}/Raw/{slideStep}/{slideImg}"
             slideMetadata = []
             slideImage : qt.QImage = None
 
@@ -747,7 +747,7 @@ class TutorialPainter:
 
                     slideImage = qt.QImage(rawStepPath + ".png")
                 except FileNotFoundError:
-                    stepPath = f"{self.outputFolder}/raw/{slideStep}"
+                    stepPath = f"{self.outputFolder}/Raw/{slideStep}"
                     slideMetadata = []
                     test_contents = os.listdir(stepPath)
                     for content in test_contents:
