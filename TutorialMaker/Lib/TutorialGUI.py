@@ -342,6 +342,51 @@ class TutorialGUI(qt.QMainWindow):
         self.icon_arrowDown = qt.QIcon(qt.QPixmap.fromImage(self.image_ArrowDown))
         pass
 
+    def _loadAnnotationsFromFile(self, filepath):
+        self.selectedAnnotator = None
+        self.selectedAnnotation = None
+        self.selectedIndexes = [0, 0]
+        
+        [tInfo, tSlides, tPaths] = AnnotatedTutorial.LoadAnnotatedTutorial(filepath)
+        for step in self.steps:
+            self.gridLayout.removeWidget(step)
+            step.deleteLater()
+        self.steps = []
+        for stepIndex in range(len(tSlides)):
+            stepWidget = AnnotatorStepWidget(stepIndex, self.thumbnailSize, parent=self)
+            stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
+            stepWidget.swapRequest.connect(self.swapStepPosition)
+            stepWidget.AddStepWindows(tSlides[stepIndex])
+
+            self.steps.append(stepWidget)
+            self.gridLayout.addWidget(stepWidget)
+            stepWidget.UNDELETABLE = True
+            stepWidget.CreateMergedWindow()
+            stepWidget.ToggleExtended()
+        self.tutorialInfo = tInfo
+        
+        self.coverStepIndex = self._findStepIndexByLayout("CoverPage")
+        self.ackStepIndex   = self._findStepIndexByLayout("Acknowledgment")
+        
+        if self.coverStepIndex is None:
+            pm = self.make_cover_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
+            self.addBlankPage(False, 0, "", type_="CoverPage", pixmap=pm)
+            self.coverStepIndex = 0
+
+        if self.ackStepIndex is None:
+            pm = self.make_acknowledgments_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
+            self.addBlankPage(False, 1, "", type_="Acknowledgment", pixmap=pm)
+            self.ackStepIndex = 1
+
+        self._regenerateCoverPixmap()
+        self._regenerateAcknowledgmentPixmap()
+        
+        if len(self.steps) > 0 and len(self.steps[0].Slides) > 0:
+            self.changeSelectedSlide(0, 0)
+        else:
+            self.slideTitleWidget.setText("")
+            self.slideBodyWidget.setText("")
+
     def openAnnotationsAsJSON(self):
         from Lib.TutorialUtils import get_module_basepath as getModulePath
         parent = slicer.util.mainWindow()
@@ -357,53 +402,7 @@ class TutorialGUI(qt.QMainWindow):
         if not os.path.exists(jsonPath):
             return
         
-        self.selectedAnnotator = None
-        self.selectedAnnotation = None
-        self.selectedIndexes = [0, 0]
-        
-        [tInfo, tSlides, tPaths] = AnnotatedTutorial.LoadAnnotatedTutorial(jsonPath)
-        for step in self.steps:
-            self.gridLayout.removeWidget(step)
-            step.deleteLater()
-        self.steps = []
-        for stepIndex in range(len(tSlides)):
-            stepWidget = AnnotatorStepWidget(stepIndex, self.thumbnailSize, parent=self)
-            stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
-            stepWidget.swapRequest.connect(self.swapStepPosition)
-            stepWidget.AddStepWindows(tSlides[stepIndex])
-
-            self.steps.append(stepWidget)
-            self.gridLayout.addWidget(stepWidget)  # noqa: F821
-            stepWidget.UNDELETABLE = True # noqa: F821
-            stepWidget.CreateMergedWindow() # noqa: F821
-            stepWidget.ToggleExtended() # noqa: F821
-        self.tutorialInfo = tInfo
-        
-        
-        
-        self.coverStepIndex = self._findStepIndexByLayout("CoverPage")
-        self.ackStepIndex   = self._findStepIndexByLayout("Acknowledgment")
-        
-         # Ensure Cover exists
-        if self.coverStepIndex is None:
-            pm = self.make_cover_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
-            self.addBlankPage(False, 0, "", type_="CoverPage", pixmap=pm)
-            self.coverStepIndex = 0
-
-        # Ensure Acknowledgment exists ALWAYS (even if empty)
-        if self.ackStepIndex is None:
-            pm = self.make_acknowledgments_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
-            self.addBlankPage(False, 1, "", type_="Acknowledgment", pixmap=pm)
-            self.ackStepIndex = 1
-
-        self._regenerateCoverPixmap()
-        self._regenerateAcknowledgmentPixmap()
-        
-        if len(self.steps) > 0 and len(self.steps[0].Slides) > 0:
-            self.changeSelectedSlide(0, 0)
-        else:
-            self.slideTitleWidget.setText("")
-            self.slideBodyWidget.setText("")
+        self._loadAnnotationsFromFile(jsonPath)
 
 
 
@@ -918,11 +917,13 @@ class TutorialGUI(qt.QMainWindow):
 
     def open_json_file(self, filepath):
         directory_path = os.path.dirname(filepath)
-        # Read the data from the file
         with open(filepath, encoding='utf-8') as file:
             rawTutorialData = json.load(file)
             file.close()
 
+        if "slides" in rawTutorialData:
+            self._loadAnnotationsFromFile(filepath)
+            return
 
         tutorial = Tutorial(
             rawTutorialData["title"],

@@ -312,8 +312,20 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             )
             return
         
+        fileToLoad = rawTutorialPath
+        if os.path.exists(annotationsPath):
+            loadAnnotations = slicer.util.confirmYesNoDisplay(
+                _("An existing annotations file was found.\n\n"
+                  "Would you like to load the existing annotations?\n\n"
+                  "Yes: Load existing annotations\n"
+                  "No: Start fresh from raw tutorial"),
+                _("Load Existing Annotations?")
+            )
+            if loadAnnotations:
+                fileToLoad = annotationsPath
+        
         Annotator = Lib.TutorialGUI.TutorialGUI()
-        Annotator.open_json_file(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Raw/Tutorial.json")
+        Annotator.open_json_file(fileToLoad)
         Annotator.show()
         pass
 
