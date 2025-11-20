@@ -678,7 +678,72 @@ class TutorialGUI(qt.QMainWindow):
 
 
     def copy_page(self):
-        pass
+        if self.selectedAnnotator is None:
+            return
+        
+        if self.selectedAnnotator is not None:
+            self.selectedAnnotator.SlideTitle = self.slideTitleWidget.text
+            self.selectedAnnotator.SlideBody = self.slideBodyWidget.toPlainText()
+        
+        stepIndex, slideIndex = self.selectedIndexes
+        currentStep = self.steps[stepIndex]
+        currentSlide = currentStep.Slides[slideIndex]
+        
+        newPixmap = currentSlide.image.copy()
+        
+        newMetadata = copy.deepcopy(currentSlide.metadata)
+
+        newAnnotations = []
+        for annotation in currentSlide.annotations:
+            newAnnotation = Annotation(
+                TargetWidget=copy.deepcopy(annotation.target),
+                OffsetX=annotation.offsetX,
+                OffsetY=annotation.offsetY,
+                OptX=annotation.optX,
+                OptY=annotation.optY,
+                Text=annotation.text,
+                Type=annotation.type
+            )
+            newAnnotation.penConfig(annotation.color, annotation.fontSize, annotation.thickness, annotation.brush, annotation.pen)
+            newAnnotation.PERSISTENT = annotation.PERSISTENT
+            newAnnotations.append(newAnnotation)
+        
+        newWindowOffset = copy.deepcopy(currentSlide.windowOffset)
+        
+        newSlide = AnnotatorSlide(newPixmap, newMetadata, newAnnotations, newWindowOffset)
+        if currentSlide.SlideLayout == "Screenshot":
+            newSlide.SlideLayout = "Copy"
+        else:
+            newSlide.SlideLayout = currentSlide.SlideLayout
+        newSlide.SlideTitle = currentSlide.SlideTitle + _(" (Copy)")
+        newSlide.SlideBody = currentSlide.SlideBody
+        newSlide.Active = currentSlide.Active
+        
+        newStepIndex = stepIndex + 1
+        stepWidget = AnnotatorStepWidget(len(self.steps), self.thumbnailSize, parent=self)
+        stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
+        stepWidget.swapRequest.connect(self.swapStepPosition)
+        stepWidget.AddStepWindows(newSlide)
+        stepWidget.CreateMergedWindow()
+        
+        self.steps.append(stepWidget)
+        self.gridLayout.addWidget(stepWidget)
+        
+        for i in range(len(self.steps) - 1, newStepIndex, -1):
+            self.steps[i] = self.steps[i - 1]
+            self.steps[i].stepIndex = i
+            self.gridLayout.addWidget(self.steps[i], i, 0)
+        
+        self.steps[newStepIndex] = stepWidget
+        stepWidget.stepIndex = newStepIndex
+        self.gridLayout.addWidget(stepWidget, newStepIndex, 0)
+        
+        if self.coverStepIndex is not None and self.coverStepIndex >= newStepIndex:
+            self.coverStepIndex += 1
+        if self.ackStepIndex is not None and self.ackStepIndex >= newStepIndex:
+            self.ackStepIndex += 1
+        
+        self.changeSelectedSlide(newStepIndex, 0)
 
     def updateSelectedAnnotationSettings(self):
         if self.selectedAnnotation is not None:
