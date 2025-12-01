@@ -519,18 +519,27 @@ class AnnotatedTutorial:
             slideStep = str(int(slideStep) - rawDataOffsetCounter)
             rawStepPath = f"{outputFolder}/Raw/{slideStep}/{slideImg}"
             slideMetadata = []
+            if slideData["SlideLayout"] == "RepeatedScreenshot":
+                rawStepPath = f"{outputFolder}/Raw/{slideData['SlideCode']}"
+                rawDataOffsetCounter += 1
+                #print(slideData['SlideCode'])
+                #print(":D:D:D")
+           
             slideImage : qt.QImage = None
+    
+            
 
             tsParser = TutorialScreenshot()
             devicePixelRatio = 1.0  # Default for backward compatibility
-            if slideData["SlideLayout"] == "Screenshot":
+            if slideData["SlideLayout"] == "Screenshot" or slideData["SlideLayout"] == "RepeatedScreenshot":
                 try:
                     tsParser.metadata = rawStepPath + ".json"
+                    #print(tsParser.metadata)
                     slideMetadata = tsParser.getWidgets()
                     devicePixelRatio = tsParser.getDevicePixelRatio()
-
                     slideImage = qt.QImage(rawStepPath + ".png")
                 except FileNotFoundError:
+                    #print("HI")
                     stepPath = f"{outputFolder}/Raw/{slideStep}"
                     slideMetadata = []
                     test_contents = os.listdir(stepPath)
@@ -586,6 +595,7 @@ class AnnotatedTutorial:
             annotatedSlide.SlideLayout = slideData["SlideLayout"]
 
             imagePaths.append(slideData["ImagePath"])
+            #print(imagePaths)
             slides.append(annotatedSlide)
 
         return [TutorialInfo, slides, imagePaths]

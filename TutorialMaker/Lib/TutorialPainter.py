@@ -721,6 +721,8 @@ class TutorialPainter:
         pass
 
     def LoadAnnotatedTutorial(self, path):
+        print(rawData["slides"])
+
         self.slides = []
         textDict = self.GetLocalizedDict(self.currentLanguage)
         with open(path, encoding='utf-8') as file:
@@ -737,17 +739,21 @@ class TutorialPainter:
             slideStep = str(int(slideStep) - rawDataOffsetCounter)
             rawStepPath = f"{self.outputFolder}/Raw/{slideStep}/{slideImg}"
             slideMetadata = []
+            if slideData["SlideLayout"] == "RepeatedScreenshot":
+                rawStepPath = f"{outputFolder}/Raw/{slideData['SlideCode']}"
+                rawDataOffsetCounter += 1
+
             slideImage : qt.QImage = None
 
             tsParser = TutorialScreenshot()
-            if slideData["SlideLayout"] == "Screenshot":
+            if slideData["SlideLayout"] == "Screenshot" or slideData["SlideLayout"] == "RepeatedScreenshot":
                 try:
                     tsParser.metadata = rawStepPath + ".json"
                     slideMetadata = tsParser.getWidgets()
 
                     slideImage = qt.QImage(rawStepPath + ".png")
                 except FileNotFoundError:
-                    stepPath = f"{self.outputFolder}/Raw/{slideStep}"
+                   # stepPath = f"{self.outputFolder}/Raw/{slideStep}"
                     slideMetadata = []
                     test_contents = os.listdir(stepPath)
                     for content in test_contents:
@@ -803,7 +809,9 @@ class TutorialPainter:
         pass
 
     def GenerateHTMLfromAnnotatedTutorial(self, path):
+       # print(self.slides)
         [self.TutorialInfo, self.slides, self.imagePaths] = AnnotatedTutorial.LoadAnnotatedTutorial(path)
+        print(self.imagePaths)
         localizedScreenshotsPath = f"{self.outputFolder}/{self.TutorialInfo['title']}_{self.currentLanguage}"
         clean_title = self.TutorialInfo["title"].strip().replace(" ", "_").replace("\t", "_").replace("\n", "_").replace("\r", "_")
         clean_folder = f"{os.path.dirname(os.path.dirname(__file__))}/Outputs"
@@ -813,6 +821,7 @@ class TutorialPainter:
         # If we are going to have a exporter lib then it should handle this itself
         pages : list[Exporter.SlidePage] = []
         for slideIndex, slide in enumerate(self.slides):
+            print(slideIndex)
             page = None
             
             if slide.SlideLayout == "CoverPage":
@@ -828,18 +837,19 @@ class TutorialPainter:
                     slide.SlideTitle or "Acknowledgments",
                     slide.SlideBody 
                 )
-
-
-            elif slide.SlideLayout == "Screenshot" or slide.SlideLayout == "Copy":
+            
+            elif slide.SlideLayout == "Screenshot" or slide.SlideLayout == "RepeatedScreenshot":
                 title = slide.SlideTitle 
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
                     slide.SlideBody,
                     self.imagePaths[slideIndex]
                 )
-            else:
-                continue
-            pass
+            elif slide.SlideLayout == "Blank":
+                page = Exporter.BlankSlide(
+                slide.SlideTitle,
+                slide.SlideBody)
+                #print(slide.SlideTitle)
             pages.append(Exporter.SlidePage(page))
         
         tutorialPath = localizedScreenshotsPath + f"/{clean_title}"
