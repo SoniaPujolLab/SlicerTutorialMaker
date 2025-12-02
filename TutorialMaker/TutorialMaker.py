@@ -274,7 +274,11 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Annotations/annotations.json")
             outputPath = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/"
             if platform.system() == "Windows":
-                os.startfile(outputPath)
+                    try:
+                        import subprocess
+                        subprocess.Popen(["explorer", os.path.realpath(outputPath)])
+                    except Exception as e:
+                        print("The folder could not be opened:", e)
             else:
                 import subprocess, sys
                 opener = "open" if sys.platform == "darwin" else "xdg-open"
