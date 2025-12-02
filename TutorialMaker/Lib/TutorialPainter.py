@@ -830,7 +830,7 @@ class TutorialPainter:
                 )
 
 
-            elif slide.SlideLayout == "Screenshot":
+            elif slide.SlideLayout == "Screenshot" or slide.SlideLayout == "Copy":
                 title = slide.SlideTitle 
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
