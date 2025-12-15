@@ -595,7 +595,7 @@ class TutorialGUI(qt.QMainWindow):
 
     #TODO: Clean this up, there's a better way to keep track of the step.stepIndex value, with this we have to keep 2 copies redundant
     #This seems like a very expensive function
-    # Cambia la firma:
+    # Change the signature:
     def addBlankPage(self, state, index:int=None, backgroundPath:str="", metadata:dict=None, type_:str="", pixmap:qt.QPixmap=None):
         stepWidget = AnnotatorStepWidget(len(self.steps), self.thumbnailSize, parent=self)
         stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
@@ -609,7 +609,7 @@ class TutorialGUI(qt.QMainWindow):
         elif backgroundPath:
             annotatorSlide = AnnotatorSlide(qt.QPixmap(backgroundPath), metadata)
         else:
-            # comportamiento anterior (selector de imágenes)
+            # previous behavior (image selector)
             self.images_selector(self.tutorial2, index)
             return
 
