@@ -256,7 +256,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
               "Click on \"OK\" to continue. \"Cancel\" to abort."),
             _("Capturing tutorial")
         ):
-            return  # Usuário cancelou
+            return  # User cancelled
 
         def FinishTutorial():
             slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
