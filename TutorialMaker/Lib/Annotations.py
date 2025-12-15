@@ -50,6 +50,9 @@ class Annotation:
         self.boundingBoxBottomRight = [0,0]
         self.__selectionSlideEffect = 0
 
+        self.caretVisible = True
+        self.caretPosition = len(self.text)
+
         # Need to change this later, make it loaded through resources
         self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
         self.icon_click = self.icon_click.scaled(20,30)
@@ -73,7 +76,7 @@ class Annotation:
         return [self.boundingBoxBottomRight[0] - self.boundingBoxTopLeft[0], self.boundingBoxBottomRight[1] - self.boundingBoxTopLeft[1]]
 
     def wantsOptHelper(self):
-        return self.type in AnnotationType.Arrow | AnnotationType.TextBox | AnnotationType.ArrowText
+        return self.type in AnnotationType.Arrow | AnnotationType.ArrowText
 
     def wantsOffsetHelper(self):
         return self.type in AnnotationType.Click | AnnotationType.TextBox
@@ -111,6 +114,24 @@ class Annotation:
         self.pen = pen
         self.fontSize = fontSize
         pass
+
+    def drawCaret(self, painter, fontMetrics, textStart, textLines):
+
+        if not self.drawBoundingBox:
+            return  
+
+        caretLine = min(self.text[:self.caretPosition].count('\n'), max(len(textLines)-1, 0))
+        lineStartIndex = sum(len(l)+1 for l in textLines[:caretLine])
+        caretCol = self.caretPosition - lineStartIndex
+        caretCol = max(0, min(caretCol, len(textLines[caretLine])))
+
+        caretX = textStart[0] + fontMetrics.width(textLines[caretLine][:caretCol])
+        fHeight = fontMetrics.height()
+        lineSpacing = 2
+        caretYTop = textStart[1] - fHeight + lineSpacing + fHeight * caretLine
+        caretYBottom = caretYTop + fHeight
+
+        painter.drawLine(caretX, caretYTop, caretX, caretYBottom)
 
     def draw(self, painter : qt.QPainter = None, pen : qt.QPen = None, brush :qt.QBrush = None):
         targetPos = [self.target["position"][0] - self.annotationOffset[0] + self.offsetX,
@@ -183,93 +204,137 @@ class Annotation:
             self.setSelectionBoundingBox(*arrowTail, *arrowHead)
             pass
         elif self.type == AnnotationType.ArrowText:
-            # So the arrow will be filled
+            # ------------------------------------------------------------
+            # Arrow drawing (filled arrow head)
+            # ------------------------------------------------------------
             brush.setStyle(qt.Qt.SolidPattern)
             painter.setBrush(brush)
 
-            arrowRatio = 3 # defined as > 1 (bigger than one) and changes the arrow head angle
+            arrowRatio = 3
             arrowHeadSize = 40
             arrowSize = 200
 
-            optX =  self.optX - targetCenter[0]
+            # Optional helper relative to target center
+            optX = self.optX - targetCenter[0]
             optY = self.optY - targetCenter[1]
 
-            # To better the user experience of moving the helper element
             optX = Util.mapFromTo(optX, -targetSize[0], targetSize[0], -1, 1)
             optY = Util.mapFromTo(optY, -targetSize[1], targetSize[1], -1, 1)
 
-            # Clamp optional values between -1 and 1
             optX = min(max(-1, optX), 1)
             optY = min(max(-1, optY), 1)
 
-            arrowHead = [targetCenter[0] + optX*targetSize[0]/2,
-                         targetCenter[1] + optY*targetSize[1]/2]
+            arrowHead = [
+                targetCenter[0] + optX * targetSize[0] / 2,
+                targetCenter[1] + optY * targetSize[1] / 2
+            ]
 
-            arrowTail = [arrowHead[0] + arrowSize*optX,
-                         arrowHead[1] + arrowSize*optY]
+            arrowTail = [
+                arrowHead[0] + arrowSize * optX,
+                arrowHead[1] + arrowSize * optY
+            ]
 
             arrowLine = qt.QLineF(qt.QPointF(*arrowHead), qt.QPointF(*arrowTail))
-
             arrowAngle = math.atan2(-arrowLine.dy(), arrowLine.dx())
 
-            arrowP1 = arrowLine.p1() + qt.QPointF(math.sin(arrowAngle + math.pi / arrowRatio) * arrowHeadSize,
-                                                  math.cos(arrowAngle + math.pi / arrowRatio) * arrowHeadSize)
+            arrowP1 = arrowLine.p1() + qt.QPointF(
+                math.sin(arrowAngle + math.pi / arrowRatio) * arrowHeadSize,
+                math.cos(arrowAngle + math.pi / arrowRatio) * arrowHeadSize
+            )
 
-            arrowP2 = arrowLine.p1() + qt.QPointF(math.sin(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize,
-                                                  math.cos(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize)
+            arrowP2 = arrowLine.p1() + qt.QPointF(
+                math.sin(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize,
+                math.cos(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize
+            )
 
-            arrowHeadPolygon = qt.QPolygonF()
-            arrowHeadPolygon.clear()
-
-            arrowHeadPolygon.append(arrowLine.p1())
-            arrowHeadPolygon.append(arrowP1)
-            arrowHeadPolygon.append(arrowP2)
+            arrowHeadPolygon = qt.QPolygonF([arrowLine.p1(), arrowP1, arrowP2])
 
             painter.drawLine(arrowLine)
             painter.drawPolygon(arrowHeadPolygon)
 
-
-            self.setSelectionBoundingBox(*arrowTail, *arrowHead)
-
-            # Text section
-            yPadding = 6
-            xPadding = 10
+            # ------------------------------------------------------------
+            # Text layout
+            # ------------------------------------------------------------
+            padding = 8
             lineSpacing = 2
 
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
+
             pen.setColor(qt.Qt.black)
             painter.setPen(pen)
 
             fontMetrics = qt.QFontMetrics(font)
-            fHeight = fontMetrics.height()
+            lineHeight = fontMetrics.height()
+            ascent = fontMetrics.ascent()
 
-            textToWrite = self.text
-            if textToWrite == "":
-                textToWrite = _("Write your text here")
+            textToWrite = self.text if self.text else _("Write your text here")
             textLines = textToWrite.splitlines()
 
-            # Calculate text size
-            textHeight = len(textLines) * fHeight # + (len(textLines) - 1) * lineSpacing
-            textWidth = max(fontMetrics.width(line) for line in textLines)
+            textWidth = max(
+                (fontMetrics.horizontalAdvance(line) for line in textLines),
+                default=0
+            )
 
-            # Calcule the position of the text box (center)
-            topLeft = qt.QPoint(arrowTail[0] - textWidth / 2,arrowTail[1] - textHeight / 2)
-            bottomRight = qt.QPoint(xPadding*2 + (arrowTail[0] + textWidth / 2), yPadding*2 + (arrowTail[1] + textHeight / 2))
-            rectToDraw = qt.QRect(topLeft, bottomRight)
+            textHeight = (
+                len(textLines) * lineHeight +
+                (len(textLines) - 1) * lineSpacing
+            )
+
+            boxWidth = textWidth + 2 * padding
+            boxHeight = textHeight + 2 * padding
+
+            topLeft = [
+                arrowTail[0] - boxWidth / 2,
+                arrowTail[1] - boxHeight / 2
+            ]
+
+            bottomRight = [
+                topLeft[0] + boxWidth,
+                topLeft[1] + boxHeight
+            ]
+
+            rectToDraw = qt.QRect(
+                qt.QPoint(*topLeft),
+                qt.QPoint(*bottomRight)
+            )
+
+            # ------------------------------------------------------------
+            # Draw filled rectangle without border (EXACT logic requested)
+            # ------------------------------------------------------------
+            painter.setPen(qt.Qt.NoPen)
             painter.drawRect(rectToDraw)
 
-            # Ajust text to the center box
-            textStart = [topLeft.x() + xPadding, topLeft.y() + fHeight]
+            # Restore pen for text rendering
+            pen.setColor(qt.Qt.black)
+            painter.setPen(pen)
 
+            # Starting position for text (baseline-based, symmetric padding)
+            textStart = [
+                topLeft[0] + padding,
+                topLeft[1] + padding + ascent
+            ]
 
-            for lineIndex, line in enumerate(textLines):
-                painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight * lineIndex, line)
+            # Draw each text line
+            for i, line in enumerate(textLines):
+                painter.drawText(
+                    textStart[0],
+                    textStart[1] + i * (lineHeight + lineSpacing),
+                    line
+                )
 
-            self.setSelectionBoundingBox(arrowHead[0], arrowHead[1], arrowTail[0], arrowTail[1])
+            # ------------------------------------------------------------
+            # Selection bounding box
+            # ------------------------------------------------------------
+            # Caret
+            self.drawCaret(painter, fontMetrics, textStart, textLines)
+            self.setSelectionBoundingBox(
+                min(arrowHead[0], topLeft[0]),
+                min(arrowHead[1], topLeft[1]),
+                max(arrowTail[0], bottomRight[0]),
+                max(arrowTail[1], bottomRight[1])
+            )
 
-
-            pass
 
         elif self.type == AnnotationType.Rectangle:
             topLeft = qt.QPoint(targetPos[0], targetPos[1])
@@ -283,70 +348,115 @@ class Annotation:
         elif self.type == AnnotationType.Circle:
             pass
         elif self.type == AnnotationType.TextBox:
-            # So the box will be filled
+
+            # Use solid fill for the background
             brush.setStyle(qt.Qt.SolidPattern)
             painter.setBrush(brush)
 
-            # Padding
-
-            yPadding = 6
-            xPadding = 6
+            # Padding and spacing (symmetric on all sides)
+            padding = 10
             lineSpacing = 2
 
-            optX = self.optX - targetCenter[0]
-            optY = self.optY - targetCenter[1]
-
-            topLeft = qt.QPoint(targetPos[0], targetPos[1])
-            bottomRight = qt.QPoint(targetPos[0] + optX, targetPos[1] + optY)
-            rectToDraw = qt.QRect(topLeft,bottomRight)
-            painter.drawRect(rectToDraw)
-
-            # Calculate the text break and position
+            # Configure font
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
+
+            # Font metrics for precise text layout
+            fontMetrics = qt.QFontMetrics(font)
+            ascent = fontMetrics.ascent()
+            descent = fontMetrics.descent()
+            lineHeight = ascent + descent
+
+            # Fallback text when annotation is empty
+            textToWrite = self.text if self.text else _("Write something here")
+
+            # Split text preserving explicit line breaks
+            textTokens = textToWrite.splitlines(keepends=True)
+            textLines = []
+            line = ""
+
+            # Simple word wrapping logic with fixed max width (200 px)
+            for token in textTokens:
+                if "\n" in token:
+                    if line:
+                        textLines.append(line)
+                    textLines.append(token.rstrip("\n"))
+                    line = ""
+                    continue
+
+                if fontMetrics.width(line + token) > 200:
+                    if line:
+                        textLines.append(line)
+                    line = token
+                else:
+                    line += token
+
+            if line:
+                textLines.append(line)
+
+            # Compute text bounding box size including padding
+            textWidth = (
+                max((fontMetrics.width(l) for l in textLines), default=0)
+                + 2 * padding
+            )
+
+            textHeight = (
+                len(textLines) * lineHeight
+                + (len(textLines) - 1) * lineSpacing
+                + 2 * padding
+            )
+
+            # Determine rectangle size (auto-size or user-defined)
+            if not hasattr(self, "_userSetSize"):
+                bottomRight = [
+                    targetPos[0] + textWidth,
+                    targetPos[1] + textHeight
+                ]
+            else:
+                bottomRight = [
+                    targetPos[0] + self.optX,
+                    targetPos[1] + self.optY
+                ]
+
+            topLeft = [targetPos[0], targetPos[1]]
+
+            rectToDraw = qt.QRect(
+                qt.QPoint(*topLeft),
+                qt.QPoint(*bottomRight)
+            )
+
+            # Draw filled rectangle without border
+            painter.setPen(qt.Qt.NoPen)
+            painter.drawRect(rectToDraw)
+
+            # Restore pen for text rendering
             pen.setColor(qt.Qt.black)
             painter.setPen(pen)
 
-            fontMetrics = qt.QFontMetrics(font)
-            fHeight = fontMetrics.height()
+            # Starting position for text (baseline-based, symmetric padding)
+            textStart = [
+                topLeft[0] + padding,
+                topLeft[1] + padding + ascent
+            ]
 
-            textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
-            textBoxTopLeft = [targetPos[0], targetPos[1]]
+            # Draw each text line
+            for i, line in enumerate(textLines):
+                painter.drawText(
+                    textStart[0],
+                    textStart[1] + i * (lineHeight + lineSpacing),
+                    line
+                )
 
-            if textBoxBottomRight[0] < textBoxTopLeft[0]:
-                tmp = textBoxTopLeft[0]
-                textBoxTopLeft[0] = textBoxBottomRight[0]
-                textBoxBottomRight[0] = tmp
+            # Draw caret for text editing (if active)
+            self.drawCaret(painter, fontMetrics, textStart, textLines)
 
-            if textBoxBottomRight[1] < textBoxTopLeft[1]:
-                tmp = textBoxTopLeft[1]
-                textBoxTopLeft[1] = textBoxBottomRight[1]
-                textBoxBottomRight[1] = tmp
-
-            textStart = [textBoxTopLeft[0] + xPadding,
-                         textBoxTopLeft[1] + yPadding + fHeight]
-
-            textToWrite = self.text
-            if textToWrite == "":
-                textToWrite = _("Write something here")
-
-            displayLines = []
-            textLines = textToWrite.splitlines()
-            for tLines in textLines:
-                textTokens = tLines.split()
-                line = ""
-                for token in textTokens:
-                    if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
-                        displayLines.append(copy.deepcopy(line))
-                        line = f"{token} "
-                        continue
-                    line += f"{token} "
-                displayLines.append(line)
-
-            for lineIndex, line in enumerate(displayLines):
-                painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight*lineIndex, line)
-
-            self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
+            # Update selection bounding box for interaction
+            self.setSelectionBoundingBox(
+                topLeft[0],
+                topLeft[1],
+                bottomRight[0],
+                bottomRight[1]
+            )
 
         elif self.type == AnnotationType.Click:
             bottomRight = [targetPos[0] + targetSize[0],

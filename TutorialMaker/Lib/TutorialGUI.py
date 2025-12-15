@@ -342,6 +342,51 @@ class TutorialGUI(qt.QMainWindow):
         self.icon_arrowDown = qt.QIcon(qt.QPixmap.fromImage(self.image_ArrowDown))
         pass
 
+    def _loadAnnotationsFromFile(self, filepath):
+        self.selectedAnnotator = None
+        self.selectedAnnotation = None
+        self.selectedIndexes = [0, 0]
+        
+        [tInfo, tSlides, tPaths] = AnnotatedTutorial.LoadAnnotatedTutorial(filepath)
+        for step in self.steps:
+            self.gridLayout.removeWidget(step)
+            step.deleteLater()
+        self.steps = []
+        for stepIndex in range(len(tSlides)):
+            stepWidget = AnnotatorStepWidget(stepIndex, self.thumbnailSize, parent=self)
+            stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
+            stepWidget.swapRequest.connect(self.swapStepPosition)
+            stepWidget.AddStepWindows(tSlides[stepIndex])
+
+            self.steps.append(stepWidget)
+            self.gridLayout.addWidget(stepWidget)
+            stepWidget.UNDELETABLE = True
+            stepWidget.CreateMergedWindow()
+            stepWidget.ToggleExtended()
+        self.tutorialInfo = tInfo
+        
+        self.coverStepIndex = self._findStepIndexByLayout("CoverPage")
+        self.ackStepIndex   = self._findStepIndexByLayout("Acknowledgment")
+        
+        if self.coverStepIndex is None:
+            pm = self.make_cover_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
+            self.addBlankPage(False, 0, "", type_="CoverPage", pixmap=pm)
+            self.coverStepIndex = 0
+
+        if self.ackStepIndex is None:
+            pm = self.make_acknowledgments_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
+            self.addBlankPage(False, 1, "", type_="Acknowledgment", pixmap=pm)
+            self.ackStepIndex = 1
+
+        self._regenerateCoverPixmap()
+        self._regenerateAcknowledgmentPixmap()
+        
+        if len(self.steps) > 0 and len(self.steps[0].Slides) > 0:
+            self.changeSelectedSlide(0, 0)
+        else:
+            self.slideTitleWidget.setText("")
+            self.slideBodyWidget.setText("")
+
     def openAnnotationsAsJSON(self):
         from Lib.TutorialUtils import get_module_basepath as getModulePath
         parent = slicer.util.mainWindow()
@@ -357,48 +402,17 @@ class TutorialGUI(qt.QMainWindow):
         if not os.path.exists(jsonPath):
             return
         
-        [tInfo, tSlides, tPaths] = AnnotatedTutorial.LoadAnnotatedTutorial(jsonPath)
-        for step in self.steps:
-            self.gridLayout.removeWidget(step)
-            step.deleteLater()
-        self.steps = []
-        for stepIndex in range(len(tSlides)):
-            stepWidget = AnnotatorStepWidget(stepIndex, self.thumbnailSize, parent=self)
-            stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
-            stepWidget.swapRequest.connect(self.swapStepPosition)
-            stepWidget.AddStepWindows(tSlides[stepIndex])
-
-            self.steps.append(stepWidget)
-            self.gridLayout.addWidget(stepWidget)  # noqa: F821
-            stepWidget.UNDELETABLE = True # noqa: F821
-            stepWidget.CreateMergedWindow() # noqa: F821
-            stepWidget.ToggleExtended() # noqa: F821
-        self.tutorialInfo = tInfo
-        
-        
-        
-        self.coverStepIndex = self._findStepIndexByLayout("CoverPage")
-        self.ackStepIndex   = self._findStepIndexByLayout("Acknowledgment")
-        
-         # Ensure Cover exists
-        if self.coverStepIndex is None:
-            pm = self.make_cover_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
-            self.addBlankPage(False, 0, "", type_="CoverPage", pixmap=pm)
-            self.coverStepIndex = 0
-
-        # Ensure Acknowledgment exists ALWAYS (even if empty)
-        if self.ackStepIndex is None:
-            pm = self.make_acknowledgments_pixmap(self.tutorialInfo, tuple(self.selectedSlideSize))
-            self.addBlankPage(False, 1, "", type_="Acknowledgment", pixmap=pm)
-            self.ackStepIndex = 1
-
-        self._regenerateCoverPixmap()
-        self._regenerateAcknowledgmentPixmap()
+        self._loadAnnotationsFromFile(jsonPath)
 
 
 
     def saveAnnotationsAsJSON(self):
         import re
+        
+        if self.selectedAnnotator is not None:
+            self.selectedAnnotator.SlideTitle = self.slideTitleWidget.text
+            self.selectedAnnotator.SlideBody = self.slideBodyWidget.toPlainText()
+        
         outputFileAnnotations = {**self.tutorialInfo}
         outputFileTextDict = {}
         outputFileOld = []
@@ -520,6 +534,9 @@ class TutorialGUI(qt.QMainWindow):
         if acknowledgments_pm is not None:
             self.addBlankPage(False, len(self.steps), "", type_="Acknowledgment", pixmap=acknowledgments_pm)
             self.ackStepIndex = len(self.steps) - 1
+        
+        if len(self.steps) > 0 and len(self.steps[0].Slides) > 0:
+            self.changeSelectedSlide(0, 0)
         pass
 
     def swapStepPosition(self, index, swapTo):
@@ -551,21 +568,15 @@ class TutorialGUI(qt.QMainWindow):
         self.selectedSlide.setPixmap(selectedScreenshot.GetResized(*self.selectedSlideSize, keepAspectRatio=True))
         self.selectedAnnotator = selectedScreenshot
 
-        # Load text from slideAnnotator
-        self.slideTitleWidget.setText(self.selectedAnnotator.SlideTitle)
-        self.slideBodyWidget.setText(self.selectedAnnotator.SlideBody)
-
-         # Bind editors depending on layout
         layout = getattr(selectedScreenshot, "SlideLayout", "")
+        self._unbindEditorsFromCover()
+        self._unbindEditorsFromAcknowledgment()
+
         if layout == "CoverPage":
             self._bindEditorsToCover()
-            self._unbindEditorsFromAcknowledgment()
         elif layout == "Acknowledgment":
             self._bindEditorsToAcknowledgment()
-            self._unbindEditorsFromCover()
         else:
-            self._unbindEditorsFromCover()
-            self._unbindEditorsFromAcknowledgment()
             self.slideTitleWidget.setText(self.selectedAnnotator.SlideTitle)
             self.slideBodyWidget.setText(self.selectedAnnotator.SlideBody)
 
@@ -667,7 +678,72 @@ class TutorialGUI(qt.QMainWindow):
 
 
     def copy_page(self):
-        pass
+        if self.selectedAnnotator is None:
+            return
+        
+        if self.selectedAnnotator is not None:
+            self.selectedAnnotator.SlideTitle = self.slideTitleWidget.text
+            self.selectedAnnotator.SlideBody = self.slideBodyWidget.toPlainText()
+        
+        stepIndex, slideIndex = self.selectedIndexes
+        currentStep = self.steps[stepIndex]
+        currentSlide = currentStep.Slides[slideIndex]
+        
+        newPixmap = currentSlide.image.copy()
+        
+        newMetadata = copy.deepcopy(currentSlide.metadata)
+
+        newAnnotations = []
+        for annotation in currentSlide.annotations:
+            newAnnotation = Annotation(
+                TargetWidget=copy.deepcopy(annotation.target),
+                OffsetX=annotation.offsetX,
+                OffsetY=annotation.offsetY,
+                OptX=annotation.optX,
+                OptY=annotation.optY,
+                Text=annotation.text,
+                Type=annotation.type
+            )
+            newAnnotation.penConfig(annotation.color, annotation.fontSize, annotation.thickness, annotation.brush, annotation.pen)
+            newAnnotation.PERSISTENT = annotation.PERSISTENT
+            newAnnotations.append(newAnnotation)
+        
+        newWindowOffset = copy.deepcopy(currentSlide.windowOffset)
+        
+        newSlide = AnnotatorSlide(newPixmap, newMetadata, newAnnotations, newWindowOffset)
+        if currentSlide.SlideLayout == "Screenshot":
+            newSlide.SlideLayout = "Copy"
+        else:
+            newSlide.SlideLayout = currentSlide.SlideLayout
+        newSlide.SlideTitle = currentSlide.SlideTitle + _(" (Copy)")
+        newSlide.SlideBody = currentSlide.SlideBody
+        newSlide.Active = currentSlide.Active
+        
+        newStepIndex = stepIndex + 1
+        stepWidget = AnnotatorStepWidget(len(self.steps), self.thumbnailSize, parent=self)
+        stepWidget.thumbnailClicked.connect(self.changeSelectedSlide)
+        stepWidget.swapRequest.connect(self.swapStepPosition)
+        stepWidget.AddStepWindows(newSlide)
+        stepWidget.CreateMergedWindow()
+        
+        self.steps.append(stepWidget)
+        self.gridLayout.addWidget(stepWidget)
+        
+        for i in range(len(self.steps) - 1, newStepIndex, -1):
+            self.steps[i] = self.steps[i - 1]
+            self.steps[i].stepIndex = i
+            self.gridLayout.addWidget(self.steps[i], i, 0)
+        
+        self.steps[newStepIndex] = stepWidget
+        stepWidget.stepIndex = newStepIndex
+        self.gridLayout.addWidget(stepWidget, newStepIndex, 0)
+        
+        if self.coverStepIndex is not None and self.coverStepIndex >= newStepIndex:
+            self.coverStepIndex += 1
+        if self.ackStepIndex is not None and self.ackStepIndex >= newStepIndex:
+            self.ackStepIndex += 1
+        
+        self.changeSelectedSlide(newStepIndex, 0)
 
     def updateSelectedAnnotationSettings(self):
         if self.selectedAnnotation is not None:
@@ -852,33 +928,65 @@ class TutorialGUI(qt.QMainWindow):
             self.setFocus()
             return False
 
-        if self.selectedAnnotationType == AnnotationType.Selected:
+        if self.selectedAnnotationType == AnnotationType.Selected and self.selectedAnnotation is not None:
+            ann = self.selectedAnnotation
+
+
             if event.key() == qt.Qt.Key_Delete:
-                self.selectedAnnotation.PERSISTENT = False
+                ann.PERSISTENT = False
                 self.cancelCurrentAnnotation()
 
-            elif self.selectedAnnotation.type in [AnnotationType.TextBox, AnnotationType.ArrowText]:
-                # Detect command Ctrl+C copy text
+
+            elif ann.type in [AnnotationType.TextBox, AnnotationType.ArrowText]:
+
                 if event.key() == qt.Qt.Key_C and event.modifiers() & qt.Qt.ControlModifier:
-                    qt.QApplication.clipboard().setText(self.selectedAnnotation.text)
-                
-                # Detect command Ctl+v page text
+                    qt.QApplication.clipboard().setText(ann.text)
+
                 elif event.key() == qt.Qt.Key_V and event.modifiers() & qt.Qt.ControlModifier:
-                    self.selectedAnnotation.text += qt.QApplication.clipboard().text()
+                    ann.text = ann.text[:ann.caretPosition] + qt.QApplication.clipboard().text() + ann.text[ann.caretPosition:]
+                    ann.caretPosition += len(qt.QApplication.clipboard().text())
+                    ann.caretPosition = max(0, min(ann.caretPosition, len(ann.text)))
 
-                # Detect Enter to add a line break
                 elif event.key() in [qt.Qt.Key_Return, qt.Qt.Key_Enter]:
-                    self.selectedAnnotation.text += "\n"
+                    try:
+                        ann.text = ann.text[:ann.caretPosition] + "\n" + ann.text[ann.caretPosition:]
+                        ann.caretPosition += 1
+                        ann.caretPosition = max(0, min(ann.caretPosition, len(ann.text)))
+                    except Exception as e:
+                        import traceback
+                        traceback.print_exc()
 
-                # Detect Backspace
                 elif event.key() == qt.Qt.Key_Backspace:
-                    self.selectedAnnotation.text = self.selectedAnnotation.text[:-1]
+                    if ann.caretPosition > 0:
+                        ann.text = ann.text[:ann.caretPosition-1] + ann.text[ann.caretPosition:]
+                        ann.caretPosition -= 1
+                        ann.caretPosition = max(0, min(ann.caretPosition, len(ann.text)))
+
+                elif event.key() == qt.Qt.Key_Left:
+                    ann.caretPosition -= 1
+                    ann.caretPosition = max(0, ann.caretPosition)
+                elif event.key() == qt.Qt.Key_Right:
+                    ann.caretPosition += 1
+                    ann.caretPosition = min(len(ann.text), ann.caretPosition)
+                elif event.key() == qt.Qt.Key_Home:
+                    lines = ann.text.splitlines(keepends=True)
+                    lineIndex = ann.text[:ann.caretPosition].count('\n')
+                    lineStart = sum(len(l) for l in lines[:lineIndex])
+                    ann.caretPosition = lineStart
+                elif event.key() == qt.Qt.Key_End:
+                    lines = ann.text.splitlines(keepends=True)
+                    lineIndex = ann.text[:ann.caretPosition].count('\n')
+                    lineStart = sum(len(l) for l in lines[:lineIndex])
+                    ann.caretPosition = lineStart + len(lines[lineIndex])
 
                 else:
-                    self.selectedAnnotation.text += event.text()
+                    ann.text = ann.text[:ann.caretPosition] + event.text() + ann.text[ann.caretPosition:]
+                    ann.caretPosition += len(event.text())
+                    ann.caretPosition = max(0, min(ann.caretPosition, len(ann.text)))
 
-            return True
+                return True
 
+        # --- Navegar entre anotaciones con flechas ---
         elif self.selectedAnnotator is not None and self.selectedAnnotation is not None:
             if event.key() == qt.Qt.Key_Up:
                 self.selectorParentDelta(-1)
@@ -906,11 +1014,13 @@ class TutorialGUI(qt.QMainWindow):
 
     def open_json_file(self, filepath):
         directory_path = os.path.dirname(filepath)
-        # Read the data from the file
         with open(filepath, encoding='utf-8') as file:
             rawTutorialData = json.load(file)
             file.close()
 
+        if "slides" in rawTutorialData:
+            self._loadAnnotationsFromFile(filepath)
+            return
 
         tutorial = Tutorial(
             rawTutorialData["title"],
