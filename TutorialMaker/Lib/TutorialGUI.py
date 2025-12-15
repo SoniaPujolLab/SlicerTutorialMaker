@@ -1108,8 +1108,9 @@ class TutorialGUI(qt.QMainWindow):
         self.circle.setCheckable(True)
 
         self.clck = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/pointer.png'), _("Click"), self)
-        self.clck.setCheckable(True)
+        self.clck.setCheckable(False)
         toolbar.addAction(self.clck)
+        self.clck.setVisible(False)
 
         #New Icon for textless arrows, if we add text back we change it back
         self.arrow = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/arrow_disabled.png'), _("Arrow"), self)
