@@ -204,93 +204,137 @@ class Annotation:
             self.setSelectionBoundingBox(*arrowTail, *arrowHead)
             pass
         elif self.type == AnnotationType.ArrowText:
-            # So the arrow will be filled
+            # ------------------------------------------------------------
+            # Arrow drawing (filled arrow head)
+            # ------------------------------------------------------------
             brush.setStyle(qt.Qt.SolidPattern)
             painter.setBrush(brush)
 
-            arrowRatio = 3 # defined as > 1 (bigger than one) and changes the arrow head angle
+            arrowRatio = 3
             arrowHeadSize = 40
             arrowSize = 200
 
-            optX =  self.optX - targetCenter[0]
+            # Optional helper relative to target center
+            optX = self.optX - targetCenter[0]
             optY = self.optY - targetCenter[1]
 
-            # To better the user experience of moving the helper element
             optX = Util.mapFromTo(optX, -targetSize[0], targetSize[0], -1, 1)
             optY = Util.mapFromTo(optY, -targetSize[1], targetSize[1], -1, 1)
 
-            # Clamp optional values between -1 and 1
             optX = min(max(-1, optX), 1)
             optY = min(max(-1, optY), 1)
 
-            arrowHead = [targetCenter[0] + optX*targetSize[0]/2,
-                         targetCenter[1] + optY*targetSize[1]/2]
+            arrowHead = [
+                targetCenter[0] + optX * targetSize[0] / 2,
+                targetCenter[1] + optY * targetSize[1] / 2
+            ]
 
-            arrowTail = [arrowHead[0] + arrowSize*optX,
-                         arrowHead[1] + arrowSize*optY]
+            arrowTail = [
+                arrowHead[0] + arrowSize * optX,
+                arrowHead[1] + arrowSize * optY
+            ]
 
             arrowLine = qt.QLineF(qt.QPointF(*arrowHead), qt.QPointF(*arrowTail))
-
             arrowAngle = math.atan2(-arrowLine.dy(), arrowLine.dx())
 
-            arrowP1 = arrowLine.p1() + qt.QPointF(math.sin(arrowAngle + math.pi / arrowRatio) * arrowHeadSize,
-                                                  math.cos(arrowAngle + math.pi / arrowRatio) * arrowHeadSize)
+            arrowP1 = arrowLine.p1() + qt.QPointF(
+                math.sin(arrowAngle + math.pi / arrowRatio) * arrowHeadSize,
+                math.cos(arrowAngle + math.pi / arrowRatio) * arrowHeadSize
+            )
 
-            arrowP2 = arrowLine.p1() + qt.QPointF(math.sin(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize,
-                                                  math.cos(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize)
+            arrowP2 = arrowLine.p1() + qt.QPointF(
+                math.sin(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize,
+                math.cos(arrowAngle + math.pi - math.pi / arrowRatio) * arrowHeadSize
+            )
 
-            arrowHeadPolygon = qt.QPolygonF()
-            arrowHeadPolygon.clear()
-
-            arrowHeadPolygon.append(arrowLine.p1())
-            arrowHeadPolygon.append(arrowP1)
-            arrowHeadPolygon.append(arrowP2)
+            arrowHeadPolygon = qt.QPolygonF([arrowLine.p1(), arrowP1, arrowP2])
 
             painter.drawLine(arrowLine)
             painter.drawPolygon(arrowHeadPolygon)
 
-
-            self.setSelectionBoundingBox(*arrowTail, *arrowHead)
-
-            # Text section
-            yPadding = 6
-            xPadding = 10
+            # ------------------------------------------------------------
+            # Text layout
+            # ------------------------------------------------------------
+            padding = 8
             lineSpacing = 2
 
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
+
             pen.setColor(qt.Qt.black)
             painter.setPen(pen)
 
             fontMetrics = qt.QFontMetrics(font)
-            fHeight = fontMetrics.height()
+            lineHeight = fontMetrics.height()
+            ascent = fontMetrics.ascent()
 
-            textToWrite = self.text
-            if textToWrite == "":
-                textToWrite = _("Write your text here")
+            textToWrite = self.text if self.text else _("Write your text here")
             textLines = textToWrite.splitlines()
 
-            # Calculate text size
-            textHeight = len(textLines) * fHeight # + (len(textLines) - 1) * lineSpacing
-            textWidth = max(fontMetrics.width(line) for line in textLines)
+            textWidth = max(
+                (fontMetrics.horizontalAdvance(line) for line in textLines),
+                default=0
+            )
 
-            # Calcule the position of the text box (center)
-            topLeft = qt.QPoint(arrowTail[0] - textWidth / 2,arrowTail[1] - textHeight / 2)
-            bottomRight = qt.QPoint(xPadding*2 + (arrowTail[0] + textWidth / 2), yPadding*2 + (arrowTail[1] + textHeight / 2))
-            rectToDraw = qt.QRect(topLeft, bottomRight)
+            textHeight = (
+                len(textLines) * lineHeight +
+                (len(textLines) - 1) * lineSpacing
+            )
+
+            boxWidth = textWidth + 2 * padding
+            boxHeight = textHeight + 2 * padding
+
+            topLeft = [
+                arrowTail[0] - boxWidth / 2,
+                arrowTail[1] - boxHeight / 2
+            ]
+
+            bottomRight = [
+                topLeft[0] + boxWidth,
+                topLeft[1] + boxHeight
+            ]
+
+            rectToDraw = qt.QRect(
+                qt.QPoint(*topLeft),
+                qt.QPoint(*bottomRight)
+            )
+
+            # ------------------------------------------------------------
+            # Draw filled rectangle without border (EXACT logic requested)
+            # ------------------------------------------------------------
+            painter.setPen(qt.Qt.NoPen)
             painter.drawRect(rectToDraw)
 
-            # Ajust text to the center box
-            textStart = [topLeft.x() + xPadding, topLeft.y() + fHeight]
+            # Restore pen for text rendering
+            pen.setColor(qt.Qt.black)
+            painter.setPen(pen)
 
+            # Starting position for text (baseline-based, symmetric padding)
+            textStart = [
+                topLeft[0] + padding,
+                topLeft[1] + padding + ascent
+            ]
 
-            for lineIndex, line in enumerate(textLines):
-                painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight * lineIndex, line)
+            # Draw each text line
+            for i, line in enumerate(textLines):
+                painter.drawText(
+                    textStart[0],
+                    textStart[1] + i * (lineHeight + lineSpacing),
+                    line
+                )
 
-            self.setSelectionBoundingBox(arrowHead[0], arrowHead[1], arrowTail[0], arrowTail[1])
+            # ------------------------------------------------------------
+            # Selection bounding box
+            # ------------------------------------------------------------
+            # Caret
+            self.drawCaret(painter, fontMetrics, textStart, textLines)
+            self.setSelectionBoundingBox(
+                min(arrowHead[0], topLeft[0]),
+                min(arrowHead[1], topLeft[1]),
+                max(arrowTail[0], bottomRight[0]),
+                max(arrowTail[1], bottomRight[1])
+            )
 
-
-            pass
 
         elif self.type == AnnotationType.Rectangle:
             topLeft = qt.QPoint(targetPos[0], targetPos[1])
