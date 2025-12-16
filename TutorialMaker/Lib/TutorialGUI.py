@@ -225,7 +225,7 @@ class TutorialGUI(qt.QMainWindow):
         self.selectedAnnotation = None
 
         _penSettings = {"color": qt.QColor(255, 128, 0),
-                       "fontSize": 14,
+                       "fontSize": 24,
                        "penThickness": 4}
 
         self.penSettings = _penSettings
@@ -1127,7 +1127,7 @@ class TutorialGUI(qt.QMainWindow):
         self.fill = False
         #toolbar.addAction(self.fill_annot)
 
-        self.t_px = 14
+        self.t_px = 24
         self.spin_box_txt = qt.QSpinBox()
         self.spin_box_txt.setSuffix(" px")
         self.spin_box_txt.setMinimum(5)
