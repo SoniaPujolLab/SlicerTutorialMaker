@@ -18,9 +18,7 @@ import Lib.TutorialGUI
 from Lib.CreateTutorial import CreateTutorial
 from Lib.TutorialUtils import SelfTestTutorialLayer
 
-#
 # TutorialMaker
-#
 
 class TutorialMaker(ScriptedLoadableModule): # noqa: F405
     """Uses ScriptedLoadableModule base class, available at:
@@ -48,9 +46,7 @@ class TutorialMaker(ScriptedLoadableModule): # noqa: F405
         The development of this module has been made possible in part by a grant from the Chan Zuckerberg Initiative
         """)
 
-#
 # TutorialMakerWidget
-#
 
 class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # noqa: F405
     """Uses ScriptedLoadableModuleWidget base class, available at:
