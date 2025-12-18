@@ -18,7 +18,7 @@ class CoverSlide():
                 """.format(self.Title, self.Author, self.Description)
     
     def ToMarkdown(self):
-        return f"# {self.Title}\n**Autor:** {self.Author}\n\n{self.Description}\n"
+        return f"# {self.Title}\n**Author:** {self.Author}\n\n{self.Description}\n"
 
 class BackCoverSlide():
     def __init__(self, title: str, Acknowledgments: str):
