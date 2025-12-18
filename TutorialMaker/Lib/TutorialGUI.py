@@ -31,7 +31,7 @@ class DraggableLabel(qt.QLabel):
         self.move(x - width/2, y - height/2)
 
     def SetActive(self, state : bool):
-        #Did it explicit for clarity
+        # Explicit for clarity
         if state:
             self.show()
             self.setAttribute(qt.Qt.WA_TransparentForMouseEvents, False)
