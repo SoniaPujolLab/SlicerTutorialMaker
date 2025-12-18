@@ -393,7 +393,7 @@ class Util():
         clearSceneCheck = qt.QCheckBox(_("Clear scene before capture"))
         clearSceneCheck.checked = True
 
-        maximizeCheck = qt.QCheckBox(_("Slicer is maximized"))
+        maximizeCheck = qt.QCheckBox(_("Slicer is in full screen"))
         maximizeCheck.checked = True
 
         closePythonConsoleCheck = qt.QCheckBox(_("Close Python console"))
