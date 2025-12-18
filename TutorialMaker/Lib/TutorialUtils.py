@@ -371,6 +371,66 @@ class Util():
             Util.loadMainWindow()
         result=(value-inputMin)/(inputMax-inputMin)*(outputMax-outputMin)+outputMin
         return result
+        
+    @staticmethod
+    def showCapturePreparationDialog():
+        dialog = qt.QDialog(slicer.util.mainWindow())
+        dialog.setWindowTitle(_("Prepare tutorial capture"))
+        dialog.setModal(True)
+
+        layout = qt.QVBoxLayout()
+        dialog.setLayout(layout)  
+
+        introLabel = qt.QLabel(
+            _("Before capturing the tutorial, please review the following options:")
+        )
+        introLabel.wordWrap = True
+        layout.addWidget(introLabel)
+
+        saveSceneCheck = qt.QCheckBox(_("Save scene"))
+        saveSceneCheck.checked = False
+
+        clearSceneCheck = qt.QCheckBox(_("Clear scene before capture"))
+        clearSceneCheck.checked = True
+
+        maximizeCheck = qt.QCheckBox(_("Slicer is maximized"))
+        maximizeCheck.checked = True
+
+        closePythonConsoleCheck = qt.QCheckBox(_("Close Python console"))
+        closePythonConsoleCheck.checked = True
+
+        for cb in (
+            saveSceneCheck,
+            clearSceneCheck,
+            maximizeCheck,
+            closePythonConsoleCheck
+        ):
+            layout.addWidget(cb)
+
+        buttons = qt.QDialogButtonBox()
+        buttons.setStandardButtons(
+            qt.QDialogButtonBox.Ok | qt.QDialogButtonBox.Cancel
+        )
+        layout.addWidget(buttons)
+
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+
+        dialog.adjustSize()  
+        dialog.show()       
+
+        if not dialog.exec_():
+            return None
+
+        return {
+            "saveScene": saveSceneCheck.checked,
+            "clearScene": clearSceneCheck.checked,
+            "maximize": maximizeCheck.checked,
+            "closePythonConsole": closePythonConsoleCheck.checked
+        }
+
+
+
 
 class WidgetFinder(qt.QWidget):
     def __init__(self, parent=None):
@@ -769,15 +829,16 @@ class Tutorial():
 
     def beginTutorial(self):
         screenshotTools = ScreenshotTools()
-        answer = slicer.util.confirmOkCancelDisplay(
-            _("Close Python Console and Error Log?"),
-            _("Do you want to close the Python Console and Error Log windows for a better tutorial experience?"),
-            okButtonText=_("Yes"),
-            cancelButtonText=_("No")
-        )
-        if answer:
-            slicer.util.mainWindow().pythonConsole().parent().setVisible(False)
-            slicer.util.mainWindow().errorLogWidget().parent().setVisible(False)
+        # answer = slicer.util.confirmOkCancelDisplay(
+        #     _("Close Python Console and Error Log?"),
+        #     _("Do you want to close the Python Console and Error Log windows for a better tutorial experience?"),
+        #     okButtonText=_("Yes"),
+        #     cancelButtonText=_("No")
+
+        # )
+        # if answer:
+        #     slicer.util.mainWindow().pythonConsole().parent().setVisible(False)
+        #     slicer.util.mainWindow().errorLogWidget().parent().setVisible(False)
         #Screenshot counter
         self.nSteps = 0
         self.screenshottools = screenshotTools

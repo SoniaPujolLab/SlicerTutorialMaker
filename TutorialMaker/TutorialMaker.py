@@ -243,27 +243,152 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         pass
 
     def Capture(self, tutorialName):
-        if not slicer.util.confirmOkCancelDisplay(
-            _("Please do not interact with Slicer until the process is finished.\n"
-              "Ensure your slicer application is maximized.\n"
-              "Save and clear the scene before starting.\n"
-              "Some tutorials may take several minutes to be captured.\n"
-              "And will appear frozen, but this is normal, the tutorial still being captured.\n"
-              "Click on \"OK\" to continue. \"Cancel\" to abort."),
-            _("Capturing tutorial")
-        ):
-            return  # User cancelled
+        """
+        Main capture entry point.
+        Handles user preparation, optional saving, and starts tutorial capture.
+        """
+
+        options = Lib.TutorialUtils.Util.showCapturePreparationDialog()
+        if options is None:
+            return
+
+        # SAVE SCENE (USER CONTROLLED, NON-BLOCKING)
+        if options.get("saveScene", False):
+            self._triggerCtrlS()
+
+            # Non-blocking confirmation dialog
+            self._waitForUserToFinishSaving(
+                lambda: self._continueAfterSave(options, tutorialName)
+            )
+            return
+
+        # No save requested → continue immediately
+        self._continueAfterSave(options, tutorialName)
+
+    # SAVE HANDLING
+    def _triggerCtrlS(self):
+        """Trigger Ctrl+S to open Slicer's Save Data dialog."""
+        mw = slicer.util.mainWindow()
+
+        qt.QApplication.postEvent(
+            mw,
+            qt.QKeyEvent(qt.QEvent.KeyPress, qt.Qt.Key_S, qt.Qt.ControlModifier)
+        )
+        qt.QApplication.postEvent(
+            mw,
+            qt.QKeyEvent(qt.QEvent.KeyRelease, qt.Qt.Key_S, qt.Qt.ControlModifier)
+        )
+
+
+    def _waitForUserToFinishSaving(self, onContinue):
+        """
+        Non-blocking confirmation dialog that allows interaction
+        with the Save Data dialog.
+        """
+
+        self._saveConfirmDialog = qt.QMessageBox(slicer.util.mainWindow())
+        self._saveConfirmDialog.setWindowTitle(_("Finish saving"))
+        self._saveConfirmDialog.setText(
+            _("Please finish saving your data.\n\n"
+            "When the Save dialog is closed, click OK to continue capturing.")
+        )
+        self._saveConfirmDialog.setIcon(qt.QMessageBox.Information)
+        self._saveConfirmDialog.setStandardButtons(
+            qt.QMessageBox.Ok | qt.QMessageBox.Cancel
+        )
+
+        self._saveConfirmDialog.setModal(False)
+
+        self._saveConfirmDialog.accepted.connect(onContinue)
+        self._saveConfirmDialog.rejected.connect(self._saveConfirmDialog.close)
+
+        self._saveConfirmDialog.show()
+
+
+    def _continueAfterSave(self, options, tutorialName):
+        """
+        Applies pre-capture options and starts the capture.
+        """
+
+        # Close confirmation dialog if still open
+        try:
+            self._saveConfirmDialog.close()
+        except Exception:
+            pass
+
+        if options.get("clearScene", False):
+            slicer.mrmlScene.Clear()
+
+        if options.get("maximize", False):
+            slicer.util.mainWindow().showMaximized()
+
+        if options.get("closePythonConsole", False):
+            slicer.util.mainWindow().pythonConsole().parent().hide()
+
+        self._startCapture(tutorialName)
+
+    # CAPTURE EXECUTION
+    def _startCapture(self, tutorialName):
+        """
+        Shows progress dialog and runs the tutorial capture.
+        """
+
+        self._progress = qt.QProgressDialog(
+            _("Capturing tutorial...\n\n"
+            "Please do not interact with Slicer.\n"
+            "The application may appear frozen — this is normal."),
+            None, 0, 0, slicer.util.mainWindow()
+        )
+        self._progress.setWindowTitle(_("Capturing tutorial"))
+        self._progress.setCancelButton(None)
+        self._progress.setWindowModality(qt.Qt.ApplicationModal)
+        self._progress.show()
+
+        qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
+
+        qt.QTimer.singleShot(
+            5000,  # milliseconds
+            lambda: self._runCaptureWithProgress(tutorialName)
+        )
+    
+    def _runCaptureWithProgress(self, tutorialName):
+        try:
+            self._captureInternal(tutorialName)
+        finally:
+            self._progress.close()
+            qt.QApplication.restoreOverrideCursor()
+
+    # INTERNAL CAPTURE LOGIC
+    def _captureInternal(self, tutorialName):
+        """
+        Actual tutorial capture logic.
+        """
 
         def FinishTutorial():
-            slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
-            slicer.util.infoDisplay(_("Tutorial Captured"), _("Captured Tutorial: {tutorialName}").format(tutorialName=tutorialName))
+            slicer.util.mainWindow().moduleSelector().selectModule(
+                'TutorialMaker'
+            )
+            slicer.util.infoDisplay(
+                _("Tutorial Captured"),
+                _("Captured Tutorial: {tutorialName}")
+                .format(tutorialName=tutorialName)
+            )
 
         try:
-            TutorialMakerLogic.runTutorialTestCases(tutorialName, FinishTutorial)
+            TutorialMakerLogic.runTutorialTestCases(
+                tutorialName,
+                FinishTutorial
+            )
         except Exception as e:
-            slicer.util.errorDisplay(_("Failed to capture tutorial, please send this error on our GitHub Issue page:\n{err}").format(err=str(e)))
+            slicer.util.errorDisplay(
+                _("Failed to capture tutorial, please send this error on our GitHub Issue page:\n{err}")
+                .format(err=str(e))
+            )
             slicer.util.reloadScriptedModule("TutorialMaker")
             slicer.util.selectModule("TutorialMaker")
+
+
+
 
     def Generate(self, tutorialName):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
@@ -405,7 +530,7 @@ class TutorialMakerTest(ScriptedLoadableModuleTest): # noqa: F405
     def setUp(self):
         """ Do whatever is needed to reset the state - typically a scene clear will be enough.
         """
-        slicer.mrmlScene.Clear()
+        #slicer.mrmlScene.Clear()
         TutorialMakerLogic().loadTutorialsFromRepos()
 
         Lib.TutorialUtils.Util.verifyOutputFolders()
