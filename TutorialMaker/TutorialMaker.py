@@ -18,9 +18,7 @@ import Lib.TutorialAnnotator
 from Lib.CreateTutorial import CreateTutorial
 from Lib.TutorialUtils import SelfTestTutorialLayer
 
-#
 # TutorialMaker
-#
 
 class TutorialMaker(ScriptedLoadableModule): # noqa: F405
     """Uses ScriptedLoadableModule base class, available at:
@@ -48,9 +46,7 @@ class TutorialMaker(ScriptedLoadableModule): # noqa: F405
         The development of this module has been made possible in part by a grant from the Chan Zuckerberg Initiative
         """)
 
-#
 # TutorialMakerWidget
-#
 
 class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # noqa: F405
     """Uses ScriptedLoadableModuleWidget base class, available at:
@@ -256,7 +252,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
               "Click on \"OK\" to continue. \"Cancel\" to abort."),
             _("Capturing tutorial")
         ):
-            return  # Usuário cancelou
+            return  # User cancelled
 
         def FinishTutorial():
             slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
@@ -270,11 +266,26 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             slicer.util.selectModule("TutorialMaker")
 
     def Generate(self, tutorialName):
+        modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
+        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
+        
+        if not os.path.exists(annotationsPath):
+            slicer.util.warningDisplay(
+                _("You don't have any annotations to export.\n"
+                  "Please annotate your screenshots first using \"Edit Annotations\"."),
+                _("No Annotations Found")
+            )
+            return
+        
         with slicer.util.tryWithErrorDisplay(_("Failed to generate tutorial")):
-            AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Annotations/annotations.json")
-            outputPath = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/"
+            AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(annotationsPath)
+            outputPath = modulePath + "/Outputs/"
             if platform.system() == "Windows":
-                os.startfile(outputPath)
+                    try:
+                        import subprocess
+                        subprocess.Popen(["explorer", os.path.realpath(outputPath)])
+                    except Exception as e:
+                        print("The folder could not be opened:", e)
             else:
                 import subprocess, sys
                 opener = "open" if sys.platform == "darwin" else "xdg-open"
@@ -289,8 +300,32 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         pass
 
     def OpenAnnotator(Self):
+        modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
+        rawTutorialPath = modulePath + "/Outputs/Raw/Tutorial.json"
+        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
+        
+        if not os.path.exists(rawTutorialPath):
+            slicer.util.warningDisplay(
+                _("Before editing annotations you should run the capture of the screenshots.\n"
+                  "Select a tutorial and click on \"Capture Screenshots\"."),
+                _("No Screenshots Found")
+            )
+            return
+        
+        fileToLoad = rawTutorialPath
+        if os.path.exists(annotationsPath):
+            loadAnnotations = slicer.util.confirmYesNoDisplay(
+                _("An existing annotations file was found.\n\n"
+                  "Would you like to load the existing annotations?\n\n"
+                  "Yes: Load existing annotations\n"
+                  "No: Start fresh from raw tutorial"),
+                _("Load Existing Annotations?")
+            )
+            if loadAnnotations:
+                fileToLoad = annotationsPath
+
         Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
-        Annotator.openJsonFile(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Raw/Tutorial.json")
+        Annotator.openJsonFile(fileToLoad)
         Annotator.show()
         pass
 

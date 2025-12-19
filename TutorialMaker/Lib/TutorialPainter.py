@@ -130,7 +130,7 @@ class ImageDrawer:
         tip_length = 15
         tip_width = 12
         
-        # Calcular diferencias en x e y
+        # Calculate differences in x and y
         x = p2.x() - p1.x()
         y = p2.y() - p1.y()
 
@@ -257,7 +257,7 @@ class ImageDrawer:
             - end_y (int): The y-coordinate where the text should be positioned.
             - font_size (int): The font size of the text.
             - text_color (Qt.Color, optional): The color of the text. Default is Qt.black.
-            - type (str): type of draw (ej. 'rectangle','arrow','clickMark')
+            - type (str): type of draw (e.g. 'rectangle','arrow','clickMark')
 
         Outputs:
             None
@@ -364,8 +364,8 @@ class ImageDrawer:
                 qt.Qt.black
             )
             
-            # Obtener los límites de la imagen en la escena
-            pixmap_rect = self.view.rect  # Obtiene el rectángulo de la imagen en la escena
+            # Get the image limits in the scene
+            pixmap_rect = self.view.rect  # Gets the image rectangle in the scene
 
             if not pixmap_rect.contains(text_bounding_rect):
                 # If the text is outside, reposition it within visible bounds
@@ -397,9 +397,9 @@ class ImageDrawer:
                 path_item = qt.QGraphicsPathItem(arrow_path)
                 pen = qt.QPen(qt.QColor.fromRgb(*color))
                 pen.setWidth(3.5)
-                brush = qt.QBrush(qt.QColor.fromRgb(*color))  # Mismo color que el borde
+                brush = qt.QBrush(qt.QColor.fromRgb(*color))  # Same color as the border
                 path_item.setPen(pen)
-                path_item.setBrush(brush)  # Establece el relleno
+                path_item.setBrush(brush)  # Sets the fill
                 self.scene.addItem(path_item)
         
 
@@ -419,9 +419,9 @@ class ImageDrawer:
                 path_item = qt.QGraphicsPathItem(arrow_path)
                 pen = qt.QPen(qt.QColor.fromRgb(*color))
                 pen.setWidth(3.5)
-                brush = qt.QBrush(qt.QColor.fromRgb(*color))  # Mismo color que el borde
+                brush = qt.QBrush(qt.QColor.fromRgb(*color))  # Same color as the border
                 path_item.setPen(pen)
-                path_item.setBrush(brush)  # Establece el relleno
+                path_item.setBrush(brush)  # Sets the fill
                 self.scene.addItem(path_item)
                                         # Add text with calculated dynamic offset
                 self.add_text_with_background(
@@ -830,7 +830,7 @@ class TutorialPainter:
                 )
 
 
-            elif slide.SlideLayout == "Screenshot":
+            elif slide.SlideLayout == "Screenshot" or slide.SlideLayout == "Copy":
                 title = slide.SlideTitle 
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
