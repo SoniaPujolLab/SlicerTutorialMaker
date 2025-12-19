@@ -90,6 +90,8 @@ class AnnotatorStepWidget(qt.QWidget):
         self.setStyleSheet('background-color: #9e9493;')
         self.setObjectName(f"label_step_{self.stepIndex}")
 
+        self.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
+
         #This can be done in a UI file
 
         self.expandButton = qt.QPushButton()
@@ -126,6 +128,7 @@ class AnnotatorStepWidget(qt.QWidget):
 
         self.Slides.append(annotatorSlide)
         screenshotWidget.setPixmap(annotatorSlide.GetResized(*self.thumbnailSize))
+        screenshotWidget.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
         screenshotWidget.clicked.connect(lambda screen= self.screenshotCount: self.thumbnailClick(screen))
 
         self.screenshotCount = self.screenshotCount + 1
@@ -295,7 +298,7 @@ class TutorialGUI(qt.QMainWindow):
         self.setCentralWidget(self.uiWidget)
 
         # Configure Main Window
-        self.setFixedSize(*self.windowSize)
+        #self.setFixedSize(*self.windowSize)
         self.setWindowTitle(_("TutorialMaker - Annotator"))
 
         # Left Scroll Area
@@ -305,7 +308,7 @@ class TutorialGUI(qt.QMainWindow):
         self.uiWidget.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.scroll_area = self.uiWidget.findChild(qt.QScrollArea, "scrollArea")
-        self.scroll_area.setFixedSize(*self.scrollAreaSize)
+        #self.scroll_area.setFixedSize(*self.scrollAreaSize)
         self.scroll_area.setAcceptDrops(True)
         self.scroll_area.installEventFilter(self)
 
@@ -325,7 +328,7 @@ class TutorialGUI(qt.QMainWindow):
         self.slideTitleWidget.placeholderText = _("Title for the slide")
 
         self.slideBodyWidget = self.uiWidget.findChild(qt.QTextEdit, "myTextEdit")
-        self.slideBodyWidget.setFixedSize(self.selectedSlideSize[0], 150)
+        #self.slideBodyWidget.setFixedSize(self.selectedSlideSize[0], 150)
         self.slideBodyWidget.placeholderText = _("Write a description for the slide")
 
         # Load Used Resources
