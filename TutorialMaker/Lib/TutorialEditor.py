@@ -4,9 +4,7 @@ import os
 import Lib.TutorialUtils as TutorialUtils
 from slicer.i18n import tr as _
 
-#
 # Tutorial Editor Widget
-#
 
 class TutorialEditor(qt.QWidget):
 
@@ -29,16 +27,16 @@ class TutorialEditor(qt.QWidget):
 
     def Setup(self):
 
-        # Load Ui file
+        # Load UI file
         uiWidget = slicer.util.loadUI(resourcePath('UI/TutorialEditor.ui'))
         self.boxLayout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
 
-        # Table sentings
+        # Table settings
         self.ui.tableWidgetStates.horizontalHeader().setStretchLastSection(True)
         self.ui.tableWidgetStates.horizontalHeader().setSectionResizeMode(qt.QHeaderView.Stretch)
 
-        # Connections
+        # Connect UI signals
         self.ui.pushButtonStartStopRecord.clicked.connect(self.logic.StopStartRecording)
         self.ui.pushButtonCapture.clicked.connect(self.OnClickedAnnotate)
         self.ui.tableWidgetStates.cellClicked.connect(self.onCellClicked)
