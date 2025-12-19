@@ -14,7 +14,7 @@ from slicer.util import VTKObservationMixin
 from slicer.i18n import tr as _
 from slicer.i18n import translate
 from Lib.TutorialEditor import TutorialEditor
-import Lib.TutorialGUI
+import Lib.TutorialAnnotator
 from Lib.CreateTutorial import CreateTutorial
 from Lib.TutorialUtils import SelfTestTutorialLayer
 
@@ -81,7 +81,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         Called when the user opens the module the first time and the widget is initialized.
         """
         import importlib
-        importlib.reload(Lib.TutorialGUI)
+        importlib.reload(Lib.TutorialAnnotator)
         importlib.reload(Lib.TutorialUtils)
 
         ScriptedLoadableModuleWidget.setup(self) # noqa: F405
@@ -289,8 +289,8 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         pass
 
     def OpenAnnotator(Self):
-        Annotator = Lib.TutorialGUI.TutorialGUI()
-        Annotator.open_json_file(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Raw/Tutorial.json")
+        Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
+        Annotator.openJsonFile(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Raw/Tutorial.json")
         Annotator.show()
         pass
 

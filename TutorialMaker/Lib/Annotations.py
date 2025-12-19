@@ -51,8 +51,8 @@ class Annotation:
         self.__selectionSlideEffect = 0
 
         # Need to change this later, make it loaded through resources
-        self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
-        self.icon_click = self.icon_click.scaled(20,30)
+        #self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
+        #self.icon_click = self.icon_click.scaled(20,30)
 
     def setSelectionBoundingBox(self, topLeftX, topLeftY, bottomRightX, bottomRightY):
         padding = 5
@@ -352,7 +352,7 @@ class Annotation:
             bottomRight = [targetPos[0] + targetSize[0],
                            targetPos[1] + targetSize[1]]
 
-            painter.drawImage(qt.QPoint(*bottomRight), self.icon_click)
+            #painter.drawImage(qt.QPoint(*bottomRight), self.icon_click)
 
             self.setSelectionBoundingBox(*bottomRight, bottomRight[0] + 20,bottomRight[1] + 30)
         pass
@@ -406,6 +406,7 @@ class AnnotatorSlide:
         self.SlideBody = ""
         
         self.devicePixelRatio = 1.0
+        self.screenshotPaths : list[str] = []
         pass
 
     def AddAnnotation(self, annotation : Annotation):
@@ -495,7 +496,185 @@ class AnnotatedTutorial:
         return textDict
 
     @staticmethod
+    def GetCompositeSlide(tutorialScreenshots : list[TutorialScreenshot]):
+        finalImage = tutorialScreenshots[0].getImage().toImage()
+        finalJson = copy.deepcopy(tutorialScreenshots[0].getWidgets())
+        painter = qt.QPainter(finalImage)
+        for slide in tutorialScreenshots[1:]:
+
+            finalJson.extend(copy.deepcopy(slide.getWidgets()))
+
+            nextImage = slide.getImage().toImage()
+
+            mainWidget = slide.getWidgets()[0]
+            painter.drawImage(qt.QRect(mainWidget["position"][0],
+                                       mainWidget["position"][1],
+                                       nextImage.width(),
+                                       nextImage.height()),
+                                       nextImage)
+        painter.end()
+        return [qt.QPixmap().fromImage(finalImage), finalJson]
+    
+    @staticmethod
     def LoadAnnotatedTutorial(path):
+        with open(path, encoding='utf-8') as file:
+            rawData = json.load(file)
+
+        if not ("TutorialMaker_version" in rawData):
+            return AnnotatedTutorial.LoadAnnotatedTutorial_Legacy(path)
+
+        outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
+
+        settings = slicer.app.userSettings()
+        currentLanguage = settings.value("language")
+
+        imagePaths : list[str] = [] #TODO: Improve this part
+        slides = []
+
+        textDict = AnnotatedTutorial.GetLocalizedDict(currentLanguage)
+
+        TutorialInfo = {
+            "title": rawData["title"],
+            "author": rawData["author"],
+            "date": rawData["date"],
+            "desc": rawData["desc"],
+            "TMversion": rawData["TutorialMaker_version"]
+        }
+
+        for slideData in rawData["slides"]:
+            rawStepPaths : list[str] = []
+            for rawSlides in slideData['SlideCode']:
+                slideStep, windowIndex = rawSlides.splt("/")
+                rawStepPaths.append(f"{outputFolder}/Raw/{slideStep}/{windowIndex}")
+
+            slideMetadata = []
+            slideImage : qt.QImage = None
+
+            devicePixelRatio = 1.0  # Default for backward compatibility
+            if slideData["SlideLayout"] == "Screenshot":
+                if len(rawStepPaths) == 1:
+                    tsParser = TutorialScreenshot()
+                    tsParser.metadata = rawStepPaths[0] + ".json"
+                    slideMetadata = tsParser.getWidgets()
+                    devicePixelRatio = tsParser.getDevicePixelRatio()
+                    slideImage = qt.QImage(rawStepPaths[0] + ".png")
+                elif len(rawStepPaths) > 1:
+                    screenshots : list[TutorialScreenshot] = []
+                    for rawStepPath in rawStepPaths:
+                        tsParser = TutorialScreenshot()
+                        tsParser.metadata = rawStepPath + ".json"
+                        devicePixelRatio = tsParser.getDevicePixelRatio()
+                        tsParser.screenshot = rawStepPath + ".png"
+                        screenshots.append(tsParser)
+                    slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide()
+                    slideImage = slideImage.toImage()
+
+            else:
+                slideImage = qt.QImage(f"{outputFolder}/Annotations/{slideData['ImagePath']}")
+
+            annotations = []
+            for annotationData in slideData["Annotations"]:
+                targetWidget = {
+                    "position": [0,0],
+                    "size": [1,1]
+                }
+                for widget in slideMetadata:
+                    if annotationData["widgetPath"] == widget["path"]:
+                        targetWidget = widget
+                annotation = Annotation(
+                    targetWidget,
+                    *annotationData["offset"],
+                    *annotationData["optional"],
+                    textDict.get(annotationData["text"], ""),
+                    AnnotationType[annotationData["type"]]
+                )
+                annotation.penConfig(
+                    qt.QColor(annotationData["penSettings"]["color"]),
+                    annotationData["penSettings"]["fontSize"],
+                    annotationData["penSettings"]["thickness"]
+                )
+                annotation.PERSISTENT = True
+                annotations.append(annotation)
+            
+            pixmap = qt.QPixmap.fromImage(slideImage)
+            if devicePixelRatio > 1.0:
+                logicalWidth = int(pixmap.width() / devicePixelRatio)
+                logicalHeight = int(pixmap.height() / devicePixelRatio)
+                pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
+            pixmap.setDevicePixelRatio(1.0)
+            
+            annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations)
+            annotatedSlide.devicePixelRatio = 1.0
+            annotatedSlide.SlideTitle = textDict.get(slideData["SlideTitle"], "")
+            annotatedSlide.SlideBody = textDict.get(slideData["SlideDesc"], "")
+            annotatedSlide.SlideLayout = slideData["SlideLayout"]
+            annotatedSlide.screenshotPaths = slideData["SlideCode"]
+
+            imagePaths.append(slideData["ImagePath"])
+            slides.append(annotatedSlide)
+        pass
+
+    @staticmethod
+    def SaveAnnotatedTutorial(tutorialInfo, slides : list[AnnotatorSlide]):
+        import re
+        outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
+
+        outputFileAnnotations = {**tutorialInfo}
+        outputFileTextDict = {}
+
+        outputFileAnnotations["slides"] = []
+
+        for slideIndex, slide in enumerate(slides):
+
+            layoutName = getattr(slide, "SlideLayout", "")
+            if (not slide.Active) and layoutName not in ("CoverPage", "Acknowledgment"):
+                continue
+            slideImage = slide.image
+
+            cleanSlideTitle = slide.SlideTitle.replace(' ', '')
+            cleanSlideTitle = re.sub(r'[^a-zA-Z0-9]', '', cleanSlideTitle)
+
+            slidePrefix = f"{slideIndex}"
+            slideTitle = f"{slidePrefix}_{cleanSlideTitle}"
+            slideImagePath = f"{outputFolder}/{slideTitle}"
+            if cleanSlideTitle == "":
+                slideTitle += "slide"
+                slideImagePath += "slide"
+
+            slideImage.save(slideImagePath + ".png", "PNG")
+
+            textDict = {f"{slideTitle}_title": slide.SlideTitle,
+                        f"{slideTitle}_body": slide.SlideBody}
+
+            slideInfo = {"ImagePath": f"{slideTitle}.png",
+                         "SlideCode": slide.screenshotPaths,
+                         "SlideLayout": slide.SlideLayout,
+                         "SlideTitle": f"{slideTitle}_title",
+                         "SlideDesc": f"{slideTitle}_body",
+                         "Annotations": []}
+
+            for annIndex, annotation in enumerate(slide.annotations):
+                info = annotation.toDict()
+                textDict[f"{slidePrefix}_{info['type']}_{annIndex}"] = info["text"]
+                slideInfo["Annotations"].append({"widgetPath": info["widgetPath"],
+                                                 "type": info["type"],
+                                                 "offset": info["offset"],
+                                                 "optional": info["optional"],
+                                                 "custom": info["custom"],
+                                                 "penSettings": info["penSettings"],
+                                                  "text": f"{slidePrefix}_{info['type']}_{annIndex}"})
+                pass
+            outputFileAnnotations["slides"].append(slideInfo)
+            outputFileTextDict = {**outputFileTextDict, **textDict}
+
+        with open(file= f"{outputFolder}/annotations.json", mode='w', encoding="utf-8") as fd:
+            json.dump(outputFileAnnotations, fd, ensure_ascii=False, indent=4)
+
+        with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
+            json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
+
+    @staticmethod
+    def LoadAnnotatedTutorial_Legacy(path):
         outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
 
         settings = slicer.app.userSettings()
