@@ -66,7 +66,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.__selectedTutorial = None
         self.isDebug = slicer.app.settings().value("Developer/DeveloperMode")
 
-        print(_("Version Date: {}").format("2025/11/11-08:00AM"))
+        print(_("Version Date: {}").format("2025/20/12-08:00AM"))
 
         #PROTOTYPE FOR PLAYBACK
 
@@ -115,7 +115,8 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         if self.isDebug != True: # noqa: E712
             self.ui.CollapsibleButtonTutorialMaking.setVisible(0)
             self.ui.pushButtonNewTutorial.setVisible(0)
-            self.logic.loadTutorialsFromRepos()
+            self.ui.pushButtonFetchFromGithub.setVisible(0)
+            #self.logic.loadTutorialsFromRepos()
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
@@ -244,13 +245,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
 
     def Capture(self, tutorialName):
         if not slicer.util.confirmOkCancelDisplay(
-            _("Please do not interact with Slicer until the process is finished.\n"
-              "Ensure your slicer application is maximized.\n"
-              "Save and clear the scene before starting.\n"
-              "Some tutorials may take several minutes to be captured.\n"
-              "And will appear frozen, but this is normal, the tutorial still being captured.\n"
-              "Click on \"OK\" to continue. \"Cancel\" to abort."),
-            _("Capturing tutorial")
+            _("Please ensure 3D Slicer is in full-screen mode before starting the screenshot capture. Click \"OK\" to continue, or \"Cancel\" to return to the module."),
+            _("Full-Screen Mode Required"),
+            okButtonText=_("Next Step"),
         ):
             return  # User cancelled
 

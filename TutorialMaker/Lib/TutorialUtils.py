@@ -769,11 +769,11 @@ class Tutorial():
 
     def beginTutorial(self):
         screenshotTools = ScreenshotTools()
-        answer = slicer.util.confirmOkCancelDisplay(
-            _("Close Python Console and Error Log?"),
-            _("Do you want to close the Python Console and Error Log windows for a better tutorial experience?"),
-            okButtonText=_("Yes"),
-            cancelButtonText=_("No")
+        answer = slicer.util.confirmYesNoDisplay(
+            _("Closing the Python Console and Error Log windows will provide more screen space for the 3D Slicer views"),
+            _("Tutorial Maker View Setup"),
+            okButtonText=_("Close Windows (Recommended)"),
+            cancelButtonText=_("Keep Windows Open")
         )
         if answer:
             slicer.util.mainWindow().pythonConsole().parent().setVisible(False)
