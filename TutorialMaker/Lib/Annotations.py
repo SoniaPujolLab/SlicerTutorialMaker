@@ -25,7 +25,7 @@ class Annotation:
         TargetWidget : dict = None,
         OffsetX : float = 0,
         OffsetY : float = 0,
-        OptX : float = 0, #Optional Helper Coordinates Used Differently in each Annotation Type
+        OptX : float = 0, # Optional helper coordinates, used differently in each annotation type
         OptY : float = 0,
         Text : str = "",
         Type : AnnotationType = None):
@@ -253,13 +253,13 @@ class Annotation:
             textHeight = len(textLines) * fHeight # + (len(textLines) - 1) * lineSpacing
             textWidth = max(fontMetrics.width(line) for line in textLines)
 
-            # Calcule the position of the text box (center)
+            # Calculate the position of the text box (center)
             topLeft = qt.QPoint(arrowTail[0] - textWidth / 2,arrowTail[1] - textHeight / 2)
             bottomRight = qt.QPoint(xPadding*2 + (arrowTail[0] + textWidth / 2), yPadding*2 + (arrowTail[1] + textHeight / 2))
             rectToDraw = qt.QRect(topLeft, bottomRight)
             painter.drawRect(rectToDraw)
 
-            # Ajust text to the center box
+            # Adjust text to the center box
             textStart = [topLeft.x() + xPadding, topLeft.y() + fHeight]
 
 

@@ -18,9 +18,7 @@ import Lib.TutorialAnnotator
 from Lib.CreateTutorial import CreateTutorial
 from Lib.TutorialUtils import SelfTestTutorialLayer
 
-#
 # TutorialMaker
-#
 
 class TutorialMaker(ScriptedLoadableModule): # noqa: F405
     """Uses ScriptedLoadableModule base class, available at:
@@ -48,9 +46,7 @@ class TutorialMaker(ScriptedLoadableModule): # noqa: F405
         The development of this module has been made possible in part by a grant from the Chan Zuckerberg Initiative
         """)
 
-#
 # TutorialMakerWidget
-#
 
 class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # noqa: F405
     """Uses ScriptedLoadableModuleWidget base class, available at:
@@ -70,7 +66,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.__selectedTutorial = None
         self.isDebug = slicer.app.settings().value("Developer/DeveloperMode")
 
-        print(_("Version Date: {}").format("2025/11/11-08:00AM"))
+        print(_("Version Date: {}").format("2025/20/12-08:00AM"))
 
         #PROTOTYPE FOR PLAYBACK
 
@@ -119,7 +115,8 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         if self.isDebug != True: # noqa: E712
             self.ui.CollapsibleButtonTutorialMaking.setVisible(0)
             self.ui.pushButtonNewTutorial.setVisible(0)
-            self.logic.loadTutorialsFromRepos()
+            self.ui.pushButtonFetchFromGithub.setVisible(0)
+            #self.logic.loadTutorialsFromRepos()
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
@@ -248,15 +245,11 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
 
     def Capture(self, tutorialName):
         if not slicer.util.confirmOkCancelDisplay(
-            _("Please do not interact with Slicer until the process is finished.\n"
-              "Ensure your slicer application is maximized.\n"
-              "Save and clear the scene before starting.\n"
-              "Some tutorials may take several minutes to be captured.\n"
-              "And will appear frozen, but this is normal, the tutorial still being captured.\n"
-              "Click on \"OK\" to continue. \"Cancel\" to abort."),
-            _("Capturing tutorial")
+            _("Please ensure 3D Slicer is in full-screen mode before starting the screenshot capture. Click \"OK\" to continue, or \"Cancel\" to return to the module."),
+            _("Full-Screen Mode Required"),
+            okButtonText=_("Next Step"),
         ):
-            return  # Usuário cancelou
+            return  # User cancelled
 
         def FinishTutorial():
             slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
@@ -270,11 +263,26 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             slicer.util.selectModule("TutorialMaker")
 
     def Generate(self, tutorialName):
+        modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
+        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
+        
+        if not os.path.exists(annotationsPath):
+            slicer.util.warningDisplay(
+                _("You don't have any annotations to export.\n"
+                  "Please annotate your screenshots first using \"Edit Annotations\"."),
+                _("No Annotations Found")
+            )
+            return
+        
         with slicer.util.tryWithErrorDisplay(_("Failed to generate tutorial")):
-            AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Annotations/annotations.json")
-            outputPath = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/"
+            AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(annotationsPath)
+            outputPath = modulePath + "/Outputs/"
             if platform.system() == "Windows":
-                os.startfile(outputPath)
+                    try:
+                        import subprocess
+                        subprocess.Popen(["explorer", os.path.realpath(outputPath)])
+                    except Exception as e:
+                        print("The folder could not be opened:", e)
             else:
                 import subprocess, sys
                 opener = "open" if sys.platform == "darwin" else "xdg-open"
@@ -289,8 +297,32 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         pass
 
     def OpenAnnotator(Self):
+        modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
+        rawTutorialPath = modulePath + "/Outputs/Raw/Tutorial.json"
+        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
+        
+        if not os.path.exists(rawTutorialPath):
+            slicer.util.warningDisplay(
+                _("Before editing annotations you should run the capture of the screenshots.\n"
+                  "Select a tutorial and click on \"Capture Screenshots\"."),
+                _("No Screenshots Found")
+            )
+            return
+        
+        fileToLoad = rawTutorialPath
+        if os.path.exists(annotationsPath):
+            loadAnnotations = slicer.util.confirmYesNoDisplay(
+                _("An existing annotations file was found.\n\n"
+                  "Would you like to load the existing annotations?\n\n"
+                  "Yes: Load existing annotations\n"
+                  "No: Start fresh from raw tutorial"),
+                _("Load Existing Annotations?")
+            )
+            if loadAnnotations:
+                fileToLoad = annotationsPath
+
         Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
-        Annotator.openJsonFile(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Raw/Tutorial.json")
+        Annotator.openJsonFile(fileToLoad)
         Annotator.show()
         pass
 

@@ -213,7 +213,7 @@ class TutorialAnnotator(qt.QMainWindow):
         textLabel = qt.QLabel("Text: ")
         toolbar.addWidget(textLabel)
 
-        fontSize = 14
+        fontSize = 24
         fontSpinbox = qt.QSpinBox()
         fontSpinbox.setSuffix(" px")
         fontSpinbox.setMinimum(5)
