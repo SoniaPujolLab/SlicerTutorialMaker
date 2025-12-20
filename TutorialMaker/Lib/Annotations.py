@@ -489,10 +489,17 @@ class AnnotatedTutorial:
     
     @staticmethod
     def GetLocalizedDict(lang, tutorialName = ""):
-        dictPath = f"{os.path.dirname(__file__)}/../Outputs" + "/Annotations/text_dict_default.json"
+        DefaultDictPath = f"{os.path.dirname(__file__)}/../Outputs" + "/Annotations/text_dict_default.json"
+        LocalizedDictPath = f"{os.path.dirname(__file__)}/../Outputs" + f"/Annotations/text_dict_{lang}.json"
         textDict = {}
-        with open(dictPath, encoding='utf-8') as file:
+        if os.path.isfile(LocalizedDictPath):
+            with open(LocalizedDictPath, encoding='utf-8') as file:
                 textDict = json.load(file)
+        else:
+            print(f"{LocalizedDictPath} doesn't exist loading default")
+            with open(DefaultDictPath, encoding='utf-8') as file:
+                textDict = json.load(file)
+        
         return textDict
 
     @staticmethod
@@ -529,7 +536,7 @@ class AnnotatedTutorial:
         currentLanguage = settings.value("language")
 
         imagePaths : list[str] = [] #TODO: Improve this part
-        slides = []
+        slides : list[AnnotatorSlide] = []
 
         textDict = AnnotatedTutorial.GetLocalizedDict(currentLanguage)
 
@@ -544,7 +551,7 @@ class AnnotatedTutorial:
         for slideData in rawData["slides"]:
             rawStepPaths : list[str] = []
             for rawSlides in slideData['SlideCode']:
-                slideStep, windowIndex = rawSlides.splt("/")
+                slideStep, windowIndex = rawSlides.split("/")
                 rawStepPaths.append(f"{outputFolder}/Raw/{slideStep}/{windowIndex}")
 
             slideMetadata = []
@@ -566,11 +573,16 @@ class AnnotatedTutorial:
                         devicePixelRatio = tsParser.getDevicePixelRatio()
                         tsParser.screenshot = rawStepPath + ".png"
                         screenshots.append(tsParser)
-                    slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide()
+                    slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
                     slideImage = slideImage.toImage()
 
+            elif slideData["SlideLayout"] == "CoverPage":
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
+            
+            elif slideData["SlideLayout"] == "Acknowledgment":
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")
             else:
-                slideImage = qt.QImage(f"{outputFolder}/Annotations/{slideData['ImagePath']}")
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
 
             annotations = []
             for annotationData in slideData["Annotations"]:
@@ -612,15 +624,17 @@ class AnnotatedTutorial:
 
             imagePaths.append(slideData["ImagePath"])
             slides.append(annotatedSlide)
-        pass
+        return [TutorialInfo, slides]
 
     @staticmethod
     def SaveAnnotatedTutorial(tutorialInfo, slides : list[AnnotatorSlide]):
         import re
-        outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
+        outputFolder = f"{os.path.dirname(__file__)}/../Outputs/Annotations"
 
         outputFileAnnotations = {**tutorialInfo}
         outputFileTextDict = {}
+
+        outputFileAnnotations["TutorialMaker_version"] = "1.0"
 
         outputFileAnnotations["slides"] = []
 
@@ -641,7 +655,7 @@ class AnnotatedTutorial:
                 slideTitle += "slide"
                 slideImagePath += "slide"
 
-            slideImage.save(slideImagePath + ".png", "PNG")
+            #slideImage.save(slideImagePath + ".png", "PNG")
 
             textDict = {f"{slideTitle}_title": slide.SlideTitle,
                         f"{slideTitle}_body": slide.SlideBody}
@@ -667,10 +681,10 @@ class AnnotatedTutorial:
             outputFileAnnotations["slides"].append(slideInfo)
             outputFileTextDict = {**outputFileTextDict, **textDict}
 
-        with open(file= f"{outputFolder}/annotations.json", mode='w', encoding="utf-8") as fd:
+        with open(file= f"{outputFolder}/annotations_.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileAnnotations, fd, ensure_ascii=False, indent=4)
 
-        with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
+        with open(file= f"{outputFolder}/text_dict_default_.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
 
     @staticmethod

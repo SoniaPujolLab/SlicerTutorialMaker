@@ -848,7 +848,11 @@ class TutorialScreenshot():
     
     def getDevicePixelRatio(self):
         """Get the device pixel ratio saved with this screenshot, defaults to 1.0"""
-        nWidgets = JSONHandler.parseJSON(self.metadata)
+        nWidgets = {}
+        try:
+            nWidgets = JSONHandler.parseJSON(self.metadata)
+        except Exception:
+            pass
         return nWidgets.get("_devicePixelRatio", 1.0)
 
 # TODO: REMOVE THIS, DEPRECATED
