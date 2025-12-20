@@ -260,9 +260,42 @@ class TutorialAnnotator(qt.QMainWindow):
         pass
 
     def loadAnnotations(self):
+        from Lib.TutorialUtils import get_module_basepath as getModulePath
+        parent = slicer.util.mainWindow()
+        basePath = getModulePath("TutorialMaker")
+        jsonPath = qt.QFileDialog.getOpenFileName(
+            parent,
+            _("Select a JSON file"),
+            basePath + "/Outputs/Annotations/",              
+            _("JSON Files (*.json)") 
+        )
+        self.raise_()
+        self.activateWindow()
+        if not os.path.exists(jsonPath):
+            return
+        
+        [tInfo, tSlides] = AnnotatedTutorial.LoadAnnotatedTutorial(jsonPath)
+        for slide in self.slides:
+            self.slide_gridLayout.removeWidget(slide)
+            slide.deleteLater()
+        self.slides = []
+
+        for slideIndex in range(len(tSlides)):
+            slideWidget = AnnotatorSlideWidget(slideIndex, self.thumbnailRatio, self.slidesScrollArea.widget())
+            slideWidget.thumbnailClicked.connect(self.changeSelectedSlide)
+            slideWidget.swapRequest.connect(self.swapSlidePosition)
+            slideWidget.SetTutorialSlide(tSlides[slideIndex])
+
+            self.slides.append(slideWidget)
+            self.slide_gridLayout.addWidget(slideWidget)  # noqa: F821
+        self.tutorialInfo = tInfo
         pass
 
     def saveAnnotations(self):
+        slides : list[AnnotatorSlide] = []
+        for slide in self.slides:
+            slides.append(slide.Slide)
+        AnnotatedTutorial.SaveAnnotatedTutorial(self.tutorialInfo, slides)
         pass
 
     def deleteSelectedAnnotation(self):
@@ -618,6 +651,8 @@ class TutorialAnnotator(qt.QMainWindow):
                     annotatorSlide = AnnotatorSlide(cImage, cMetadata)
                     annotatorSlide.SlideLayout = "Screenshot"
                     slideWidget.SetTutorialSlide(annotatorSlide)
+                    for screenshotIndex, sreenshot in enumerate(screenshots):
+                        annotatorSlide.screenshotPaths.append(f"{stepIndex}/{screenshotIndex}")
                 except Exception as e:
                     print(e)
                     print(f"ERROR: Annotator Failed to add window in step:{stepIndex}, loadImagesAndMetadata")
@@ -628,6 +663,7 @@ class TutorialAnnotator(qt.QMainWindow):
                     annotatorSlide = AnnotatorSlide(screenshots[0].getImage(), screenshots[0].getWidgets())
                     annotatorSlide.SlideLayout = "Screenshot"
                     slideWidget.SetTutorialSlide(annotatorSlide)
+                    annotatorSlide.screenshotPaths = [f"{stepIndex}/0"]
                 except Exception:
                     print(f"ERROR: Annotator Failed to add top level window in step:{stepIndex}, loadImagesAndMetadata")
                     del slideWidget
@@ -670,16 +706,6 @@ class TutorialAnnotator(qt.QMainWindow):
                 screenshotList.append(wScreenshot)
             tutorial.steps.append(screenshotList)
         self.loadImagesAndMetadata(tutorial)
-        self.tutorial2 = tutorial
-        
-        new_image_path = self.dir_path+'/../Resources/NewSlide/white.png'
-        new_screenshot = TutorialScreenshot(new_image_path, "")
-        if self.tutorial2.steps:
-            self.tutorial2.steps.append([new_screenshot])  #The white image is added
-        else:
-            self.tutorial2.steps.append([new_screenshot]) 
-
-        pass
 
 class AnnotatorSlideWidget(qt.QWidget):
     thumbnailClicked = qt.Signal(int)
