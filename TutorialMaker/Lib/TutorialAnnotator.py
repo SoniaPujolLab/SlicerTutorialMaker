@@ -12,6 +12,7 @@ from slicer.i18n import tr as _
 class TutorialAnnotator(qt.QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
+        self.setAttribute(qt.Qt.WA_DeleteOnClose)
 
         self.READY_EVENTS = False
 
@@ -57,6 +58,13 @@ class TutorialAnnotator(qt.QMainWindow):
         self.installEventFilter(self)
 
         self.READY_EVENTS = True
+
+    def closeEvent(self, event):
+        self.updateTimer.stop()
+        if self.slides is not None:
+            self.slides.clear()
+        self.removeEventFilter(self)
+        event.accept()
 
     def setupGUI(self):
         # Get and load UI Fle
