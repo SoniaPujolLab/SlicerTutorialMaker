@@ -9,8 +9,6 @@ from Lib.TutorialUtils import Tutorial, TutorialScreenshot
 import slicer
 from slicer.i18n import tr as _
 
-
-
 class TutorialAnnotator(qt.QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
@@ -60,9 +58,6 @@ class TutorialAnnotator(qt.QMainWindow):
         self.installEventFilter(self)
 
         self.READY_EVENTS = True
-
-
-
 
     def setupGUI(self):
         # Get and load UI Fle
@@ -317,7 +312,7 @@ class TutorialAnnotator(qt.QMainWindow):
         deletedSlide.deleteLater()
         pass
 
-    def addBlankPage(self):
+    def addSlide(self):
 
         pass
 
@@ -344,8 +339,6 @@ class TutorialAnnotator(qt.QMainWindow):
 
     def onActionTriggered(self, sender):
         pass
-
-    
 
     def swapSlidePosition(self, index, swapTo):
         if swapTo >= len(self.slides) or swapTo < 0:
@@ -406,7 +399,6 @@ class TutorialAnnotator(qt.QMainWindow):
         
         self.selectAnnotation(selectedAnnotation)
         
-
     def selectAnnotation(self, annotation : Annotation):
         if annotation is None:
             return
@@ -646,8 +638,7 @@ class TutorialAnnotator(qt.QMainWindow):
                 qt.QTimer.singleShot(100, callback)
                 return False
         return False
-            
-            
+                       
     def loadImagesAndMetadata(self, tutorialData):
         for stepIndex, screenshots in enumerate(tutorialData.steps):
             slideWidget = AnnotatorSlideWidget(stepIndex, self.thumbnailRatio, self.slidesScrollArea.widget())
@@ -805,6 +796,7 @@ class AnnotatorSlideWidget(qt.QWidget):
 
     def mousePressEvent(self, event):
         pass
+
     def mouseMoveEvent(self, event):
         if event.buttons() == qt.Qt.LeftButton:
             drag = qt.QDrag(self)
@@ -857,7 +849,6 @@ class DraggableLabel(qt.QLabel):
                     if pos.y() > 0 and pos.y() < self.parent().height:
                         newPos[1] = pos.y()
                     self.SetCenter(*newPos)
-
 
 class tmLabel(qt.QLabel):
     clicked = qt.Signal()
