@@ -89,6 +89,26 @@ class Annotation:
                                           "fontSize": self.fontSize},
                            "text": self.text}
         return annotationJSON
+    
+    def __getstate__(self):
+        state = {**self.toDict(), **{"targetWidget": self.target}}
+        return state
+        
+    def __setstate__(self, state):
+        # Not good practice
+        self.__init__(
+            state["targetWidget"],
+            *state["offset"],
+            *state["optional"],
+            state["text"],
+            AnnotationType[state["type"]]
+        )
+        self.penConfig(
+                qt.QColor(state["penSettings"]["color"]),
+                state["penSettings"]["fontSize"],
+                state["penSettings"]["thickness"]
+            )
+        self.PERSISTENT = True
 
     def setOffset(self, Offset : list[int]):
         self.annotationOffset = Offset
