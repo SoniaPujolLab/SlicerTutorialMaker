@@ -322,7 +322,6 @@ class TutorialAnnotator(qt.QMainWindow):
         pass
 
     def copySlide(self):
-        return 
         originalSlide = self.slides[self.selectedSlideIndex].Slide
 
         newImage = originalSlide.image.copy()
@@ -337,10 +336,11 @@ class TutorialAnnotator(qt.QMainWindow):
         self.slide_gridLayout.addWidget(slideWidget, self.selectedSlideIndex + 1, 0)
         slideWidget.thumbnailClicked.connect(self.changeSelectedSlide)
         slideWidget.swapRequest.connect(self.swapSlidePosition)
-        self.slides.insert(slideWidget, self.selectedSlideIndex + 1)
+        self.slides.insert(self.selectedSlideIndex + 1, slideWidget)
         for index, slide in enumerate(self.slides):
             slide.slideIndex = index
         pass
+        self.windowResizeEvent(None)
 
     def onActionTriggered(self, sender):
         pass
@@ -402,16 +402,22 @@ class TutorialAnnotator(qt.QMainWindow):
         elif self.selectorParentCount < 0:
             self.selectorParentCount = 0
         selectedAnnotation = annotations[len(annotations) - 1 - self.selectorParentCount]
-        if selectedAnnotation is None:
+        
+        
+        self.selectAnnotation(selectedAnnotation)
+        
+
+    def selectAnnotation(self, annotation : Annotation):
+        if annotation is None:
             return
-        optValuesInImage = self.selectedAnnotator.MapImageToScreen(qt.QPointF(selectedAnnotation.optX, selectedAnnotation.optY,), self.selectedSlideWidget)
+        optValuesInImage = self.selectedAnnotator.MapImageToScreen(qt.QPointF(annotation.optX, annotation.optY,), self.selectedSlideWidget)
         self.OptHelperWidget.SetCenter(*optValuesInImage)
-        _offsetPos = self.selectedAnnotator.MapImageToScreen(qt.QPointF(selectedAnnotation.target["position"][0] + selectedAnnotation.offsetX,
-                                                                       selectedAnnotation.target["position"][1] + selectedAnnotation.offsetY), self.selectedSlideWidget)
+        _offsetPos = self.selectedAnnotator.MapImageToScreen(qt.QPointF(annotation.target["position"][0] + annotation.offsetX,
+                                                                       annotation.target["position"][1] + annotation.offsetY), self.selectedSlideWidget)
 
         self.OffsetHelperWidget.SetCenter(*_offsetPos)
 
-        self.selectedAnnotation = selectedAnnotation
+        self.selectedAnnotation = annotation
         self.selectedAnnotationType = AnnotationType.Selected
         self.selectedAnnotation.drawBoundingBox = True
 
@@ -493,6 +499,8 @@ class TutorialAnnotator(qt.QMainWindow):
     def refreshViews(self):
         if self.selectedAnnotator is None:
             return
+        
+        self.slides[self.selectedSlideIndex]._resizeEvent(None)
         self.selectedAnnotator.ReDraw()
         self.selectedSlideWidget.setPixmap(self.selectedAnnotator.GetResized(*self.selectedSlideSize, keepAspectRatio=True))
         pass
@@ -593,9 +601,13 @@ class TutorialAnnotator(qt.QMainWindow):
     def windowResizeEvent(self, event):
         mainScreenWidth = (self.slidesScrollArea.width * 3)
         ratio = mainScreenWidth/self.selectedSlideWidget.width
+        # Update main slide size
         mainScreenHeight = self.selectedSlideWidget.height * ratio
         self.selectedSlideSize = [mainScreenWidth, mainScreenHeight]
 
+        # Update draggable controls positions
+        self.selectAnnotation(self.selectedAnnotation)
+            
         for slide in self.slides:
             slide._resizeEvent(event)
         return True
@@ -839,7 +851,13 @@ class DraggableLabel(qt.QLabel):
                 if event.button() == 0: # Left Button pressed
                     sPos = event.screenPos().toPoint()
                     pos = self.parent().mapFromGlobal(sPos)
-                    self.SetCenter(pos.x(), pos.y())
+                    newPos = self.GetCenter()
+                    if pos.x() > 0 and pos.x() < self.parent().width:
+                        newPos[0] = pos.x()
+                    if pos.y() > 0 and pos.y() < self.parent().height:
+                        newPos[1] = pos.y()
+                    self.SetCenter(*newPos)
+
 
 class tmLabel(qt.QLabel):
     clicked = qt.Signal()
