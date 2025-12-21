@@ -289,6 +289,8 @@ class TutorialAnnotator(qt.QMainWindow):
 
             self.slides.append(slideWidget)
         self.tutorialInfo = tInfo
+
+        self.windowResizeEvent(None)
         pass
 
     def saveAnnotations(self):
