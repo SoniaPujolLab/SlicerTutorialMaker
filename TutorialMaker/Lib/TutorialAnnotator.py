@@ -3,7 +3,7 @@ import qt
 import json
 import os
 import copy
-from Lib.Annotations import Annotation, AnnotationType, AnnotatorSlide, AnnotatedTutorial
+from Lib.Annotations import Annotation, AnnotationType, AnnotatorSlide, AnnotatedTutorial, AnnotatorSlideLayoutType
 from Lib.TutorialUtils import Tutorial, TutorialScreenshot
 
 import slicer
@@ -16,10 +16,9 @@ class TutorialAnnotator(qt.QMainWindow):
         self.READY_EVENTS = False
 
         self.defaultHelperOffset = [60,60]
-        self.thumbnailRatio = [280, 165]
         self.selectedSlideSize = [0, 0]
 
-        self.slides : list[AnnotatorSlideWidget] = []
+        self.slides = None
 
         self.selectedSlideIndex = 0
         self.selectedAnnotator : AnnotatorSlide = None
@@ -90,6 +89,8 @@ class TutorialAnnotator(qt.QMainWindow):
         self.slidesScrollArea.setAcceptDrops(True)
         self.slidesScrollArea.installEventFilter(self)
 
+        self.slides = AnnotatorSlideWidgetList(self.slide_gridLayout, self.changeSelectedSlide, self.swapSlidePosition)
+
         # Offset positional helper
         self.OffsetHelperWidget = DraggableLabel()
         self.OffsetHelperWidget.setParent(self.selectedSlideWidget)
@@ -147,7 +148,7 @@ class TutorialAnnotator(qt.QMainWindow):
             {"text": _("Save"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/save.png', "trigger": self.saveAnnotations},
             {"text": _("Undo"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png', "trigger": self.deleteSelectedAnnotation},
             {"text": _("Delete"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png', "trigger": self.deleteSlide},
-            {"text": _("Add"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png', "trigger": self.addBlankPage},
+            {"text": _("Add"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png', "trigger": self.addSlide},
             {"text": _("Copy"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/copy.png', "trigger": self.copySlide}
         ]
         addActions(toolbar, systemActions)
@@ -270,19 +271,13 @@ class TutorialAnnotator(qt.QMainWindow):
             return
         
         [tInfo, tSlides] = AnnotatedTutorial.LoadAnnotatedTutorial(jsonPath)
-        for slide in self.slides:
-            self.slide_gridLayout.removeWidget(slide)
-            slide.deleteLater()
-        self.slides = []
+        self.slides.clear()
 
         for slideIndex in range(len(tSlides)):
-            slideWidget = AnnotatorSlideWidget(slideIndex, self.thumbnailRatio, self.slidesScrollArea.widget())
-            slideWidget.thumbnailClicked.connect(self.changeSelectedSlide)
-            slideWidget.swapRequest.connect(self.swapSlidePosition)
+            slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
             slideWidget.SetTutorialSlide(tSlides[slideIndex])
 
             self.slides.append(slideWidget)
-            self.slide_gridLayout.addWidget(slideWidget)  # noqa: F821
         self.tutorialInfo = tInfo
         pass
 
@@ -300,60 +295,67 @@ class TutorialAnnotator(qt.QMainWindow):
         pass
 
     def deleteSlide(self):
-        deletedSlide = self.slides.pop(self.selectedSlideIndex)
-        for index, slide in enumerate(self.slides):
-            slide.slideIndex = index
-        indexFixer = 0
-        if len(self.slides) <= self.selectedSlideIndex:
-            indexFixer = -1
+        if not self.slides:
+            return
 
-        self.changeSelectedSlide(self.selectedSlideIndex + indexFixer)
-        self.slide_gridLayout.removeWidget(deletedSlide)
-        deletedSlide.deleteLater()
-        pass
+        self.slides.remove(self.slides[self.selectedSlideIndex])
+
+        if self.slides:
+            self.changeSelectedSlide(self.slides[min(self.selectedSlideIndex, len(self.slides) - 1)])
 
     def addSlide(self):
+        image = qt.QPixmap(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
 
-        pass
+        if self.slides:
+            size = self.slides[self.selectedSlideIndex].Slide.image.size()
+            image = image.scaled(size, qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
+            self.selectedSlideIndex += 1
+        
+        newSlide = AnnotatorSlide(image, [])
+        newSlide.SlideLayout = AnnotatorSlideLayoutType.Blank
+        
+        slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
+        slideWidget.SetTutorialSlide(newSlide)
+        
+        self.slides.insert(self.selectedSlideIndex, slideWidget)
+        self.changeSelectedSlide(slideWidget)
 
     def copySlide(self):
-        originalSlide = self.slides[self.selectedSlideIndex].Slide
+        if not (0 <= self.selectedSlideIndex < len(self.slides)):
+            return
 
-        newImage = originalSlide.image.copy()
-        newMetadata = copy.deepcopy(originalSlide.metadata)
-        newAnnotations = copy.deepcopy(originalSlide.annotations)
-        newWindowOffset = copy.deepcopy(originalSlide.windowOffset)
+        original = self.slides[self.selectedSlideIndex].Slide
 
-        newSlide = AnnotatorSlide(newImage, newMetadata, newAnnotations, newWindowOffset)
+        newSlide = AnnotatorSlide(
+            original.image.copy(),
+            copy.deepcopy(original.metadata),
+            copy.deepcopy(original.annotations),
+            copy.deepcopy(original.windowOffset)
+        )
+        newSlide.SlideLayout = original.SlideLayout
 
-        slideWidget = AnnotatorSlideWidget(self.selectedSlideIndex + 1, self.thumbnailRatio, self.slidesScrollArea.widget())
+        slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
         slideWidget.SetTutorialSlide(newSlide)
-        self.slide_gridLayout.addWidget(slideWidget, self.selectedSlideIndex + 1, 0)
-        slideWidget.thumbnailClicked.connect(self.changeSelectedSlide)
-        slideWidget.swapRequest.connect(self.swapSlidePosition)
+        
         self.slides.insert(self.selectedSlideIndex + 1, slideWidget)
-        for index, slide in enumerate(self.slides):
-            slide.slideIndex = index
-        pass
+        self.changeSelectedSlide(slideWidget)
         self.windowResizeEvent(None)
 
     def onActionTriggered(self, sender):
         pass
 
-    def swapSlidePosition(self, index, swapTo):
+    def swapSlidePosition(self, widget, direction):
+        index = self.slides.index(widget)
+        swapTo = index + direction
+
         if swapTo >= len(self.slides) or swapTo < 0:
             return
-        tmp = self.slides[swapTo]
-        self.slides[swapTo] = self.slides[index]
-        self.slides[swapTo].slideIndex = swapTo
-        self.slide_gridLayout.addWidget(self.slides[swapTo], swapTo, 0)
-
-        self.slides[index] = tmp
-        self.slides[index].slideIndex = index
-        self.slide_gridLayout.addWidget(self.slides[index], index, 0)
+        self.slides.swap(widget, self.slides[swapTo])
         pass
 
-    def changeSelectedSlide(self, slideId):
+    def changeSelectedSlide(self, widget):
+        slideId = self.slides.index(widget)
+
         self.finishCurrentAnnotation()
 
         # Save text to slideAnnotator
@@ -585,7 +587,7 @@ class TutorialAnnotator(qt.QMainWindow):
         pos = event.pos()
         for slide in self.slides:
             if pos.y() + self.slidesScrollArea.verticalScrollBar().value < slide.pos.y() + slide.size.height():
-                self.swapSlidePosition(slideWidget.slideIndex, slide.slideIndex)
+                self.slides.swap(slideWidget, slide)
                 break
         event.accept()
         return True
@@ -641,9 +643,7 @@ class TutorialAnnotator(qt.QMainWindow):
                        
     def loadImagesAndMetadata(self, tutorialData):
         for stepIndex, screenshots in enumerate(tutorialData.steps):
-            slideWidget = AnnotatorSlideWidget(stepIndex, self.thumbnailRatio, self.slidesScrollArea.widget())
-            slideWidget.thumbnailClicked.connect(self.changeSelectedSlide)
-            slideWidget.swapRequest.connect(self.swapSlidePosition)
+            slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
 
             #>>>>>> This assumes that the first window is always the SlicerAppMainWindow <<<<<<<
 
@@ -652,7 +652,7 @@ class TutorialAnnotator(qt.QMainWindow):
                 try:
                     cImage, cMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
                     annotatorSlide = AnnotatorSlide(cImage, cMetadata)
-                    annotatorSlide.SlideLayout = "Screenshot"
+                    annotatorSlide.SlideLayout = AnnotatorSlideLayoutType.Screenshot
                     slideWidget.SetTutorialSlide(annotatorSlide)
                     for screenshotIndex, sreenshot in enumerate(screenshots):
                         annotatorSlide.screenshotPaths.append(f"{stepIndex}/{screenshotIndex}")
@@ -664,7 +664,7 @@ class TutorialAnnotator(qt.QMainWindow):
             else:
                 try:
                     annotatorSlide = AnnotatorSlide(screenshots[0].getImage(), screenshots[0].getWidgets())
-                    annotatorSlide.SlideLayout = "Screenshot"
+                    annotatorSlide.SlideLayout = AnnotatorSlideLayoutType.Screenshot
                     slideWidget.SetTutorialSlide(annotatorSlide)
                     annotatorSlide.screenshotPaths = [f"{stepIndex}/0"]
                 except Exception:
@@ -674,10 +674,10 @@ class TutorialAnnotator(qt.QMainWindow):
                 
 
             self.slides.append(slideWidget)  # noqa: F821
-            self.slide_gridLayout.addWidget(slideWidget)  # noqa: F821
         def callback():
             self.windowResizeEvent(None)
-            self.changeSelectedSlide(0)
+            if self.slides:
+                self.changeSelectedSlide(self.slides[0])
         qt.QTimer.singleShot(100, callback)
 
     def openJsonFile(self, filepath):
@@ -711,13 +711,11 @@ class TutorialAnnotator(qt.QMainWindow):
         self.loadImagesAndMetadata(tutorial)
 
 class AnnotatorSlideWidget(qt.QWidget):
-    thumbnailClicked = qt.Signal(int)
-    swapRequest = qt.Signal(int, int)
+    thumbnailClicked = qt.Signal(qt.QWidget)
+    swapRequest = qt.Signal(qt.QWidget, int)
 
-    def __init__(self, slideIndex : int, thumbnailRatio, parent = None):
+    def __init__(self, parent = None):
         super().__init__(parent)
-
-        self.slideIndex = slideIndex
 
         self.UNDELETABLE = False
         self.thumbnailSize = [280, 165] #Default Value
@@ -725,7 +723,7 @@ class AnnotatorSlideWidget(qt.QWidget):
         self.buttonSize = [24, 24]
 
         self.Slide : AnnotatorSlide = None
-        self.SlideWidget : tmLabel = None
+        self.SlideWidget : ClickableLabel = None
 
         self.SetupGUI()
         
@@ -737,7 +735,7 @@ class AnnotatorSlideWidget(qt.QWidget):
         self.setLayout(self.slideLayout)
         self.setAttribute(qt.Qt.WA_StyledBackground, True)
         self.setStyleSheet('background-color: #9e9493;')
-        self.setObjectName(f"label_step_{self.slideIndex}")
+        self.setObjectName("label_step")
 
         self.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
 
@@ -758,8 +756,8 @@ class AnnotatorSlideWidget(qt.QWidget):
         pass
 
     def SetTutorialSlide(self, annotatorSlide : AnnotatorSlide):
-        screenshotWidget = tmLabel(f"label_window_{self.slideIndex}", self.slideIndex)
-        screenshotWidget.setObjectName(f"label_window_{self.slideIndex}")
+        screenshotWidget = ClickableLabel("label_window")
+        screenshotWidget.setObjectName("label_window")
         self.slideLayout.addWidget(screenshotWidget)
 
         self.SlideWidget = screenshotWidget
@@ -770,15 +768,15 @@ class AnnotatorSlideWidget(qt.QWidget):
         screenshotWidget.stackUnder(self.slideUpButton)
 
     def swapUp(self, state):
-        self.swapRequest.emit(self.slideIndex, self.slideIndex - 1)
+        self.swapRequest.emit(self, -1)
         pass
 
     def swapDown(self, state):
-        self.swapRequest.emit(self.slideIndex, self.slideIndex + 1)
+        self.swapRequest.emit(self, 1)
         pass
 
     def thumbnailClick(self):
-        self.thumbnailClicked.emit(self.slideIndex)
+        self.thumbnailClicked.emit(self)
         pass
 
     def _resizeEvent(self, event):
@@ -850,12 +848,59 @@ class DraggableLabel(qt.QLabel):
                         newPos[1] = pos.y()
                     self.SetCenter(*newPos)
 
-class tmLabel(qt.QLabel):
+class ClickableLabel(qt.QLabel):
     clicked = qt.Signal()
 
-    def __init__(self, text, index, parent=None):
+    def __init__(self, text, parent=None):
         super().__init__(text, parent)
-        self.index = index
 
     def mousePressEvent(self, event):
         self.clicked.emit()
+
+class AnnotatorSlideWidgetList(list):
+    def __init__(self, layout, selectionCallback, swapCallback):
+        super().__init__()
+        self.layout = layout
+        self.selectionCallback = selectionCallback
+        self.swapCallback = swapCallback
+
+    def insert(self, index, item):
+        super().insert(index, item)
+        self._refreshLayout()
+        self._connectSignals(item)
+        
+    def append(self, item):
+        self.insert(len(self), item)    
+
+    def remove(self, item):
+        super().remove(item)
+        self.layout.removeWidget(item)
+        item.deleteLater()
+        self._refreshLayout()
+
+    def clear(self):
+        for item in self:
+            self.layout.removeWidget(item)
+            item.deleteLater()
+        super().clear()
+        self._refreshLayout()
+
+    def swap(self, item1, item2):
+        index1 = self.index(item1)
+        index2 = self.index(item2)
+        self[index1], self[index2] = self[index2], self[index1]
+        self._refreshLayout()
+
+    def _refreshLayout(self):
+        for i, slide in enumerate(self):
+            self.layout.addWidget(slide, i, 0)
+
+    def _connectSignals(self, slide):
+        try:
+            slide.thumbnailClicked.disconnect(self.selectionCallback)
+            slide.swapRequest.disconnect(self.swapCallback)
+        except:
+            pass
+        slide.thumbnailClicked.connect(self.selectionCallback)
+        slide.swapRequest.connect(self.swapCallback)
+

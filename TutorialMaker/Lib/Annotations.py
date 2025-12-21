@@ -708,10 +708,10 @@ class AnnotatedTutorial:
             outputFileAnnotations["slides"].append(slideInfo)
             outputFileTextDict = {**outputFileTextDict, **textDict}
 
-        with open(file= f"{outputFolder}/annotations_.json", mode='w', encoding="utf-8") as fd:
+        with open(file= f"{outputFolder}/annotations.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileAnnotations, fd, ensure_ascii=False, indent=4)
 
-        with open(file= f"{outputFolder}/text_dict_default_.json", mode='w', encoding="utf-8") as fd:
+        with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
 
     @staticmethod
