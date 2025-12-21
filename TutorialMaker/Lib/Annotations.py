@@ -19,6 +19,12 @@ class AnnotationType(Flag):
     Click = auto()
     Selecting = auto()
     Selected = auto()  # Not for saving
+    
+class AnnotatorSlideLayoutType(Flag):
+    Screenshot = auto()
+    Cover = auto()
+    Acknowledgment = auto()
+    Blank = auto()
 
 class Annotation:
     def __init__(self,
@@ -406,7 +412,6 @@ class Annotation:
             rectToDraw = qt.QRect(topLeft,bottomRight)
             painter.drawRect(rectToDraw)
 
-
 class AnnotatorSlide:
     def __init__(self, BackgroundImage : qt.QPixmap, Metadata : dict, Annotations : list[Annotation] = None, WindowOffset : list[int] = None):
 
@@ -421,7 +426,7 @@ class AnnotatorSlide:
         self.annotations = Annotations
         self.Active = True
 
-        self.SlideLayout = "Screenshot"
+        self.SlideLayout = AnnotatorSlideLayoutType.Screenshot
         self.SlideTitle = ""
         self.SlideBody = ""
         
@@ -577,8 +582,10 @@ class AnnotatedTutorial:
             slideMetadata = []
             slideImage : qt.QImage = None
 
+            layoutSelected = AnnotatorSlideLayoutType[slideData["SlideLayout"]]
+
             devicePixelRatio = 1.0  # Default for backward compatibility
-            if slideData["SlideLayout"] == "Screenshot":
+            if layoutSelected == AnnotatorSlideLayoutType.Screenshot:
                 if len(rawStepPaths) == 1:
                     tsParser = TutorialScreenshot()
                     tsParser.metadata = rawStepPaths[0] + ".json"
@@ -596,10 +603,10 @@ class AnnotatedTutorial:
                     slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
                     slideImage = slideImage.toImage()
 
-            elif slideData["SlideLayout"] == "CoverPage":
+            elif layoutSelected == AnnotatorSlideLayoutType.Cover:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
             
-            elif slideData["SlideLayout"] == "Acknowledgment":
+            elif layoutSelected == AnnotatorSlideLayoutType.Acknowledgment:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")
             else:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
@@ -639,7 +646,7 @@ class AnnotatedTutorial:
             annotatedSlide.devicePixelRatio = 1.0
             annotatedSlide.SlideTitle = textDict.get(slideData["SlideTitle"], "")
             annotatedSlide.SlideBody = textDict.get(slideData["SlideDesc"], "")
-            annotatedSlide.SlideLayout = slideData["SlideLayout"]
+            annotatedSlide.SlideLayout = layoutSelected
             annotatedSlide.screenshotPaths = slideData["SlideCode"]
 
             imagePaths.append(slideData["ImagePath"])
@@ -660,8 +667,8 @@ class AnnotatedTutorial:
 
         for slideIndex, slide in enumerate(slides):
 
-            layoutName = getattr(slide, "SlideLayout", "")
-            if (not slide.Active) and layoutName not in ("CoverPage", "Acknowledgment"):
+            layout = slide.SlideLayout
+            if (not slide.Active) and layout not in (AnnotatorSlideLayoutType.Cover, AnnotatorSlideLayoutType.Acknowledgment):
                 continue
             slideImage = slide.image
 
@@ -682,7 +689,7 @@ class AnnotatedTutorial:
 
             slideInfo = {"ImagePath": f"{slideTitle}.png",
                          "SlideCode": slide.screenshotPaths,
-                         "SlideLayout": slide.SlideLayout,
+                         "SlideLayout": slide.SlideLayout.name,
                          "SlideTitle": f"{slideTitle}_title",
                          "SlideDesc": f"{slideTitle}_body",
                          "Annotations": []}
