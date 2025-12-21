@@ -79,9 +79,11 @@ class TutorialAnnotator(qt.QMainWindow):
         # Configure the Slide Title and Slide body text boxes
         self.slideTitleWidget = self.findChild(qt.QLineEdit, "lineEdit_slideTitle")
         self.slideTitleWidget.placeholderText = _("Title for the slide")
+        self.slideTitleWidget.textChanged.connect(self.saveSlideTitle)
 
         self.slideBodyWidget = self.findChild(qt.QTextEdit, "textEdit_slideDescription")
         self.slideBodyWidget.placeholderText = _("Write a description for the slide")
+        self.slideBodyWidget.textChanged.connect(self.saveSlideBody)
 
         # Left Scroll Area
         self.slidesScrollArea = self.findChild(qt.QScrollArea, "scrollArea_loadedSlides")
@@ -244,6 +246,14 @@ class TutorialAnnotator(qt.QMainWindow):
             self.selectedAnnotation.penConfig(self.penSettings["color"], self.penSettings["fontSize"],self.penSettings["penThickness"], brush=True)
         pass
 
+    def saveSlideTitle(self, text):
+        if self.selectedAnnotator is not None:
+            self.selectedAnnotator.SlideTitle = text
+
+    def saveSlideBody(self):
+        if self.selectedAnnotator is not None:
+            self.selectedAnnotator.SlideBody = self.slideBodyWidget.toPlainText()
+
     def changeAnnotationType(self, annotationType):
         self.finishCurrentAnnotation()
         if self.selectedAnnotationType == annotationType or annotationType == AnnotationType.Nil:
@@ -325,14 +335,7 @@ class TutorialAnnotator(qt.QMainWindow):
             return
 
         original = self.slides[self.selectedSlideIndex].Slide
-
-        newSlide = AnnotatorSlide(
-            original.image.copy(),
-            copy.deepcopy(original.metadata),
-            copy.deepcopy(original.annotations),
-            copy.deepcopy(original.windowOffset)
-        )
-        newSlide.SlideLayout = original.SlideLayout
+        newSlide = copy.deepcopy(original)
 
         slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
         slideWidget.SetTutorialSlide(newSlide)
@@ -350,7 +353,10 @@ class TutorialAnnotator(qt.QMainWindow):
 
         if swapTo >= len(self.slides) or swapTo < 0:
             return
+        
         self.slides.swap(widget, self.slides[swapTo])
+
+        self.changeSelectedSlide(widget)
         pass
 
     def changeSelectedSlide(self, widget):
@@ -358,22 +364,28 @@ class TutorialAnnotator(qt.QMainWindow):
 
         self.finishCurrentAnnotation()
 
-        # Save text to slideAnnotator
-        if self.selectedAnnotator is not None:
-            self.selectedAnnotator.SlideTitle = self.slideTitleWidget.text
-            self.selectedAnnotator.SlideBody = self.slideBodyWidget.toPlainText()
-
         # Change the slide variables
         self.selectedSlideIndex = slideId
         selectedSlideWidget = self.slides[slideId]
+        
         selectedScreenshot = selectedSlideWidget.Slide
 
         self.selectedSlideWidget.setPixmap(selectedScreenshot.GetResized(*self.selectedSlideSize, keepAspectRatio=True))
         self.selectedAnnotator = selectedScreenshot
+        
+        # Change selection colors
+        for slide in self.slides:
+             slide.setStyleSheet('background-color: #9e9493;')
+        selectedSlideWidget.setStyleSheet('background-color: #ff6c52;')
 
         # Load text from slideAnnotator
+        self.slideTitleWidget.blockSignals(True)
         self.slideTitleWidget.setText(self.selectedAnnotator.SlideTitle)
+        self.slideTitleWidget.blockSignals(False)
+        
+        self.slideBodyWidget.blockSignals(True)
         self.slideBodyWidget.setText(self.selectedAnnotator.SlideBody)
+        self.slideBodyWidget.blockSignals(False)
         pass
 
     def finishCurrentAnnotation(self):

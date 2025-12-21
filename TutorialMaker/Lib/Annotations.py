@@ -59,6 +59,26 @@ class Annotation:
         # Need to change this later, make it loaded through resources
         #self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
         #self.icon_click = self.icon_click.scaled(20,30)
+        
+    def __getstate__(self):
+        state = {**self.toDict(), **{"targetWidget": self.target}}
+        return state
+        
+    def __setstate__(self, state):
+        # Not good practice
+        self.__init__(
+            state["targetWidget"],
+            *state["offset"],
+            *state["optional"],
+            state["text"],
+            AnnotationType[state["type"]]
+        )
+        self.penConfig(
+                qt.QColor(state["penSettings"]["color"]),
+                state["penSettings"]["fontSize"],
+                state["penSettings"]["thickness"]
+            )
+        self.PERSISTENT = True
 
     def setSelectionBoundingBox(self, topLeftX, topLeftY, bottomRightX, bottomRightY):
         padding = 5
@@ -96,26 +116,6 @@ class Annotation:
                            "text": self.text}
         return annotationJSON
     
-    def __getstate__(self):
-        state = {**self.toDict(), **{"targetWidget": self.target}}
-        return state
-        
-    def __setstate__(self, state):
-        # Not good practice
-        self.__init__(
-            state["targetWidget"],
-            *state["offset"],
-            *state["optional"],
-            state["text"],
-            AnnotationType[state["type"]]
-        )
-        self.penConfig(
-                qt.QColor(state["penSettings"]["color"]),
-                state["penSettings"]["fontSize"],
-                state["penSettings"]["thickness"]
-            )
-        self.PERSISTENT = True
-
     def setOffset(self, Offset : list[int]):
         self.annotationOffset = Offset
         pass
@@ -433,6 +433,24 @@ class AnnotatorSlide:
         self.devicePixelRatio = 1.0
         self.screenshotPaths : list[str] = []
         pass
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["image"], state["outputImage"]
+        
+        ba = qt.QByteArray()
+        buff = qt.QBuffer(ba)
+        buff.open(qt.QIODevice.WriteOnly)
+        self.image.save(buff, "PNG")
+        state["image_data"] = ba.data()
+        return state
+
+    def __setstate__(self, state):
+        data = state.pop("image_data")
+        self.__dict__.update(state)
+        self.image = qt.QPixmap()
+        self.image.loadFromData(qt.QByteArray(data), "PNG")
+        self.outputImage = self.image.copy()
 
     def AddAnnotation(self, annotation : Annotation):
         annotation.setOffset(self.windowOffset)
