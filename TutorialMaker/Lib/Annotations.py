@@ -627,7 +627,7 @@ class AnnotatedTutorial:
                     slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
                     slideImage = slideImage.toImage()
                 
-                if(rawStepPaths[0][1] == 0):
+                if(not slideData['SlideCode'][0].split("/")[1] == "0"):
                     windowOffset = slideMetadata[0]["position"]
 
             elif layoutSelected == AnnotatorSlideLayoutType.Cover:
