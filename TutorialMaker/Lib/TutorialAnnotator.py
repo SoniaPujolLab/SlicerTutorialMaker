@@ -334,7 +334,8 @@ class TutorialAnnotator(qt.QMainWindow):
             metadata = []
         else:
             try:
-                windowOffset = metadata[0]["position"]
+                if(not path[0].split("/")[1] == "0"):
+                    windowOffset = metadata[0]["position"]
             except:
                 pass
         
