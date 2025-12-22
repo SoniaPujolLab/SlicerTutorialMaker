@@ -19,6 +19,12 @@ class AnnotationType(Flag):
     Click = auto()
     Selecting = auto()
     Selected = auto()  # Not for saving
+    
+class AnnotatorSlideLayoutType(Flag):
+    Screenshot = auto()
+    Cover = auto()
+    Acknowledgment = auto()
+    Blank = auto()
 
 class Annotation:
     def __init__(self,
@@ -53,6 +59,26 @@ class Annotation:
         # Need to change this later, make it loaded through resources
         #self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
         #self.icon_click = self.icon_click.scaled(20,30)
+        
+    def __getstate__(self):
+        state = {**self.toDict(), **{"targetWidget": self.target}}
+        return state
+        
+    def __setstate__(self, state):
+        # Not good practice
+        self.__init__(
+            state["targetWidget"],
+            *state["offset"],
+            *state["optional"],
+            state["text"],
+            AnnotationType[state["type"]]
+        )
+        self.penConfig(
+                qt.QColor(state["penSettings"]["color"]),
+                state["penSettings"]["fontSize"],
+                state["penSettings"]["thickness"]
+            )
+        self.PERSISTENT = True
 
     def setSelectionBoundingBox(self, topLeftX, topLeftY, bottomRightX, bottomRightY):
         padding = 5
@@ -90,26 +116,6 @@ class Annotation:
                            "text": self.text}
         return annotationJSON
     
-    def __getstate__(self):
-        state = {**self.toDict(), **{"targetWidget": self.target}}
-        return state
-        
-    def __setstate__(self, state):
-        # Not good practice
-        self.__init__(
-            state["targetWidget"],
-            *state["offset"],
-            *state["optional"],
-            state["text"],
-            AnnotationType[state["type"]]
-        )
-        self.penConfig(
-                qt.QColor(state["penSettings"]["color"]),
-                state["penSettings"]["fontSize"],
-                state["penSettings"]["thickness"]
-            )
-        self.PERSISTENT = True
-
     def setOffset(self, Offset : list[int]):
         self.annotationOffset = Offset
         pass
@@ -406,7 +412,6 @@ class Annotation:
             rectToDraw = qt.QRect(topLeft,bottomRight)
             painter.drawRect(rectToDraw)
 
-
 class AnnotatorSlide:
     def __init__(self, BackgroundImage : qt.QPixmap, Metadata : dict, Annotations : list[Annotation] = None, WindowOffset : list[int] = None):
 
@@ -421,13 +426,31 @@ class AnnotatorSlide:
         self.annotations = Annotations
         self.Active = True
 
-        self.SlideLayout = "Screenshot"
+        self.SlideLayout = AnnotatorSlideLayoutType.Screenshot
         self.SlideTitle = ""
         self.SlideBody = ""
         
         self.devicePixelRatio = 1.0
         self.screenshotPaths : list[str] = []
         pass
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["image"], state["outputImage"]
+        
+        ba = qt.QByteArray()
+        buff = qt.QBuffer(ba)
+        buff.open(qt.QIODevice.WriteOnly)
+        self.image.save(buff, "PNG")
+        state["image_data"] = ba.data()
+        return state
+
+    def __setstate__(self, state):
+        data = state.pop("image_data")
+        self.__dict__.update(state)
+        self.image = qt.QPixmap()
+        self.image.loadFromData(qt.QByteArray(data), "PNG")
+        self.outputImage = self.image.copy()
 
     def AddAnnotation(self, annotation : Annotation):
         annotation.setOffset(self.windowOffset)
@@ -577,8 +600,10 @@ class AnnotatedTutorial:
             slideMetadata = []
             slideImage : qt.QImage = None
 
+            layoutSelected = AnnotatorSlideLayoutType[slideData["SlideLayout"]]
+
             devicePixelRatio = 1.0  # Default for backward compatibility
-            if slideData["SlideLayout"] == "Screenshot":
+            if layoutSelected == AnnotatorSlideLayoutType.Screenshot:
                 if len(rawStepPaths) == 1:
                     tsParser = TutorialScreenshot()
                     tsParser.metadata = rawStepPaths[0] + ".json"
@@ -596,10 +621,10 @@ class AnnotatedTutorial:
                     slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
                     slideImage = slideImage.toImage()
 
-            elif slideData["SlideLayout"] == "CoverPage":
+            elif layoutSelected == AnnotatorSlideLayoutType.Cover:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
             
-            elif slideData["SlideLayout"] == "Acknowledgment":
+            elif layoutSelected == AnnotatorSlideLayoutType.Acknowledgment:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")
             else:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
@@ -639,7 +664,7 @@ class AnnotatedTutorial:
             annotatedSlide.devicePixelRatio = 1.0
             annotatedSlide.SlideTitle = textDict.get(slideData["SlideTitle"], "")
             annotatedSlide.SlideBody = textDict.get(slideData["SlideDesc"], "")
-            annotatedSlide.SlideLayout = slideData["SlideLayout"]
+            annotatedSlide.SlideLayout = layoutSelected
             annotatedSlide.screenshotPaths = slideData["SlideCode"]
 
             imagePaths.append(slideData["ImagePath"])
@@ -660,8 +685,8 @@ class AnnotatedTutorial:
 
         for slideIndex, slide in enumerate(slides):
 
-            layoutName = getattr(slide, "SlideLayout", "")
-            if (not slide.Active) and layoutName not in ("CoverPage", "Acknowledgment"):
+            layout = slide.SlideLayout
+            if (not slide.Active) and layout not in (AnnotatorSlideLayoutType.Cover, AnnotatorSlideLayoutType.Acknowledgment):
                 continue
             slideImage = slide.image
 
@@ -682,7 +707,7 @@ class AnnotatedTutorial:
 
             slideInfo = {"ImagePath": f"{slideTitle}.png",
                          "SlideCode": slide.screenshotPaths,
-                         "SlideLayout": slide.SlideLayout,
+                         "SlideLayout": slide.SlideLayout.name,
                          "SlideTitle": f"{slideTitle}_title",
                          "SlideDesc": f"{slideTitle}_body",
                          "Annotations": []}
@@ -701,10 +726,10 @@ class AnnotatedTutorial:
             outputFileAnnotations["slides"].append(slideInfo)
             outputFileTextDict = {**outputFileTextDict, **textDict}
 
-        with open(file= f"{outputFolder}/annotations_.json", mode='w', encoding="utf-8") as fd:
+        with open(file= f"{outputFolder}/annotations.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileAnnotations, fd, ensure_ascii=False, indent=4)
 
-        with open(file= f"{outputFolder}/text_dict_default_.json", mode='w', encoding="utf-8") as fd:
+        with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
 
     @staticmethod
