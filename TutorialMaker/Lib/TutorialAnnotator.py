@@ -20,6 +20,7 @@ class TutorialAnnotator(qt.QMainWindow):
         self.selectedSlideSize = [0, 0]
 
         self.slides : AnnotatorSlideWidgetList = None
+        self.slideGalery = SlideGalery(self)
 
         self.selectedSlideIndex = 0
         self.selectedAnnotator : AnnotatorSlide = None
@@ -158,7 +159,7 @@ class TutorialAnnotator(qt.QMainWindow):
             {"text": _("Save"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/save.png', "trigger": self.saveAnnotations},
             {"text": _("Undo"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png', "trigger": self.deleteSelectedAnnotation},
             {"text": _("Delete"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png', "trigger": self.deleteSlide},
-            {"text": _("Add"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png', "trigger": self.addSlide},
+            {"text": _("Add"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png', "trigger": self.OpenGalery},
             {"text": _("Copy"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/copy.png', "trigger": self.copySlide}
         ]
         addActions(toolbar, systemActions)
@@ -323,22 +324,35 @@ class TutorialAnnotator(qt.QMainWindow):
         if self.slides:
             self.changeSelectedSlide(self.slides[min(self.selectedSlideIndex, len(self.slides) - 1)])
 
-    def addSlide(self):
-        image = qt.QPixmap(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
+    def addScreenshotSlide(self, slideImage:qt.QPixmap=None, metadata:list=None, type_ = AnnotatorSlideLayoutType.Blank, index : int = 0, path : list[str] = ["0/0"]):
 
-        if self.slides:
-            size = self.slides[self.selectedSlideIndex].Slide.image.size()
-            image = image.scaled(size, qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
-            self.selectedSlideIndex += 1
+        if slideImage is None:
+            slideImage = qt.QPixmap(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
+
+        windowOffset = [0,0]
+        if metadata is None:
+            metadata = []
+        else:
+            try:
+                windowOffset = metadata[0]["position"]
+            except:
+                pass
         
-        newSlide = AnnotatorSlide(image, [])
-        newSlide.SlideLayout = AnnotatorSlideLayoutType.Blank
+        newSlide = AnnotatorSlide(slideImage, metadata, WindowOffset=windowOffset)
+        newSlide.SlideLayout = type_
+        newSlide.screenshotPaths = path
+
+        self.addSlide(newSlide, index)
         
+        
+    def addSlide(self, slide : AnnotatorSlide, index : int = 0):
         slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
-        slideWidget.SetTutorialSlide(newSlide)
+        slideWidget.SetTutorialSlide(slide)
         
-        self.slides.insert(self.selectedSlideIndex, slideWidget)
+        self.slides.insert(index, slideWidget)
         self.changeSelectedSlide(slideWidget)
+        self.windowResizeEvent(None)
+        pass
 
     def copySlide(self):
         if not (0 <= self.selectedSlideIndex < len(self.slides)):
@@ -347,12 +361,11 @@ class TutorialAnnotator(qt.QMainWindow):
         original = self.slides[self.selectedSlideIndex].Slide
         newSlide = copy.deepcopy(original)
 
-        slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
-        slideWidget.SetTutorialSlide(newSlide)
+        self.addSlide(newSlide, self.selectedSlideIndex + 1)
+
+    def OpenGalery(self):
+        self.slideGalery.exec_()
         
-        self.slides.insert(self.selectedSlideIndex + 1, slideWidget)
-        self.changeSelectedSlide(slideWidget)
-        self.windowResizeEvent(None)
 
     def onActionTriggered(self, sender):
         pass
@@ -666,6 +679,27 @@ class TutorialAnnotator(qt.QMainWindow):
         return False
                        
     def loadImagesAndMetadata(self, tutorialData):
+        # Setup the Cover and Acknownledgments slides
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")),
+            [],
+            AnnotatorSlideLayoutType.Cover
+
+        )
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")),
+            [],
+            AnnotatorSlideLayoutType.Acknowledgment
+        )
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
+            [],
+            AnnotatorSlideLayoutType.Blank
+        )
+        
+        self.slideGalery.ExportSlide(1)
+        self.slideGalery.ExportSlide(0)
+
         for stepIndex, screenshots in enumerate(tutorialData.steps):
             slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
 
@@ -679,6 +713,7 @@ class TutorialAnnotator(qt.QMainWindow):
                     annotatorSlide.SlideLayout = AnnotatorSlideLayoutType.Screenshot
                     slideWidget.SetTutorialSlide(annotatorSlide)
                     for screenshotIndex, sreenshot in enumerate(screenshots):
+                        self.slideGalery.AddScreenshot(sreenshot, path=[f"{stepIndex}/{screenshotIndex}"])
                         annotatorSlide.screenshotPaths.append(f"{stepIndex}/{screenshotIndex}")
                 except Exception as e:
                     print(e)
@@ -691,6 +726,7 @@ class TutorialAnnotator(qt.QMainWindow):
                     annotatorSlide.SlideLayout = AnnotatorSlideLayoutType.Screenshot
                     slideWidget.SetTutorialSlide(annotatorSlide)
                     annotatorSlide.screenshotPaths = [f"{stepIndex}/0"]
+                    self.slideGalery.AddScreenshot(screenshots[0], path=[f"{stepIndex}/0"])
                 except Exception:
                     print(f"ERROR: Annotator Failed to add top level window in step:{stepIndex}, loadImagesAndMetadata")
                     del slideWidget
@@ -927,4 +963,64 @@ class AnnotatorSlideWidgetList(list):
             pass
         slide.thumbnailClicked.connect(self.selectionCallback)
         slide.swapRequest.connect(self.swapCallback)
+
+class SlideGalery(qt.QDialog):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.slides = []
+
+        self.setWindowTitle("Slide Galery")
+        self.setGeometry(100, 100, 800, 600) 
+        self.thumbnailSize = [300, 200]
+
+        main_layout = qt.QVBoxLayout(self)
+
+        scroll_area = qt.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+
+        main_layout.addWidget(scroll_area)
+        
+        self.listWidget = qt.QListWidget(scroll_area)
+        self.listWidget.setSelectionMode(qt.QAbstractItemView.NoSelection) 
+        self.listWidget.setIconSize(qt.QSize(300, 300))
+        self.listWidget.setViewMode(qt.QListWidget.IconMode) 
+        self.listWidget.setResizeMode(qt.QListWidget.Adjust)  
+        self.listWidget.setSpacing(10)
+
+        scroll_area.setWidget(self.listWidget)
+
+        self.setLayout(main_layout)
+
+    def ExportSlide(self, index):
+        self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex, self.slides[index]["path"])
+
+
+    def AddSlide(self, image : qt.QPixmap, metadata : list = [], _type = AnnotatorSlideLayoutType.Blank, path : list[str] = ["0/0"]):
+        slide = {"image": image, "metadata": metadata, "type": _type, "path": path}
+
+        container_widget = ClickableLabel("")
+
+        container_widget.setPixmap(slide["image"].scaled(*self.thumbnailSize, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation))
+        container_widget.setStyleSheet("border: 2px solid black; background-color: lightgray; padding: 5px;")
+        index = len(self.slides)
+        container_widget.clicked.connect(lambda : self.ExportSlide(index))
+
+        item = qt.QListWidgetItem(self.listWidget)
+        item.setSizeHint(qt.QSize(320, 220))
+        self.listWidget.addItem(item)
+        self.listWidget.setItemWidget(item, container_widget)
+
+        self.slides.append(slide)
+        pass
+          
+    def AddScreenshot(self, tutorialScreenshot : TutorialScreenshot, _type = AnnotatorSlideLayoutType.Screenshot, path : list[str] = ["0/0"]):
+        self.AddSlide(tutorialScreenshot.getImage(), tutorialScreenshot.getWidgets(), _type, path)
+        pass
+
+    def AddScreenshots(self, tutorialScreenshots : list[TutorialScreenshot]):
+        for tutorialScreenshot in tutorialScreenshots:
+            self.AddSlide(tutorialScreenshot)
+        pass
 
