@@ -597,6 +597,7 @@ class AnnotatedTutorial:
 
         for slideData in rawData["slides"]:
             slideMetadata = []
+            windowOffset = [0,0]
             slideImage : qt.QImage = None
 
             layoutSelected = AnnotatorSlideLayoutType[slideData["SlideLayout"]]
@@ -625,6 +626,9 @@ class AnnotatedTutorial:
                         screenshots.append(tsParser)
                     slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
                     slideImage = slideImage.toImage()
+                
+                if(rawStepPaths[0][1] == 0):
+                    windowOffset = slideMetadata[0]["position"]
 
             elif layoutSelected == AnnotatorSlideLayoutType.Cover:
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
@@ -664,11 +668,6 @@ class AnnotatedTutorial:
                 logicalHeight = int(pixmap.height() / devicePixelRatio)
                 pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
             pixmap.setDevicePixelRatio(1.0)
-            windowOffset = [0,0]
-            try:
-                windowOffset = slideMetadata[0]["position"]
-            except:
-                pass
             
             annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations, WindowOffset=windowOffset)
             annotatedSlide.devicePixelRatio = 1.0
