@@ -19,7 +19,7 @@ class TutorialAnnotator(qt.QMainWindow):
         self.defaultHelperOffset = [60,60]
         self.selectedSlideSize = [0, 0]
 
-        self.slides = None
+        self.slides : AnnotatorSlideWidgetList = None
 
         self.selectedSlideIndex = 0
         self.selectedAnnotator : AnnotatorSlide = None
@@ -399,6 +399,8 @@ class TutorialAnnotator(qt.QMainWindow):
         pass
 
     def finishCurrentAnnotation(self):
+        self.OffsetHelperWidget.SetActive(False)
+        self.OptHelperWidget.SetActive(False)
         if self.selectedAnnotation is not None:
             self.selectedAnnotation.drawBoundingBox = False
             if not self.selectedAnnotation.PERSISTENT:
@@ -438,7 +440,7 @@ class TutorialAnnotator(qt.QMainWindow):
         self.selectedAnnotation.drawBoundingBox = True
 
     def annotationHandler(self, appPos):
-        if self.selectedAnnotation is None:
+        if self.selectedAnnotation is None or self.selectedAnnotation.PERSISTENT == True:
             return
         self.selectedAnnotation.PERSISTENT = True
         selectedAnnotation = self.selectedAnnotation
