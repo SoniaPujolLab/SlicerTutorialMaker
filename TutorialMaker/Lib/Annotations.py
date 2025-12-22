@@ -61,7 +61,7 @@ class Annotation:
         #self.icon_click = self.icon_click.scaled(20,30)
         
     def __getstate__(self):
-        state = {**self.toDict(), **{"targetWidget": self.target}}
+        state = {**self.toDict(), **{"targetWidget": self.target, "windowOffset": self.annotationOffset}}
         return state
         
     def __setstate__(self, state):
@@ -74,10 +74,11 @@ class Annotation:
             AnnotationType[state["type"]]
         )
         self.penConfig(
-                qt.QColor(state["penSettings"]["color"]),
-                state["penSettings"]["fontSize"],
-                state["penSettings"]["thickness"]
-            )
+            qt.QColor(state["penSettings"]["color"]),
+            state["penSettings"]["fontSize"],
+            state["penSettings"]["thickness"]
+        )
+        self.annotationOffset = state["windowOffset"]
         self.PERSISTENT = True
 
     def setSelectionBoundingBox(self, topLeftX, topLeftY, bottomRightX, bottomRightY):
@@ -426,6 +427,9 @@ class AnnotatorSlide:
         self.annotations = Annotations
         self.Active = True
 
+        for annotation in Annotations:
+            annotation.setOffset(self.windowOffset)
+
         self.SlideLayout = AnnotatorSlideLayoutType.Screenshot
         self.SlideTitle = ""
         self.SlideBody = ""
@@ -592,11 +596,6 @@ class AnnotatedTutorial:
         }
 
         for slideData in rawData["slides"]:
-            rawStepPaths : list[str] = []
-            for rawSlides in slideData['SlideCode']:
-                slideStep, windowIndex = rawSlides.split("/")
-                rawStepPaths.append(f"{outputFolder}/Raw/{slideStep}/{windowIndex}")
-
             slideMetadata = []
             slideImage : qt.QImage = None
 
@@ -604,6 +603,12 @@ class AnnotatedTutorial:
 
             devicePixelRatio = 1.0  # Default for backward compatibility
             if layoutSelected == AnnotatorSlideLayoutType.Screenshot:
+
+                rawStepPaths : list[str] = []
+                for rawSlides in slideData['SlideCode']:
+                    slideStep, windowIndex = rawSlides.split("/")
+                    rawStepPaths.append(f"{outputFolder}/Raw/{slideStep}/{windowIndex}")
+
                 if len(rawStepPaths) == 1:
                     tsParser = TutorialScreenshot()
                     tsParser.metadata = rawStepPaths[0] + ".json"
@@ -659,8 +664,13 @@ class AnnotatedTutorial:
                 logicalHeight = int(pixmap.height() / devicePixelRatio)
                 pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
             pixmap.setDevicePixelRatio(1.0)
+            windowOffset = [0,0]
+            try:
+                windowOffset = slideMetadata[0]["position"]
+            except:
+                pass
             
-            annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations)
+            annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations, WindowOffset=windowOffset)
             annotatedSlide.devicePixelRatio = 1.0
             annotatedSlide.SlideTitle = textDict.get(slideData["SlideTitle"], "")
             annotatedSlide.SlideBody = textDict.get(slideData["SlideDesc"], "")
@@ -684,11 +694,6 @@ class AnnotatedTutorial:
         outputFileAnnotations["slides"] = []
 
         for slideIndex, slide in enumerate(slides):
-
-            layout = slide.SlideLayout
-            if (not slide.Active) and layout not in (AnnotatorSlideLayoutType.Cover, AnnotatorSlideLayoutType.Acknowledgment):
-                continue
-            slideImage = slide.image
 
             cleanSlideTitle = slide.SlideTitle.replace(' ', '')
             cleanSlideTitle = re.sub(r'[^a-zA-Z0-9]', '', cleanSlideTitle)
