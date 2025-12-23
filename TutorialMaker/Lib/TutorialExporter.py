@@ -58,6 +58,7 @@ class SimpleSlide():
         self.Title = Title
         self.Description = Description
         self.ImagePath = ImagePath
+        print(self.ImagePath)
         
     def ToHtml(self):
         return  """
@@ -74,10 +75,32 @@ class SimpleSlide():
         title_html = f"""<div style="background-color:#003366; color:white; padding:10px; text-align:center; font-size:24px; font-weight:bold;">{self.Title}</div>"""
         return f"{title_html}\n\n![Imagen]({self.ImagePath})\n\n{self.Description}\n"
 
+class BlankSlide():
+    def __init__(self, Title: str, Description: str):
+        self.Title = Title
+        self.Description = Description
+
+    def ToHtml(self):
+        return """
+            <div class="slide">
+                <h1 class="slideTitle">{}</h1>
+                <h3 class="slideDescription">{}</h3>
+            </div>
+        """.format(self.Title, self.Description)
+
+    def ToMarkdown(self):
+        title_html = (
+            f'<div style="background-color:#003366; color:white; '
+            f'padding:10px; text-align:center; font-size:24px; '
+            f'font-weight:bold;">{self.Title}</div>'
+        )
+        return f"{title_html}\n\n{self.Description}\n"
+
 class SlideModel():
     Cover= CoverSlide
     SimpleSlide = SimpleSlide
     BackCover = BackCoverSlide
+    BlankSlide = BlankSlide 
 
 class SlidePage():
     def __init__(self, Model:SlideModel = SlideModel.SimpleSlide):
