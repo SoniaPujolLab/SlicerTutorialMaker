@@ -436,6 +436,7 @@ class AnnotatorSlide:
         
         self.devicePixelRatio = 1.0
         self.screenshotPaths : list[str] = []
+        self.imagePath = "" # Only used on the painter
         pass
 
     def __getstate__(self):
@@ -582,7 +583,6 @@ class AnnotatedTutorial:
         settings = slicer.app.userSettings()
         currentLanguage = settings.value("language")
 
-        imagePaths : list[str] = [] #TODO: Improve this part
         slides : list[AnnotatorSlide] = []
 
         textDict = AnnotatedTutorial.GetLocalizedDict(currentLanguage)
@@ -675,8 +675,8 @@ class AnnotatedTutorial:
             annotatedSlide.SlideBody = textDict.get(slideData["SlideDesc"], "")
             annotatedSlide.SlideLayout = layoutSelected
             annotatedSlide.screenshotPaths = slideData["SlideCode"]
+            annotatedSlide.imagePath = slideData["ImagePath"]
 
-            imagePaths.append(slideData["ImagePath"])
             slides.append(annotatedSlide)
         return [TutorialInfo, slides]
 

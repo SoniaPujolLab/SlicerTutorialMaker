@@ -4,7 +4,7 @@ import os
 import math
 import json
 from slicer.i18n import tr as _
-from Lib.Annotations import Annotation, AnnotationType, AnnotatorSlide, AnnotatedTutorial
+from Lib.Annotations import Annotation, AnnotationType, AnnotatorSlide, AnnotatedTutorial, AnnotatorSlideLayoutType
 from Lib.TutorialUtils import Tutorial, TutorialScreenshot
 import Lib.TutorialUtils as TutorialUtils
 import Lib.TutorialExporter as Exporter
@@ -722,7 +722,7 @@ class TutorialPainter:
 
     def LoadAnnotatedTutorial(self, path):
         self.slides = []
-        textDict = self.GetLocalizedDict(self.currentLanguage)
+        textDict = AnnotatedTutorial.GetLocalizedDict(self.currentLanguage)
         with open(path, encoding='utf-8') as file:
             rawData = json.load(file)
         self.TutorialInfo = {
@@ -797,14 +797,15 @@ class TutorialPainter:
         if not os.path.exists(path):
             os.mkdir(path)
         for slideIndex, slide in enumerate(self.slides):
+            if slide.SlideLayout is not AnnotatorSlideLayoutType.Screenshot:
+                continue
             slide.Draw()
             slideImage = slide.outputImage
-            slideImage.save(f"{path}/{self.imagePaths[slideIndex]}")
+            slideImage.save(f"{path}/{slide.imagePath}")
         pass
 
     def GenerateHTMLfromAnnotatedTutorial(self, path):
-        [self.TutorialInfo, self.slides, self.imagePaths] = AnnotatedTutorial.LoadAnnotatedTutorial(path)
-        localizedScreenshotsPath = f"{self.outputFolder}/{self.TutorialInfo['title']}_{self.currentLanguage}"
+        [self.TutorialInfo, self.slides] = AnnotatedTutorial.LoadAnnotatedTutorial(path)
         clean_title = self.TutorialInfo["title"].strip().replace(" ", "_").replace("\t", "_").replace("\n", "_").replace("\r", "_")
         clean_folder = f"{os.path.dirname(os.path.dirname(__file__))}/Outputs"
         localizedScreenshotsPath = f"{clean_folder}/{clean_title}_{self.currentLanguage}"
@@ -835,12 +836,14 @@ class TutorialPainter:
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
                     slide.SlideBody,
-                    self.imagePaths[slideIndex]
+                    slide.imagePath
                 )
             else:
                 continue
             pass
-            pages.append(Exporter.SlidePage(page))
+        
+            if page is not None:
+                pages.append(Exporter.SlidePage(page))
         
         tutorialPath = localizedScreenshotsPath + f"/{clean_title}"
 
@@ -855,10 +858,3 @@ class TutorialPainter:
             fd.write(markdown)
             
         pass
-
-    def GetLocalizedDict(self, lang, tutorialName = ""):
-        dictPath = self.outputFolder + "/Annotations/text_dict_default.json"
-        textDict = {}
-        with open(dictPath, encoding='utf-8') as file:
-                textDict = json.load(file)
-        return textDict
