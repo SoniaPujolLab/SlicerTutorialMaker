@@ -816,7 +816,7 @@ class TutorialPainter:
         for slideIndex, slide in enumerate(self.slides):
             page = None
             
-            if slide.SlideLayout == "CoverPage":
+            if slide.SlideLayout == AnnotatorSlideLayoutType.Cover:
                 page = Exporter.CoverSlide(
                     self.TutorialInfo['title'],
                     self.TutorialInfo['author'],
@@ -824,14 +824,14 @@ class TutorialPainter:
                     self.TutorialInfo['desc'],
                     )
             # This doesn't parse the Acknowledgements correctly
-            elif slide.SlideLayout == "Acknowledgment":
+            elif slide.SlideLayout == AnnotatorSlideLayoutType.Acknowledgment:
                 page = Exporter.BackCoverSlide(
                     slide.SlideTitle or "Acknowledgments",
                     slide.SlideBody 
                 )
 
 
-            elif slide.SlideLayout == "Screenshot" or slide.SlideLayout == "Copy":
+            elif slide.SlideLayout == AnnotatorSlideLayoutType.Screenshot:
                 title = slide.SlideTitle 
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
@@ -841,7 +841,7 @@ class TutorialPainter:
             else:
                 continue
             pass
-        
+
             if page is not None:
                 pages.append(Exporter.SlidePage(page))
         
