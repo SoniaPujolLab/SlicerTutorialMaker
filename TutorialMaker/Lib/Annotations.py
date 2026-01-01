@@ -284,7 +284,15 @@ class Annotation:
             topLeft = qt.QPoint(arrowTail[0] - textWidth / 2,arrowTail[1] - textHeight / 2)
             bottomRight = qt.QPoint(xPadding*2 + (arrowTail[0] + textWidth / 2), yPadding*2 + (arrowTail[1] + textHeight / 2))
             rectToDraw = qt.QRect(topLeft, bottomRight)
+            
+            # Draw rectangle without border
+            pen.setColor(qt.Qt.transparent)
+            painter.setPen(pen)
             painter.drawRect(rectToDraw)
+            
+            # Reset pen color for text
+            pen.setColor(qt.Qt.black)
+            painter.setPen(pen)
 
             # Adjust text to the center box
             textStart = [topLeft.x() + xPadding, topLeft.y() + fHeight]
@@ -355,7 +363,7 @@ class Annotation:
 
             textToWrite = self.text
             if textToWrite == "":
-                textToWrite = _("Write something here")
+                textToWrite = _("Start typing here")
 
             displayLines = []
             textLines = textToWrite.splitlines()
@@ -544,7 +552,6 @@ class AnnotatedTutorial:
             with open(LocalizedDictPath, encoding='utf-8') as file:
                 textDict = json.load(file)
         else:
-            print(f"{LocalizedDictPath} doesn't exist loading default")
             with open(DefaultDictPath, encoding='utf-8') as file:
                 textDict = json.load(file)
         

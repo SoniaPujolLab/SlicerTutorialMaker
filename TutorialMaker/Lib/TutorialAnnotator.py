@@ -30,7 +30,7 @@ class TutorialAnnotator(qt.QMainWindow):
 
         # Default settings for the annotations
         _penSettings = {"color": qt.QColor(255, 128, 0),
-                       "fontSize": 14,
+                       "fontSize": 24,
                        "penThickness": 4}
 
         self.penSettings = _penSettings
@@ -157,7 +157,7 @@ class TutorialAnnotator(qt.QMainWindow):
         systemActions = [
             {"text": _("Open"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/open.png', "trigger": self.loadAnnotations},
             {"text": _("Save"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/save.png', "trigger": self.saveAnnotations},
-            {"text": _("Undo"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png', "trigger": self.deleteSelectedAnnotation},
+            #{"text": _("Undo"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/back.png', "trigger": self.deleteSelectedAnnotation},
             {"text": _("Delete"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/remove.png', "trigger": self.deleteSlide},
             {"text": _("Add"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/add.png', "trigger": self.OpenGalery},
             {"text": _("Copy"), "icon": self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/copy.png', "trigger": self.copySlide}
@@ -681,25 +681,24 @@ class TutorialAnnotator(qt.QMainWindow):
                        
     def loadImagesAndMetadata(self, tutorialData):
         # Setup the Cover and Acknownledgments slides
-        self.slideGalery.AddSlide(
-            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")),
-            [],
-            AnnotatorSlideLayoutType.Cover
-
-        )
-        self.slideGalery.AddSlide(
-            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")),
-            [],
-            AnnotatorSlideLayoutType.Acknowledgment
-        )
+        # self.slideGalery.AddSlide(
+        #     qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")),
+        #     [],
+        #     AnnotatorSlideLayoutType.Cover
+        # )
+        # self.slideGalery.AddSlide(
+        #     qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")),
+        #     [],
+        #     AnnotatorSlideLayoutType.Acknowledgment
+        # )
         self.slideGalery.AddSlide(
             qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
             [],
             AnnotatorSlideLayoutType.Blank
         )
         
-        self.slideGalery.ExportSlide(1)
-        self.slideGalery.ExportSlide(0)
+        #self.slideGalery.ExportSlide(1)
+        #self.slideGalery.ExportSlide(0)
 
         for stepIndex, screenshots in enumerate(tutorialData.steps):
             slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
@@ -972,7 +971,7 @@ class SlideGalery(qt.QDialog):
 
         self.slides = []
 
-        self.setWindowTitle("Slide Galery")
+        self.setWindowTitle(_("Slide Gallery"))
         self.setGeometry(100, 100, 800, 600) 
         self.thumbnailSize = [300, 200]
 
