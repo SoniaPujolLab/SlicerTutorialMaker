@@ -35,10 +35,16 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         mainWindow = slicer.util.mainWindow()  
         
         self.delayDisplay("Starting the test")
-        
-        # Install necessary dependencies BEFORE starting
-        self.delayDisplay("Verificando e instalando dependências...")
-        
+        import os
+
+        if not os.path.isfile(slicer.dicomDatabase.databaseFilename):  
+            dicomBrowser = ctk.ctkDICOMBrowser()
+            dicomBrowser.databaseDirectory = slicer.dicomDatabase.databaseDirectory
+            dicomBrowser.createNewDatabaseDirectory()
+            slicer.dicomDatabase.openDatabase(slicer.dicomDatabase.databaseFilename)
+
+        # TUTORIALMAKER BEGIN
+                
         # Pre-install PyTorch without user confirmation
         try:
             import PyTorchUtils
@@ -54,8 +60,6 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         logic = MONAIAuto3DSeg.MONAIAuto3DSegLogic()
         logic.setupPythonRequirements(upgrade=False)
         self.delayDisplay("Dependencies installed successfully!")
-    
-        # TUTORIALMAKER BEGIN
 
         # Clear the scene to start fresh
         slicer.mrmlScene.Clear(0)
@@ -73,6 +77,7 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         # TUTORIALMAKER INFO AUTHOR Sonia Pujol, Ph.D.
         # TUTORIALMAKER INFO DATE 30/06/2025
         # TUTORIALMAKER INFO DESC AI - based Segmentation in 3D Slicer
+        # TUTORIALMAKER INFO DEPENDENCIES MONAIAuto3DSeg
         
         # 1 shot: 
         mainWindow.moduleSelector().selectModule('Welcome')
@@ -84,15 +89,12 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         # 2 shot: 
         #addDataDialog=slicer.qSlicerDataDialog()
         #qt.QTimer.singleShot(0, lambda: addDataDialog.exec())
-
-
         
-        self.delayDisplay('Screenshot #2: Click in Add Data button')
-        ww = slicer.app.activeWindow()
-        ww.close()
+        #self.delayDisplay('Screenshot #2: Click in Add Data button')
+        #ww = slicer.app.activeWindow()
+        #ww.close()
 
         # 3 shot: Load protate data
-        import os
         import urllib.request
         import zipfile
 
@@ -208,20 +210,16 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
             slicer.mrmlScene.RemoveNode(seg_node)
 
         # 1 shot: 
-        mainWindow.moduleSelector().selectModule('Welcome')
-        layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutFourUpView)    
-        
-        addDataDialog=slicer.qSlicerDataDialog()
-        qt.QTimer.singleShot(0, lambda: addDataDialog.exec())
-
-        # TUTORIALMAKER SCREENSHOT
-        self.delayDisplay('Screenshot #1: Click in Add Data button')
-        ww = slicer.app.activeWindow()
-        ww.close()
+        # mainWindow.moduleSelector().selectModule('Welcome')
+        # layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutFourUpView)    
+        # addDataDialog=slicer.qSlicerDataDialog()
+        # qt.QTimer.singleShot(0, lambda: addDataDialog.exec())
+        # self.delayDisplay('Screenshot #1: Click in Add Data button')
+        # ww = slicer.app.activeWindow()
+        # ww.close()
 
         # 2 shot: Load BrainMRI_Glioma data
 
-        # Carregar os volumes
         brain_glioma_folder = os.path.join(extract_path, "dataset4_BrainMRI_Glioma")
         braTS_t1c_path = os.path.join(brain_glioma_folder, "BraTS-GLI-00006-000-t1c.nii.gz")
         braTS_t1n_path = os.path.join(brain_glioma_folder, "BraTS-GLI-00006-000-t1n.nii.gz")
@@ -316,40 +314,32 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         mainWindow.moduleSelector().selectModule('DICOM')
         ct_thorax_folder = os.path.join(extract_path, "dataset1_ThoraxAbdomenCT")
         
-        # Criar/configurar banco de dados DICOM
         import DICOMLib
         from DICOMLib import DICOMUtils
         
-        # Obter ou criar o banco de dados DICOM
         dicomDatabase = slicer.dicomDatabase
         if not dicomDatabase:
-            # Se não existe, criar um banco temporário
             dicomDatabasePath = os.path.join(slicer.app.temporaryPath, "DICOMDatabase")
             if not os.path.exists(dicomDatabasePath):
                 os.makedirs(dicomDatabasePath)
             
-            # Inicializar o banco de dados
             dicomWidget = slicer.modules.dicom.widgetRepresentation().self()
             dicomWidget.onDatabaseDirectoryChanged(dicomDatabasePath)
             dicomDatabase = slicer.dicomDatabase
         
-        # Importar arquivos DICOM
-        self.delayDisplay('Importando arquivos DICOM...')
+        self.delayDisplay('Importing DICOM files...')
         DICOMUtils.importDicom(ct_thorax_folder)
         
-        # Aguardar a importação ser concluída
         import time
         time.sleep(2)
         slicer.app.processEvents()
         
-        # Carregar os dados DICOM
-        self.delayDisplay('Carregando dados DICOM...')
+        self.delayDisplay('Loading DICOM data...')
         dicomFiles = slicer.util.getFilesInDirectory(ct_thorax_folder)
         loadablesByPlugin, loadEnabled = DICOMLib.getLoadablesFromFileLists([dicomFiles])
         loadedNodeIDs = DICOMLib.loadLoadables(loadablesByPlugin)
         
-        # Aguardar o carregamento ser concluído e verificar se os nós foram criados
-        max_wait_time = 30  # 30 segundos no máximo
+        max_wait_time = 30
         start_time = time.time()
         ct_node = None
         
@@ -357,26 +347,22 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
             slicer.app.processEvents()
             time.sleep(0.5)
             
-            # Procurar especificamente pelo nó "6: CT_Thorax_Abdomen"
             try:
                 ct_node = slicer.util.getNode("6: CT_Thorax_Abdomen")
                 if ct_node:
-                    print(f"Nó DICOM encontrado: {ct_node.GetName()}")
                     break
             except:
-                # Se não encontrar com o nome exato, procurar por padrão similar
                 volumeNodes = slicer.util.getNodesByClass('vtkMRMLScalarVolumeNode')
                 for node in volumeNodes:
                     nodeName = node.GetName()
                     if 'CT_Thorax_Abdomen' in nodeName:
                         ct_node = node
-                        print(f"Nó DICOM encontrado: {nodeName}")
                         break
         
         if ct_node is None:
-            raise Exception("Falha ao carregar dados DICOM. Nó '6: CT_Thorax_Abdomen' não foi encontrado.")
+            raise Exception("Failed to load DICOM data. Node '6: CT_Thorax_Abdomen' not found.")
         
-        self.delayDisplay(f'Dados DICOM carregados: {ct_node.GetName()}')
+        self.delayDisplay(f'DICOM data loaded: {ct_node.GetName()}')
         
         # TUTORIALMAKER SCREENSHOT
         self.delayDisplay('Screenshot #1: DICOM module selected')
@@ -393,7 +379,6 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
 
         # 3 shot: Select volume input
         nodeSelectorTc = slicer.util.findChild(slicer.util.mainWindow(), "inputNodeSelector0")
-        # Usar o nó CT que foi encontrado anteriormente
         nodeSelectorTc.setCurrentNode(ct_node)
 
         # TUTORIALMAKER SCREENSHOT

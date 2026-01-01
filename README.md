@@ -2,8 +2,8 @@
 
 The Slicer Tutorial Maker is an extension to 3D Slicer to streamline the creation of 3D Slicer tutorials in multiple languages. The sections below provide a user guide to the tool.
 
-[Documentação em Português](https://github.com/SlicerLatinAmerica/SlicerTutorialMaker/blob/main/README_pt-br.md)
-[Documentación en Español](https://github.com/SlicerLatinAmerica/SlicerTutorialMaker/blob/main/README_esp.md)
+[Documentação em Português](https://github.com/SoniaPujolLab/SlicerTutorialMaker/blob/main/README_pt-br.md)
+[Documentación en Español](https://github.com/SoniaPujolLab/SlicerTutorialMaker/blob/main/README_esp.md)
 
 ### Installation (Using Extension Manager)
 - Install [3D Slicer 5.9.0-2025-01-28](https://download.slicer.org/) preview version or [latest stable available](https://download.slicer.org/)
@@ -17,7 +17,7 @@ The Slicer Tutorial Maker is an extension to 3D Slicer to streamline the creatio
 Follow these steps if you want to get the latest version of the extension before the preview build (which occurs in the morning ~9 EST).
 
 - Install the latest [3D Slicer Stable Release](https://download.slicer.org/) or [3D Slicer Preview Release](https://download.slicer.org/)
-- Open the [Tutorial Maker repository on GitHub](https://github.com/SlicerLatinAmerica/TutorialMaker)
+- Open the [Tutorial Maker repository on GitHub](https://github.com/SoniaPujolLab/TutorialMaker)
 - Clone the green button Code' and select the option 'Download ZIP' as displayed in the image below to download the file 'TutorialMaker.zip' on your computer
 - Unzip the 'TutorialMaker.zip' archive to access the 'TutorialMaker-main' directory
 - **Windows users** :
@@ -25,7 +25,7 @@ Follow these steps if you want to get the latest version of the extension before
   2. Drag and drop the `TutorialMaker` folder to the Slicer application window
   3. A first pop-up window, 'Select a reader,' appears. Select 'Add Python scripted modules to the application' and click OK.
   4. A second pop-up window appears to load the Tutorial Maker module. Click on 'Yes'.
-![TutorialMakerInstall](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
+![TutorialMakerInstall](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
 
 - **MacOs users**:
    1. Start 3D Slicer
@@ -34,7 +34,7 @@ Follow these steps if you want to get the latest version of the extension before
    4. A 'Parameters' window appears: select 'Modules' in the left panel
    5. Select the file 'TutoriaMaker.py'
    6. Drag and drop the file `TutorialMaker.py` located in the sub-directory 'TutorialMaker-main/TutorialMaker/'into the field 'Additional module paths' and click on OK to restart Slicer
-![TutorialMakerInstallMac](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
+![TutorialMakerInstallMac](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
 
 
 ### How to use Tutorial Maker
@@ -59,7 +59,7 @@ Follow these steps if you want to get the latest version of the extension before
 - After selecting a tool, specify the style and the text of the annotation
 ![image](https://github.com/user-attachments/assets/0dfcace2-cacb-4c09-8f5e-d01bbadbc82f)
 - Then click on the element that will receive the annotation
-![TutorialMakenAnnotation](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/49ef485f-c880-4a96-b4b5-75304752e5dc)
+![TutorialMakenAnnotation](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/49ef485f-c880-4a96-b4b5-75304752e5dc)
 
 > [!WARNING]
 > For people who have epilepsy, the screen will blink for each screenshot.
@@ -71,11 +71,11 @@ Follow these steps if you want to get the latest version of the extension before
 > For people who have epilepsy, don't run the translation. The screen will blink for each screenshot.
 
 - And then click on the "Test Translation" button
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/dae305bc-3fd1-4a7a-87b4-6e724037e728)
+![image](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/dae305bc-3fd1-4a7a-87b4-6e724037e728)
 -->
 The Screenshots with Annotations are now saved in the Module folder under Outputs;
 
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
+![image](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
 
 <!-- ### Writing tutorials
 TODO: Create the "developer manual" to create new tutorials.
