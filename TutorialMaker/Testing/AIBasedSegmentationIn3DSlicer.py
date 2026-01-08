@@ -16,6 +16,106 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
 
+    def findModelId(self, preferredModelId, logic=None):
+        """
+        Find a model ID with fallback support.
+        If the exact model ID is not found, searches for the latest version with the same base name.
+        
+        Args:
+            preferredModelId (str): The preferred model ID (e.g., "prostate-v1.0.1")
+            logic: MONAIAuto3DSegLogic instance (optional, will create if not provided)
+        
+        Returns:
+            str: The model ID to use (exact match or latest version fallback)
+        
+        Examples:
+            >>> self.findModelId("prostate-v1.0.1")
+            "prostate-v1.0.1"  # if exists
+            "prostate-v1.0.2"  # if v1.0.1 doesn't exist but v1.0.2 does
+        """
+        if logic is None:
+            import MONAIAuto3DSeg
+            logic = MONAIAuto3DSeg.MONAIAuto3DSegLogic()
+        
+        # First, try to find exact match
+        for model in logic.models:
+            if model["id"] == preferredModelId:
+                print(f"Model found: {preferredModelId}")
+                return preferredModelId
+        
+        # If exact match not found, extract base name and find latest version
+        # Example: "prostate-v1.0.1" -> base: "prostate"
+        import re
+        match = re.match(r"^(.+)-v\d+\.\d+\.\d+$", preferredModelId)
+        if match:
+            baseName = match.group(1)
+            print(f"Exact model '{preferredModelId}' not found. Searching for latest '{baseName}' version...")
+            
+            # Find all models matching the base name
+            matchingModels = []
+            for model in logic.models:
+                if model["id"].startswith(baseName + "-v"):
+                    matchingModels.append(model)
+            
+            if matchingModels:
+                # Sort by version (models are already sorted by version, first is latest)
+                latestModel = matchingModels[0]
+                print(f"Using fallback model: {latestModel['id']} (title: {latestModel['title']})")
+                return latestModel["id"]
+        
+        # If still not found, raise an error
+        raise ValueError(f"Model '{preferredModelId}' not found and no fallback available. Available models: {[m['id'] for m in logic.models[:5]]}...")
+    
+    def getModelSearchKeywords(self, modelId, logic=None):
+        """
+        Get translated search keywords from model title.
+        Extracts 1-2 key words from the model's translated title to display in search box.
+        
+        Args:
+            modelId (str): The model ID to get keywords for
+            logic: MONAIAuto3DSegLogic instance (optional, will create if not provided)
+        
+        Returns:
+            str: 1-2 key words from the translated model title
+        
+        Examples:
+            >>> self.getModelSearchKeywords("prostate-v1.0.1")
+            "Prostate"  # or translated version like "Próstata" in Portuguese
+            >>> self.getModelSearchKeywords("brats-gli-v1.0.0")
+            "Brain Tumor" or "BRATS GLI"
+        """
+        if logic is None:
+            import MONAIAuto3DSeg
+            logic = MONAIAuto3DSeg.MONAIAuto3DSegLogic()
+        
+        from slicer.i18n import translate
+        
+        # Find the model
+        for model in logic.models:
+            if model["id"] == modelId:
+                # Get translated title
+                translatedTitle = translate("Models", model["title"])
+                
+                # Extract meaningful keywords (skip common words like "segmentation", "quick", etc.)
+                skipWords = ["segmentation", "quick", "-", "ts1", "ts2", "v1", "v2"]
+                words = translatedTitle.split()
+                keywords = []
+                
+                for word in words:
+                    if word.lower() not in skipWords and len(word) > 2:
+                        keywords.append(word)
+                        if len(keywords) >= 2:  # Get first 2 meaningful words
+                            break
+                
+                # Return keywords
+                if keywords:
+                    return " ".join(keywords)
+                else:
+                    # Fallback to first word of title
+                    return words[0] if words else ""
+        
+        return ""
+
     def setUp(self):
         """ Do whatever is needed to reset the state - typically a scene clear will be enough.
         """
@@ -140,15 +240,23 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         
         # 5 shot: Select Prostate segmentation model
         modMenu.close()
+        
+        # Use model ID instead of translated title for language-independent selection
+        import MONAIAuto3DSeg
+        logic = MONAIAuto3DSeg.MONAIAuto3DSegLogic()
+        
+        # Set the model directly by ID with fallback support
+        modelId = self.findModelId("prostate-v1.0.1", logic)
+        parameterNode = logic.getParameterNode()
+        parameterNode.SetParameter("Model", modelId)
+        
+        # Set search box with translated keywords for visual feedback
         searchBox = slicer.util.findChild(slicer.util.mainWindow(), "modelSearchBox")
-        searchBox.setText("Prostate")
+        searchKeywords = self.getModelSearchKeywords(modelId, logic)
+        searchBox.setText(searchKeywords)
 
         # TUTORIALMAKER SCREENSHOT
-        self.delayDisplay('Screenshot #6: Prostate model filtered')
-
-        # 6 Shot: Select prostate model
-        modelCombo = slicer.util.findChild(slicer.util.mainWindow(), "modelComboBox")
-        modelCombo.setCurrentItem(modelCombo.findItems("Prostate", qt.Qt.MatchContains)[0])
+        self.delayDisplay('Screenshot #6: Prostate model selected')
 
         # TUTORIALMAKER SCREENSHOT
         self.delayDisplay('Screenshot #6: Prostate model selected and ready to run')
@@ -237,11 +345,14 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         # 3 shot: Open module selector and select Segmentation
         mainWindow.moduleSelector().selectModule('MONAIAuto3DSeg')
 
-        #searchBox = slicer.util.findChild(slicer.util.mainWindow(), "modelSearchBox")
-        searchBox.setText("(BRATS) GLI")
-
-        #modelCombo = slicer.util.findChild(slicer.util.mainWindow(), "modelComboBox")
-        modelCombo.setCurrentItem(modelCombo.findItems("(BRATS) GLI", qt.Qt.MatchContains)[0])
+        # Use model ID instead of translated title for language-independent selection with fallback
+        modelId = self.findModelId("brats-gli-v1.0.0", logic)
+        parameterNode.SetParameter("Model", modelId)
+        
+        # Set search box with translated keywords for visual feedback
+        searchBox = slicer.util.findChild(slicer.util.mainWindow(), "modelSearchBox")
+        searchKeywords = self.getModelSearchKeywords(modelId, logic)
+        searchBox.setText(searchKeywords)
 
         # TUTORIALMAKER SCREENSHOT
         self.delayDisplay('Screenshot #3: Brain Tumor Segmentation (BRATS) GLI model selected and ready to run')
@@ -371,8 +482,14 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         mainWindow.moduleSelector().selectModule('MONAIAuto3DSeg')
         layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutConventionalWidescreenView)    
 
-        searchBox.setText("TS1 -")
-        modelCombo.setCurrentItem(modelCombo.findItems("TS1 -", qt.Qt.MatchContains)[0])
+        # Use model ID instead of translated title for language-independent selection with fallback
+        modelId = self.findModelId("whole-body-3mm-v1.0.0", logic)
+        parameterNode.SetParameter("Model", modelId)
+        
+        # Set search box with translated keywords for visual feedback
+        searchBox = slicer.util.findChild(slicer.util.mainWindow(), "modelSearchBox")
+        searchKeywords = self.getModelSearchKeywords(modelId, logic)
+        searchBox.setText(searchKeywords)
         
         # TUTORIALMAKER SCREENSHOT
         self.delayDisplay('Screenshot #3: Whole Body Segmentation (TS1 - quick) model selected and ready to run')
