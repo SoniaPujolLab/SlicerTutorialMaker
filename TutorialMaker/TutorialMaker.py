@@ -66,7 +66,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.__selectedTutorial = None
         self.isDebug = slicer.app.settings().value("Developer/DeveloperMode")
 
-        print(_("Version Date: {}").format("2025/20/12-08:00AM"))
+        print(_("Version Date: {}").format("2026/01/01-08:00AM"))
 
         #PROTOTYPE FOR PLAYBACK
 
@@ -310,7 +310,8 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             return
         
         fileToLoad = rawTutorialPath
-        if os.path.exists(annotationsPath):
+        #TODO: enable option to load existing annotations, this will divide the button action in two different ones
+        if False:
             loadAnnotations = slicer.util.confirmYesNoDisplay(
                 _("An existing annotations file was found.\n\n"
                   "Would you like to load the existing annotations?\n\n"

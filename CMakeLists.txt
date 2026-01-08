@@ -4,8 +4,8 @@ project(TutorialMaker)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
-set(EXTENSION_HOMEPAGE "https://github.com/SlicerLatinAmerica/SlicerTutorialMaker")
-set(EXTENSION_CATEGORY "Developer Tools")
+set(EXTENSION_HOMEPAGE "https://github.com/SoniaPujolLab/SlicerTutorialMaker")
+set(EXTENSION_CATEGORY "Utilities")
 set(EXTENSION_CONTRIBUTORS "Douglas Gonçalves (Universidade de São Paulo), Enrique Hernández (Universidad Autónoma del Estado de México),
                                     João Januário (Universidade de São Paulo), Lucas Silva (Universidade de São Paulo),
                                     Paulo Pereira (Universidade de São Paulo), Victor Montaño (Universidad Autónoma del Estado de México),
@@ -17,8 +17,8 @@ set(EXTENSION_CONTRIBUTORS "Douglas Gonçalves (Universidade de São Paulo), Enr
                                     Sonia Pujol (Brigham and Women’s Hospital, Harvard Medical School)")
 set(EXTENSION_DESCRIPTION "The Tutorial Maker is still under development and is in an experimental phase.
                            Tools for creating tutorials for 3D Slicer that can be automatically translated to multiple languages.")
-set(EXTENSION_ICONURL "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/TutorialMaker.png")
-set(EXTENSION_SCREENSHOTURLS "https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/annotations.png https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/annotations2.png https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/GUIdeveloped.png https://raw.githubusercontent.com/SlicerLatinAmerica/SlicerTutorialMaker/main/DOCS/pdf.png")
+set(EXTENSION_ICONURL "https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/TutorialMaker.png")
+set(EXTENSION_SCREENSHOTURLS "https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo1.png https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo2.png https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo3.png https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo4.png")
 set(EXTENSION_DEPENDS "NA") # Specified as a list or "NA" if no dependencies
 
 #-----------------------------------------------------------------------------
