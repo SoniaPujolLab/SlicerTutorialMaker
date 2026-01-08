@@ -228,7 +228,7 @@ class TutorialGUI(qt.QMainWindow):
         self.selectedAnnotation = None
 
         _penSettings = {"color": qt.QColor(255, 128, 0),
-                       "fontSize": 14,
+                       "fontSize": 24,
                        "penThickness": 4}
 
         self.penSettings = _penSettings
@@ -1224,7 +1224,7 @@ class TutorialGUI(qt.QMainWindow):
         self.widget_action = qt.QWidgetAction(self)
         self.widget_action.setDefaultWidget(self.text_in)
         toolbar.addAction(self.widget_action)
-        self.text_in.setPlaceholderText("Add text to accompany an arrow here.")
+        self.text_in.setPlaceholderText(_("Add text to accompany an arrow here."))
 
         self.load_icon = qt.QAction(qt.QIcon(self.dir_path+'/../Resources/Icons/ScreenshotAnnotator/image.png'), _("Load icon"), self)
         self.load_icon.setCheckable(True)
@@ -1249,9 +1249,9 @@ class TutorialGUI(qt.QMainWindow):
                 action.setChecked(False)
                 action.setIcon(icons['inactive'])
 
-    def images_selector(self, tutorialDara,index):
+    def images_selector(self, tutorialData,index):
         self.dialog = qt.QDialog()
-        self.dialog.setWindowTitle("Select the images")
+        self.dialog.setWindowTitle(_("Select the images"))
         self.dialog.setGeometry(100, 100, 800, 600) 
         
         self.listWidget = qt.QListWidget()
