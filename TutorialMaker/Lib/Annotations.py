@@ -55,6 +55,7 @@ class Annotation:
         self.boundingBoxTopLeft = [0,0]
         self.boundingBoxBottomRight = [0,0]
         self.__selectionSlideEffect = 0
+        self.extraOptions = {}
 
         # Need to change this later, make it loaded through resources
         #self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
@@ -78,6 +79,7 @@ class Annotation:
             state["penSettings"]["fontSize"],
             state["penSettings"]["thickness"]
         )
+        self.extraOptions = state["custom"]
         self.annotationOffset = state["windowOffset"]
         self.PERSISTENT = True
 
@@ -110,7 +112,7 @@ class Annotation:
                           "type": self.type.name,
                           "offset": [self.offsetX, self.offsetY],
                           "optional": [self.optX, self.optY],
-                          "custom": "",
+                          "custom": self.extraOptions,
                           "penSettings": {"color": self.color.name(),
                                           "thickness": self.thickness,
                                           "fontSize": self.fontSize},
@@ -314,12 +316,6 @@ class Annotation:
             brush.setStyle(qt.Qt.SolidPattern)
             painter.setBrush(brush)
 
-            # Padding
-
-            yPadding = 6
-            xPadding = 6
-            lineSpacing = 2
-
             optX = self.optX - targetCenter[0]
             optY = self.optY - targetCenter[1]
 
@@ -328,52 +324,114 @@ class Annotation:
             rectToDraw = qt.QRect(topLeft,bottomRight)
             painter.drawRect(rectToDraw)
 
-            # Calculate the text break and position
+            # Text Color
+            textColor = None
+            if not self.extraOptions:
+                textColor = "#000000"
+            else:
+                textColor = self.extraOptions["textColor"]
+
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
-            pen.setColor(qt.Qt.black)
+            pen.setColor(qt.QColor(textColor))
             painter.setPen(pen)
+            
+            # Padding
+            yPadding = 6
+            xPadding = 6
+            lineSpacing = 2
 
-            fontMetrics = qt.QFontMetrics(font)
-            fHeight = fontMetrics.height()
+            if not self.extraOptions or self.extraOptions["textAlign"] == "right":
 
-            textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
-            textBoxTopLeft = [targetPos[0], targetPos[1]]
+                # Calculate the text break and position
+                fontMetrics = qt.QFontMetrics(font)
+                fHeight = fontMetrics.height()
 
-            if textBoxBottomRight[0] < textBoxTopLeft[0]:
-                tmp = textBoxTopLeft[0]
-                textBoxTopLeft[0] = textBoxBottomRight[0]
-                textBoxBottomRight[0] = tmp
+                textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
+                textBoxTopLeft = [targetPos[0], targetPos[1]]
 
-            if textBoxBottomRight[1] < textBoxTopLeft[1]:
-                tmp = textBoxTopLeft[1]
-                textBoxTopLeft[1] = textBoxBottomRight[1]
-                textBoxBottomRight[1] = tmp
+                if textBoxBottomRight[0] < textBoxTopLeft[0]:
+                    tmp = textBoxTopLeft[0]
+                    textBoxTopLeft[0] = textBoxBottomRight[0]
+                    textBoxBottomRight[0] = tmp
 
-            textStart = [textBoxTopLeft[0] + xPadding,
-                         textBoxTopLeft[1] + yPadding + fHeight]
+                if textBoxBottomRight[1] < textBoxTopLeft[1]:
+                    tmp = textBoxTopLeft[1]
+                    textBoxTopLeft[1] = textBoxBottomRight[1]
+                    textBoxBottomRight[1] = tmp
 
-            textToWrite = self.text
-            if textToWrite == "":
-                textToWrite = _("Write something here")
+                textStart = [textBoxTopLeft[0] + xPadding,
+                             textBoxTopLeft[1] + yPadding + fHeight]
 
-            displayLines = []
-            textLines = textToWrite.splitlines()
-            for tLines in textLines:
-                textTokens = tLines.split()
-                line = ""
-                for token in textTokens:
-                    if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
-                        displayLines.append(copy.deepcopy(line))
-                        line = f"{token} "
-                        continue
-                    line += f"{token} "
-                displayLines.append(line)
+                textToWrite = self.text
+                if textToWrite == "":
+                    textToWrite = _("Write something here")
 
-            for lineIndex, line in enumerate(displayLines):
-                painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight*lineIndex, line)
+                displayLines = []
+                textLines = textToWrite.splitlines()
+                for tLines in textLines:
+                    textTokens = tLines.split()
+                    line = ""
+                    for token in textTokens:
+                        if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
+                            displayLines.append(copy.deepcopy(line))
+                            line = f"{token} "
+                            continue
+                        line += f"{token} "
+                    displayLines.append(line)
 
-            self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
+                for lineIndex, line in enumerate(displayLines):
+                    painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight*lineIndex, line)
+
+                self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
+
+            elif self.extraOptions["textAlign"] == "center":
+
+                # Calculate the text break and position
+
+                fontMetrics = qt.QFontMetrics(font)
+                fHeight = fontMetrics.height()
+
+                textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
+                textBoxTopLeft = [targetPos[0], targetPos[1]]
+
+                if textBoxBottomRight[0] < textBoxTopLeft[0]:
+                    tmp = textBoxTopLeft[0]
+                    textBoxTopLeft[0] = textBoxBottomRight[0]
+                    textBoxBottomRight[0] = tmp
+
+                if textBoxBottomRight[1] < textBoxTopLeft[1]:
+                    tmp = textBoxTopLeft[1]
+                    textBoxTopLeft[1] = textBoxBottomRight[1]
+                    textBoxBottomRight[1] = tmp
+
+                textStart = [textBoxTopLeft[0] + xPadding,
+                             textBoxTopLeft[1] + yPadding + fHeight]
+
+                textToWrite = self.text
+                if textToWrite == "":
+                    textToWrite = _("Write something here")
+
+                displayLines = []
+                textLines = textToWrite.splitlines()
+                for tLines in textLines:
+                    textTokens = tLines.split()
+                    line = ""
+                    for token in textTokens:
+                        if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
+                            displayLines.append(copy.deepcopy(line))
+                            line = f"{token} "
+                            continue
+                        line += f"{token} "
+                    displayLines.append(line)
+                
+                top_whitespace = ( (fHeight + lineSpacing)*len(displayLines) - lineSpacing + fHeight) - (textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding)
+
+                for lineIndex, line in enumerate(displayLines):
+                    right_whitespace = fontMetrics.width(line) - (textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding)
+                    painter.drawText(textStart[0] - right_whitespace/2, (textStart[1] - top_whitespace/2) + lineSpacing + fHeight*lineIndex, line)
+
+                self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
 
         elif self.type == AnnotationType.Click:
             bottomRight = [targetPos[0] + targetSize[0],
@@ -536,9 +594,14 @@ class AnnotatorSlide:
 class AnnotatedTutorial:
     
     @staticmethod
-    def GetLocalizedDict(lang, tutorialName = ""):
-        DefaultDictPath = f"{os.path.dirname(__file__)}/../Outputs" + "/Annotations/text_dict_default.json"
-        LocalizedDictPath = f"{os.path.dirname(__file__)}/../Outputs" + f"/Annotations/text_dict_{lang}.json"
+    def GetLocalizedDict(lang, tutorialName = "", path = ""):
+        if path == "":
+            annotationDir = f"{os.path.dirname(__file__)}/../Outputs" + "/Annotations"
+        else:
+            annotationDir = os.path.dirname(path)
+
+        DefaultDictPath = f"{annotationDir}/text_dict_default.json"
+        LocalizedDictPath = f"{annotationDir}/text_dict_{lang}.json"
         textDict = {}
         if os.path.isfile(LocalizedDictPath):
             with open(LocalizedDictPath, encoding='utf-8') as file:
@@ -585,7 +648,7 @@ class AnnotatedTutorial:
 
         slides : list[AnnotatorSlide] = []
 
-        textDict = AnnotatedTutorial.GetLocalizedDict(currentLanguage)
+        textDict = AnnotatedTutorial.GetLocalizedDict(currentLanguage, path=path)
 
         TutorialInfo = {
             "title": rawData["title"],
@@ -631,11 +694,14 @@ class AnnotatedTutorial:
                     windowOffset = slideMetadata[0]["position"]
 
             elif layoutSelected == AnnotatorSlideLayoutType.Cover:
+                slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
             
             elif layoutSelected == AnnotatorSlideLayoutType.Acknowledgment:
+                slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")
             else:
+                slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
 
             annotations = []
@@ -659,6 +725,7 @@ class AnnotatedTutorial:
                     annotationData["penSettings"]["fontSize"],
                     annotationData["penSettings"]["thickness"]
                 )
+                annotation.extraOptions = annotationData["custom"]
                 annotation.PERSISTENT = True
                 annotations.append(annotation)
             
