@@ -759,8 +759,8 @@ class TutorialAnnotator(qt.QMainWindow):
             AnnotatorSlideLayoutType.Blank
         )
         
-        #self.slideGalery.ExportSlide(1)
-        #self.slideGalery.ExportSlide(0)
+        self.slideGalery.ExportSlide(1)
+        self.slideGalery.ExportSlide(0)
 
         self.setupCustomSlides(pageWidget)
 
