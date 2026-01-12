@@ -124,6 +124,8 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         #Update GUI
         self.populateTutorialList()
 
+        self.tutorialSelectionChanged()
+
     def cleanup(self):
         # that will make an exception: AttributeError: 'NoneType' object has no attribute 'exitTutorialEditor'
         # self.logic.exitTutorialEditor()
@@ -180,9 +182,14 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.logic.OpenAnnotator(self.__selectedTutorial)
 
     def tutorialSelectionChanged(self):
-        self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
+        self.__selectedTutorial = None
+        try:
+            self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
+        except:
+            pass
         self.ui.pushButtonCapture.setEnabled(self.__selectedTutorial is not None)
         self.ui.pushButtonGenerate.setEnabled(self.__selectedTutorial is not None)
+        self.ui.pushButtonOpenAnnotator.setEnabled(self.__selectedTutorial is not None)
 
     def getFromGithub(self):
         slicer.util.infoDisplay(_("Fetching tutorials from GitHub.\n" 
