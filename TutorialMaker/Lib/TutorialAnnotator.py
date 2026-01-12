@@ -461,16 +461,18 @@ class TutorialAnnotator(qt.QMainWindow):
         self.selectedAnnotationType = AnnotationType.Selected
         self.selectedAnnotation.drawBoundingBox = True
 
-    def annotationHandler(self, appPos):
+    def annotationHandler(self, appPos, shiftMod = False):
         if self.selectedAnnotation is None or self.selectedAnnotation.PERSISTENT == True:
             return
         self.selectedAnnotation.PERSISTENT = True
         selectedAnnotation = self.selectedAnnotation
         self.finishCurrentAnnotation()
-
-        self.selectedAnnotation = selectedAnnotation
-        self.selectedAnnotationType = AnnotationType.Selected
-        self.selectedAnnotation.drawBoundingBox = True
+        if not shiftMod:
+            toolbar = self.centralWidget().findChild(qt.QToolBar, "toolBar_tools")
+            toolbar.actions()[0].trigger()
+            self.selectedAnnotation = selectedAnnotation
+            self.selectedAnnotationType = AnnotationType.Selected
+            self.selectedAnnotation.drawBoundingBox = True
 
     def previewAnnotation(self, appPos):
         if self.selectedAnnotator is None:
@@ -560,7 +562,7 @@ class TutorialAnnotator(qt.QMainWindow):
         if self.selectedAnnotationType == AnnotationType.Selecting:
             self.selectionHandler(event.pos())
             return
-        self.annotationHandler(event.pos())
+        self.annotationHandler(event.pos(), event.modifiers() == qt.Qt.ShiftModifier)
 
     def mouseReleaseEvent(self, event):
         pass
@@ -570,14 +572,14 @@ class TutorialAnnotator(qt.QMainWindow):
             self.previewAnnotation(event.pos())
 
     def keyboardEvent(self, event):
-        if event.key() == qt.Qt.Key_Escape:
-            self.setFocus()
-            return False
 
         if self.selectedAnnotationType == AnnotationType.Selected:
             if event.key() == qt.Qt.Key_Delete:
                 self.selectedAnnotation.PERSISTENT = False
                 self.finishCurrentAnnotation()
+            elif event.key() == qt.Qt.Key_Escape:
+                self.finishCurrentAnnotation()
+                self.selectedAnnotationType = AnnotationType.Selecting
 
             elif self.selectedAnnotation.type in [AnnotationType.TextBox, AnnotationType.ArrowText]:
                 # Detect command Ctrl+C copy text
@@ -608,6 +610,10 @@ class TutorialAnnotator(qt.QMainWindow):
             elif event.key() == qt.Qt.Key_Down:
                 self.selectorParentDelta(1)
                 return True
+            
+        if event.key() == qt.Qt.Key_Escape:
+            self.setFocus()
+            return False
 
         return False
     
