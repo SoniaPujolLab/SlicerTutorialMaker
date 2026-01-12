@@ -735,16 +735,38 @@ class TutorialAnnotator(qt.QMainWindow):
 
         _authors = Annotation(
             widget,
-            133, 301,
-            1116, 570,
+            133, 285,
+            1116, 365,
             self.tutorialInfo["author"],
             AnnotationType.TextBox
         )
         _authors.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
         _authors.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
 
+        _date = Annotation(
+            widget,
+            133, 368,
+            1116, 420,
+            self.tutorialInfo["date"],
+            AnnotationType.TextBox
+        )
+        _date.penConfig(qt.QColor(255, 255, 255), 18,14, brush=True)
+        _date.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+        _desc = Annotation(
+            widget,
+            133, 424,
+            1116, 600,
+            self.tutorialInfo["desc"],
+            AnnotationType.TextBox
+        )
+        _desc.penConfig(qt.QColor(255, 255, 255), 16,14, brush=True)
+        _desc.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
         coverPage.AddAnnotation(_title)
         coverPage.AddAnnotation(_authors)
+        coverPage.AddAnnotation(_date)
+        coverPage.AddAnnotation(_desc)
 
         # Acknownledgements Page
         _ackText = Annotation(
