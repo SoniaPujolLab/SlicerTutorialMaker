@@ -755,9 +755,19 @@ class AnnotatedTutorial:
         return [TutorialInfo, slides]
 
     @staticmethod
-    def SaveAnnotatedTutorial(tutorialInfo, slides : list[AnnotatorSlide]):
+    def SaveAnnotatedTutorial(tutorialInfo, slides : list[AnnotatorSlide], tutorialName = "", path = ""):
         import re
+        from pathlib import Path
         outputFolder = f"{os.path.dirname(__file__)}/../Outputs/Annotations"
+        if path:
+            outputFolder = path
+        if tutorialName:
+            outputFolder += f"/{tutorialName}"
+        
+        outputPath = Path(outputFolder)
+        outputPath.mkdir(parents=True, exist_ok=True)
+
+        outputFolder = outputPath.resolve()
 
         outputFileAnnotations = {**tutorialInfo}
         outputFileTextDict = {}
@@ -809,6 +819,8 @@ class AnnotatedTutorial:
 
         with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
+
+        return outputFolder
 
     @staticmethod
     def LoadAnnotatedTutorial_Legacy(path):

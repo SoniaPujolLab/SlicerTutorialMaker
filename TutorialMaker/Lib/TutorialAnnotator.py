@@ -3,6 +3,7 @@ import qt
 import json
 import os
 import copy
+import platform
 from Lib.Annotations import Annotation, AnnotationType, AnnotatorSlide, AnnotatedTutorial, AnnotatorSlideLayoutType
 from Lib.TutorialUtils import Tutorial, TutorialScreenshot
 
@@ -47,8 +48,6 @@ class TutorialAnnotator(qt.QMainWindow):
 
         # Need to do a overhaul of the preview function so this isn't necessary
         self.lastAppPos = qt.QPoint()
-        
-        self.outputFolder = f"{os.path.dirname(__file__)}/../Outputs/Annotations"
 
         # Tutorial Information
         self.tutorialInfo = {"name": "", "author" : "", "date": "", "desc": ""}
@@ -78,6 +77,8 @@ class TutorialAnnotator(qt.QMainWindow):
         self.setCentralWidget(UI_window)
 
         self.setWindowTitle(_("TutorialMaker - Annotator"))
+
+        self.statusbar = self.findChild(qt.QStatusBar, "statusbar")
 
         # Setup Slide
         self.selectedSlideWidget = self.findChild(qt.QLabel, "label_selectedSlide")
@@ -307,9 +308,32 @@ class TutorialAnnotator(qt.QMainWindow):
 
     def saveAnnotations(self):
         slides : list[AnnotatorSlide] = []
+        savePath : str = "" 
         for slide in self.slides:
             slides.append(slide.Slide)
-        AnnotatedTutorial.SaveAnnotatedTutorial(self.tutorialInfo, slides)
+        try:
+            savePath = AnnotatedTutorial.SaveAnnotatedTutorial(self.tutorialInfo, slides, self.outputName)
+            self.statusbar.showMessage(_("Annotations saved"), 5000)
+        except Exception as e:
+            print(e)
+            self.statusbar.showMessage(_("Exception while trying to save annotations"), 10000)
+
+        if not savePath:
+                return
+        
+        try:
+            if platform.system() == "Windows":
+                    try:
+                        import subprocess
+                        subprocess.Popen(["explorer", os.path.realpath(savePath)])
+                    except Exception as e:
+                        print("The folder could not be opened:", e)
+            else:
+                import subprocess, sys
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, savePath])
+        except:
+            pass
         pass
 
     def deleteSelectedAnnotation(self):
