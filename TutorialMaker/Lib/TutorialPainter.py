@@ -827,7 +827,7 @@ class TutorialPainter:
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Acknowledgment:
                 page = Exporter.BackCoverSlide(
                     slide.SlideTitle or "Acknowledgments",
-                    slide.SlideBody 
+                    slide.annotations[1].text
                 )
 
 
