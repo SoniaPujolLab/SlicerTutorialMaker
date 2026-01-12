@@ -267,7 +267,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
 
     def Generate(self, tutorialName):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
-        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
+        annotationsPath = modulePath + f"/Outputs/Annotations/{tutorialName}/annotations.json"
         
         if not os.path.exists(annotationsPath):
             slicer.util.warningDisplay(
@@ -301,7 +301,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
 
     def OpenAnnotator(Self, tutorialName = ""):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
-        rawTutorialPath = modulePath + "/Outputs/Raw/Tutorial.json"
+        rawTutorialPath = modulePath + f"/Outputs/Raw/{tutorialName}/Tutorial.json"
         annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
         
         if not os.path.exists(rawTutorialPath):
@@ -378,6 +378,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         module.  For example, if a developer removes a feature that you depend on,
         your test should break so they know that the feature is needed.
         """
+        os.environ["TUTORIAL_CURRENT_SELFTEST"] = tutorial_name
         tPath = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + f"/Testing/{tutorial_name}.py"
         SelfTestTutorialLayer.ParseTutorial(tPath)
         import sys

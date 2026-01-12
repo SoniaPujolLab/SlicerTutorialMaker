@@ -678,7 +678,7 @@ class AnnotatedTutorial:
                 rawStepPaths : list[str] = []
                 for rawSlides in slideData['SlideCode']:
                     slideStep, windowIndex = rawSlides.split("/")
-                    rawStepPaths.append(f"{outputFolder}/Raw/{slideStep}/{windowIndex}")
+                    rawStepPaths.append(f"{outputFolder}/Raw/{os.environ["TUTORIAL_CURRENT_SELFTEST"]}/{slideStep}/{windowIndex}")
 
                 if len(rawStepPaths) == 1:
                     tsParser = TutorialScreenshot()
