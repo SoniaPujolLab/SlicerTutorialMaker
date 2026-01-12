@@ -342,7 +342,6 @@ class Annotation:
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
             pen.setColor(qt.QColor(textColor))
-            painter.setPen(pen)
             
             # Padding
             yPadding = 6
@@ -375,6 +374,9 @@ class Annotation:
                 if textToWrite == "":
                     textToWrite = _("Write your text here")
 
+                maxWidth = 0
+                maxHeight = 0
+
                 displayLines = []
                 textLines = textToWrite.splitlines()
                 for tLines in textLines:
@@ -382,16 +384,33 @@ class Annotation:
                     line = ""
                     for token in textTokens:
                         if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
-                            displayLines.append(copy.deepcopy(line))
+                            if line:
+                                displayLines.append(copy.deepcopy(line))
                             line = f"{token} "
                             continue
                         line += f"{token} "
                     displayLines.append(line)
 
+                for line in displayLines:
+                    if fontMetrics.width(line) > maxWidth:
+                        maxWidth = fontMetrics.width(line)
+                
+                maxHeight = len(displayLines)*(fHeight + lineSpacing) - lineSpacing
+
+                textFitBottomRight = [textBoxTopLeft[0] + 2*xPadding + maxWidth,textBoxTopLeft[1] + 2*yPadding + maxHeight]
+                finalRectBottomRight = [max(textBoxBottomRight[0], textFitBottomRight[0]), max(textBoxBottomRight[1], textFitBottomRight[1])]
+
+                painter.drawRect(qt.QRect(
+                    qt.QPoint(*textBoxTopLeft),
+                    qt.QPoint(*finalRectBottomRight)
+                ))
+
+                painter.setPen(pen)
+
                 for lineIndex, line in enumerate(displayLines):
                     painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight*lineIndex, line)
 
-                self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
+                self.setSelectionBoundingBox(*textBoxTopLeft, *finalRectBottomRight)
 
             elif self.extraOptions["textAlign"] == "center":
 
@@ -433,7 +452,20 @@ class Annotation:
                         line += f"{token} "
                     displayLines.append(line)
                 
+                while True:
+                    fHeight = fontMetrics.height()
+                    maxHeight = len(displayLines)*(fHeight + lineSpacing) - lineSpacing
+                    if maxHeight < textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding*2:
+                        break
+                    font.setPointSize(font.pointSize() - 1)
+                    fontMetrics = qt.QFontMetrics(font)
+                    if font.pointSize() < 1:
+                        break
+
                 top_whitespace = ( (fHeight + lineSpacing)*len(displayLines) - lineSpacing + fHeight) - (textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding)
+                painter.setFont(font)
+
+                painter.setPen(pen)
 
                 for lineIndex, line in enumerate(displayLines):
                     right_whitespace = fontMetrics.width(line) - (textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding)
