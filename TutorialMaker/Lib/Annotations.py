@@ -462,7 +462,7 @@ class Annotation:
                     if font.pointSize() < 1:
                         break
 
-                top_whitespace = ( (fHeight + lineSpacing)*len(displayLines) - lineSpacing + fHeight) - (textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding)
+                top_whitespace = ( (fHeight + lineSpacing)*len(displayLines) - lineSpacing + fHeight/2) - (textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding)
                 painter.setFont(font)
 
                 painter.setPen(pen)
