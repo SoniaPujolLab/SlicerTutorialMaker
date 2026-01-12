@@ -432,9 +432,6 @@ class Annotation:
                     textBoxTopLeft[1] = textBoxBottomRight[1]
                     textBoxBottomRight[1] = tmp
 
-                textStart = [textBoxTopLeft[0] + xPadding,
-                             textBoxTopLeft[1] + yPadding + fHeight]
-
                 textToWrite = self.text
                 if textToWrite == "":
                     textToWrite = _("Write something here")
@@ -461,6 +458,9 @@ class Annotation:
                     fontMetrics = qt.QFontMetrics(font)
                     if font.pointSize() < 1:
                         break
+                
+                textStart = [textBoxTopLeft[0] + xPadding,
+                             textBoxTopLeft[1] + yPadding + fHeight]
 
                 top_whitespace = ( (fHeight + lineSpacing)*len(displayLines) - lineSpacing + fHeight/2) - (textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding)
                 painter.setFont(font)
