@@ -105,7 +105,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
         self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
-        self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.logic.OpenAnnotator)
+        self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.openAnnotatorButton)
         self.ui.pushButtonFetchFromGithub.connect('clicked(bool)', self.getFromGithub)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
@@ -175,6 +175,9 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
 
     def captureButton(self):
         self.logic.Capture(self.__selectedTutorial)
+
+    def openAnnotatorButton(self):
+        self.logic.OpenAnnotator(self.__selectedTutorial)
 
     def tutorialSelectionChanged(self):
         self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
@@ -296,7 +299,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         Tutorial_Win.show()
         pass
 
-    def OpenAnnotator(Self):
+    def OpenAnnotator(Self, tutorialName = ""):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
         rawTutorialPath = modulePath + "/Outputs/Raw/Tutorial.json"
         annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
@@ -323,6 +326,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
                 fileToLoad = annotationsPath
 
         Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
+        Annotator.forceTutorialOutputName(tutorialName)
         Annotator.openJsonFile(fileToLoad)
         Annotator.show()
         pass
