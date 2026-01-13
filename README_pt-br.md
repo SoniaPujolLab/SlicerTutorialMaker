@@ -3,7 +3,7 @@
 ### Instalação
 
 - Instale a versão mais recente do [Slicer Stable Release](https://download.slicer.org/) (atualmente 3D Slicer-5.6.2)
-- Abra o [repositório do Tutorial Maker no GitHub](https://github.com/SlicerLatinAmerica/TutorialMaker)
+- Abra o [repositório do Tutorial Maker no GitHub](https://github.com/SoniaPujolLab/TutorialMaker)
 - Clique no botão verde ‘Código’ e selecione a opção ‘Baixar ZIP’, conforme mostrado na imagem abaixo, para baixar o arquivo ‘TutorialMaker.zip’ em seu computador
 - Extraia o arquivo ‘TutorialMaker.zip’ para acessar o diretório ‘TutorialMaker-main’
 - **Usuários do Windows**:
@@ -11,7 +11,7 @@
   2. Araste e solte a pasta `TutorialMaker` para a janela do aplicativo Slicer
   3. Aparecerá uma primeira janela pop-up, ‘Selecionar um leitor’. Selecione ‘Adicionar módulos em Python ao aplicativo’ e clique em OK.
   4. Uma segunda janela pop-up aparecerá para carregar o módulo do Tutorial Maker. Clique em ‘Sim’.
-![TutorialMakerInstall](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
+![TutorialMakerInstall](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
 
 - **Usuários do MacOs**:
   1. Inicie o 3D Slicer
@@ -20,7 +20,7 @@
   4. Uma janela 'Parâmetros' aparecerá: selecione 'Módulos' no painel à esquerda
   5. Selecione o arquivo 'TutorialMaker.py'
   6. Arraste e solte o arquivo `TutorialMaker.py`, localizado no subdiretório 'TutorialMaker-main/TutorialMaker/', no campo 'Caminhos adicionais de módulos' e clique em 'OK' para reiniciar o Slicer.
-![TutorialMakerInstallMac](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
+![TutorialMakerInstallMac](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
 
 
 ### Como usar o Tutorial Maker
@@ -58,11 +58,11 @@
 > Para pessoas com epilepsia, não execute a tradução. A tela piscará a cada captura de tela.
 
 - Em seguida, clique em "Testar Tradução"
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/dae305bc-3fd1-4a7a-87b4-6e724037e728)
+![image](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/dae305bc-3fd1-4a7a-87b4-6e724037e728)
 -->
 As capturas de tela com anotações agora são salvas na pasta Módulo em Saídas/Tradução
 
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
+![image](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
 
 <!-- ### Redação de tutoriais
 TODO: Criar o "manual do desenvolvedor" para criar novos tutoriais.
