@@ -337,10 +337,10 @@ class TutorialAnnotator(qt.QMainWindow):
         pass
 
     def deleteSelectedAnnotation(self):
-        self.selectedAnnotation = None
-        if self.selectedAnnotationType == AnnotationType.Selected:
-            self.selectedAnnotationType = AnnotationType.Selecting
-        pass
+        if self.selectedAnnotator.SlideLayout in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment:
+            return
+        self.selectedAnnotation.PERSISTENT = False
+        self.finishCurrentAnnotation()
 
     def deleteSlide(self):
         if not self.slides:
@@ -351,7 +351,7 @@ class TutorialAnnotator(qt.QMainWindow):
         if self.slides:
             self.changeSelectedSlide(self.slides[min(self.selectedSlideIndex, len(self.slides) - 1)])
 
-    def addScreenshotSlide(self, slideImage:qt.QPixmap=None, metadata:list=None, type_ = AnnotatorSlideLayoutType.Blank, index : int = 0, path : list[str] = ["0/0"]):
+    def addScreenshotSlide(self, slideImage:qt.QPixmap=None, metadata:list=None, type_ = AnnotatorSlideLayoutType.Blank, index : int = 0, path : list[str] = ["0/0"], annotations : list[Annotation] = None):
 
         if slideImage is None:
             slideImage = qt.QPixmap(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
@@ -366,7 +366,7 @@ class TutorialAnnotator(qt.QMainWindow):
             except:
                 pass
         
-        newSlide = AnnotatorSlide(slideImage, metadata, WindowOffset=windowOffset)
+        newSlide = AnnotatorSlide(slideImage, metadata, Annotations=annotations, WindowOffset=windowOffset)
         newSlide.SlideLayout = type_
         newSlide.screenshotPaths = path
 
@@ -599,8 +599,7 @@ class TutorialAnnotator(qt.QMainWindow):
 
         if self.selectedAnnotationType == AnnotationType.Selected:
             if event.key() == qt.Qt.Key_Delete:
-                self.selectedAnnotation.PERSISTENT = False
-                self.finishCurrentAnnotation()
+                self.deleteSelectedAnnotation()
             elif event.key() == qt.Qt.Key_Escape:
                 self.finishCurrentAnnotation()
                 self.selectedAnnotationType = AnnotationType.Selecting
@@ -717,80 +716,6 @@ class TutorialAnnotator(qt.QMainWindow):
                 return False
         return False
     
-    def setupCustomSlides(self, widget):
-        # Instead of doing this we should prefab the customs slides and just load them
-        coverPage : AnnotatorSlide = self.slides[0].Slide
-        ackPage : AnnotatorSlide = self.slides[1].Slide
-
-        # Cover Page
-        _title = Annotation(
-            widget,
-            133, 150,
-            1116, 274,
-            self.tutorialInfo["title"],
-            AnnotationType.TextBox
-        )
-        _title.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
-        _title.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
-
-        _authors = Annotation(
-            widget,
-            133, 285,
-            1116, 365,
-            self.tutorialInfo["author"],
-            AnnotationType.TextBox
-        )
-        _authors.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
-        _authors.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
-
-        _date = Annotation(
-            widget,
-            133, 368,
-            1116, 420,
-            self.tutorialInfo["date"],
-            AnnotationType.TextBox
-        )
-        _date.penConfig(qt.QColor(255, 255, 255), 18,14, brush=True)
-        _date.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
-
-        _desc = Annotation(
-            widget,
-            133, 424,
-            1116, 600,
-            self.tutorialInfo["desc"],
-            AnnotationType.TextBox
-        )
-        _desc.penConfig(qt.QColor(255, 255, 255), 16,14, brush=True)
-        _desc.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
-
-        coverPage.AddAnnotation(_title)
-        coverPage.AddAnnotation(_authors)
-        coverPage.AddAnnotation(_date)
-        coverPage.AddAnnotation(_desc)
-
-        # Acknownledgements Page
-        _ackText = Annotation(
-            widget,
-            294, 177,
-            985, 327,
-            _("Acknowledgements"),
-            AnnotationType.TextBox
-        )
-        _ackText.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
-        _ackText.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
-
-        _ack = Annotation(
-            widget,
-            294, 360,
-            985, 610,
-            "",
-            AnnotationType.TextBox
-        )
-        _ack.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
-        _ack.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
-
-        ackPage.AddAnnotation(_ackText)
-        ackPage.AddAnnotation(_ack)
                        
     def loadImagesAndMetadata(self, tutorialData):
         # Setup the Cover and Acknownledgments slides
@@ -813,8 +738,6 @@ class TutorialAnnotator(qt.QMainWindow):
         
         self.slideGalery.ExportSlide(1)
         self.slideGalery.ExportSlide(0)
-
-        self.setupCustomSlides(pageWidget)
 
         for stepIndex, screenshots in enumerate(tutorialData.steps):
             slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
@@ -1113,7 +1036,10 @@ class SlideGalery(qt.QDialog):
         self.setLayout(main_layout)
 
     def ExportSlide(self, index):
-        self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex, self.slides[index]["path"])
+        annotations = None
+        if self.slides[index]["type"] in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank:
+            annotations = self._mountCustomSlide(self.slides[index])
+        self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex, self.slides[index]["path"], annotations)
 
 
     def AddSlide(self, image : qt.QPixmap, metadata : list = [], _type = AnnotatorSlideLayoutType.Blank, path : list[str] = ["0/0"]):
@@ -1142,4 +1068,105 @@ class SlideGalery(qt.QDialog):
         for tutorialScreenshot in tutorialScreenshots:
             self.AddSlide(tutorialScreenshot)
         pass
+
+    def _mountCustomSlide(self, slide):
+        # Instead of doing this we should prefab the customs slides and just load them
+        annotations : list[Annotation] = []
+
+        if slide["type"] == AnnotatorSlideLayoutType.Cover:
+            _title = Annotation(
+                slide["metadata"][0],
+                133, 150,
+                1116, 274,
+                self.parent().tutorialInfo["title"],
+                AnnotationType.TextBox
+            )
+            _title.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
+            _title.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+
+            _authors = Annotation(
+                slide["metadata"][0],
+                133, 285,
+                1116, 365,
+                self.parent().tutorialInfo["author"],
+                AnnotationType.TextBox
+            )
+            _authors.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
+            _authors.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+            _date = Annotation(
+                slide["metadata"][0],
+                133, 368,
+                1116, 420,
+                self.parent().tutorialInfo["date"],
+                AnnotationType.TextBox
+            )
+            _date.penConfig(qt.QColor(255, 255, 255), 18,14, brush=True)
+            _date.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+            _desc = Annotation(
+                slide["metadata"][0],
+                133, 424,
+                1116, 600,
+                self.parent().tutorialInfo["desc"],
+                AnnotationType.TextBox
+            )
+            _desc.penConfig(qt.QColor(255, 255, 255), 16,14, brush=True)
+            _desc.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+            annotations.append(_title)
+            annotations.append(_authors)
+            annotations.append(_date)
+            annotations.append(_desc)
+
+        elif slide["type"] == AnnotatorSlideLayoutType.Acknowledgment:
+            _ackText = Annotation(
+                slide["metadata"][0],
+                294, 177,
+                985, 327,
+                _("Acknowledgements"),
+                AnnotationType.TextBox
+            )
+            _ackText.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
+            _ackText.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+
+            _ack = Annotation(
+                slide["metadata"][0],
+                294, 360,
+                985, 610,
+                "",
+                AnnotationType.TextBox
+            )
+            _ack.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
+            _ack.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+            annotations.append(_ackText)
+            annotations.append(_ack)
+
+        elif slide["type"] == AnnotatorSlideLayoutType.Blank:
+            _mainText = Annotation(
+                slide["metadata"][0],
+                294, 177,
+                985, 327,
+                _("Slide Text"),
+                AnnotationType.TextBox
+            )
+            _mainText.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
+            _mainText.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+
+            _bodyText = Annotation(
+                slide["metadata"][0],
+                294, 360,
+                985, 610,
+                _("Slide Body"),
+                AnnotationType.TextBox
+            )
+            _bodyText.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
+            _bodyText.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+            annotations.append(_mainText)
+            annotations.append(_bodyText)
+            pass
+
+        return annotations
 
