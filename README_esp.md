@@ -3,7 +3,7 @@
 ### Instalación
 
 - Instale la [última versión estable de 3D Slicer](https://download.slicer.org) (actualmente 3D Slicer-5.6.2)
-- Abra el repositorio [Tutorial Maker](https://github.com/SlicerLatinAmerica/TutorialMaker) en GitHub
+- Abra el repositorio [Tutorial Maker](https://github.com/SoniaPujolLab/TutorialMaker) en GitHub
 - Clone el botón verde “Code” y seleccione la opción “Download ZIP” como se muestra en la imagen de abajo para descargar el archivo “TutorialMaker.zip” en su computadora
 ![image](DOCS/Img_es/DescargarRepo.png)
 - Descomprima el archivo “TutorialMaker.zip” para acceder al directorio “TutorialMaker-main”
@@ -56,7 +56,7 @@
 ![image](DOCS/Img_es/PDF.png)
 
 - Las capturas de pantalla con anotaciones se guardarán ahora en la carpeta del Módulo en “Salidas”;
-![image](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
+![image](https://github.com/SoniaPujolLab/TutorialMaker/assets/28208639/3a5feeb0-b7a3-41c8-923f-77239f5331c8)
 
 ### Escribir tutoriales
 

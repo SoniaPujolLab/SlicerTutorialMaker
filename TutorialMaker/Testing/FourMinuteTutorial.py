@@ -156,6 +156,9 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         cam.GetCamera().Elevation(0)
         Util.getNamedWidget("CentralWidget/CentralWidgetLayoutFrame/ThreeDWidget1/qMRMLThreeDViewControllerWidget:0/qMRMLThreeDViewControllerWidget").inner().show()
         slicer.util.findChildren(name="SpinButton")[0].click()
+        threeDWidget = slicer.app.layoutManager().threeDWidget(0)
+        controller = threeDWidget.controllerWidget()
+        controller.setAnimationMode(0) 
         # TUTORIALMAKER SCREENSHOT
         self.delayDisplay('Screenshot #11: Active the 3D view spin button.')
         #util.getNamedWidget("CentralWidget/CentralWidgetLayoutFrame/ThreeDWidget1/qMRMLThreeDViewControllerWidget:0/qMRMLThreeDViewControllerWidget").inner().hide()
@@ -163,6 +166,5 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay('Optic chiasm should be visible. Front part of white matter should be clipped.')
         
         # Done
-        slicer.util.findChildren(name="SpinButton")[0].click()
         # TUTORIALMAKER END
         self.delayDisplay('Test passed!')
