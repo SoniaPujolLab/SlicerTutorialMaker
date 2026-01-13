@@ -187,6 +187,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
             self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
         except:
             pass
+        os.environ["TUTORIAL_CURRENT_SELFTEST"] = self.__selectedTutorial or ""
         self.ui.pushButtonCapture.setEnabled(self.__selectedTutorial is not None)
         self.ui.pushButtonGenerate.setEnabled(self.__selectedTutorial is not None)
         self.ui.pushButtonOpenAnnotator.setEnabled(self.__selectedTutorial is not None)
@@ -385,7 +386,6 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         module.  For example, if a developer removes a feature that you depend on,
         your test should break so they know that the feature is needed.
         """
-        os.environ["TUTORIAL_CURRENT_SELFTEST"] = tutorial_name
         tPath = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + f"/Testing/{tutorial_name}.py"
         SelfTestTutorialLayer.ParseTutorial(tPath)
         import sys
