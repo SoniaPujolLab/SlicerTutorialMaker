@@ -3,6 +3,7 @@ import qt
 import json
 import os
 import copy
+import platform
 from Lib.Annotations import Annotation, AnnotationType, AnnotatorSlide, AnnotatedTutorial, AnnotatorSlideLayoutType
 from Lib.TutorialUtils import Tutorial, TutorialScreenshot
 
@@ -47,8 +48,6 @@ class TutorialAnnotator(qt.QMainWindow):
 
         # Need to do a overhaul of the preview function so this isn't necessary
         self.lastAppPos = qt.QPoint()
-        
-        self.outputFolder = f"{os.path.dirname(__file__)}/../Outputs/Annotations"
 
         # Tutorial Information
         self.tutorialInfo = {"name": "", "author" : "", "date": "", "desc": ""}
@@ -78,6 +77,8 @@ class TutorialAnnotator(qt.QMainWindow):
         self.setCentralWidget(UI_window)
 
         self.setWindowTitle(_("TutorialMaker - Annotator"))
+
+        self.statusbar = self.findChild(qt.QStatusBar, "statusbar")
 
         # Setup Slide
         self.selectedSlideWidget = self.findChild(qt.QLabel, "label_selectedSlide")
@@ -299,14 +300,40 @@ class TutorialAnnotator(qt.QMainWindow):
             self.slides.append(slideWidget)
         self.tutorialInfo = tInfo
 
+        self.changeSelectedSlide(self.slides[0])
+        for slide in self.slides:
+            slide.Slide.ReDraw()
         self.windowResizeEvent(None)
         pass
 
     def saveAnnotations(self):
         slides : list[AnnotatorSlide] = []
+        savePath : str = "" 
         for slide in self.slides:
             slides.append(slide.Slide)
-        AnnotatedTutorial.SaveAnnotatedTutorial(self.tutorialInfo, slides)
+        try:
+            savePath = AnnotatedTutorial.SaveAnnotatedTutorial(self.tutorialInfo, slides, self.outputName)
+            self.statusbar.showMessage(_("Annotations saved"), 5000)
+        except Exception as e:
+            print(e)
+            self.statusbar.showMessage(_("Exception while trying to save annotations"), 10000)
+
+        if not savePath:
+                return
+        
+        try:
+            if platform.system() == "Windows":
+                    try:
+                        import subprocess
+                        subprocess.Popen(["explorer", os.path.realpath(savePath)])
+                    except Exception as e:
+                        print("The folder could not be opened:", e)
+            else:
+                import subprocess, sys
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, savePath])
+        except:
+            pass
         pass
 
     def deleteSelectedAnnotation(self):
@@ -410,6 +437,11 @@ class TutorialAnnotator(qt.QMainWindow):
         self.slideBodyWidget.blockSignals(True)
         self.slideBodyWidget.setText(self.selectedAnnotator.SlideBody)
         self.slideBodyWidget.blockSignals(False)
+
+        # Block if not screenshot type
+        enabled = not (self.selectedAnnotator.SlideLayout in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank)
+        self.slideTitleWidget.enabled = enabled
+        self.slideBodyWidget.enabled = enabled
         pass
 
     def finishCurrentAnnotation(self):
@@ -453,16 +485,18 @@ class TutorialAnnotator(qt.QMainWindow):
         self.selectedAnnotationType = AnnotationType.Selected
         self.selectedAnnotation.drawBoundingBox = True
 
-    def annotationHandler(self, appPos):
+    def annotationHandler(self, appPos, shiftMod = False):
         if self.selectedAnnotation is None or self.selectedAnnotation.PERSISTENT == True:
             return
         self.selectedAnnotation.PERSISTENT = True
         selectedAnnotation = self.selectedAnnotation
         self.finishCurrentAnnotation()
-
-        self.selectedAnnotation = selectedAnnotation
-        self.selectedAnnotationType = AnnotationType.Selected
-        self.selectedAnnotation.drawBoundingBox = True
+        if not shiftMod:
+            toolbar = self.centralWidget().findChild(qt.QToolBar, "toolBar_tools")
+            toolbar.actions()[0].trigger()
+            self.selectedAnnotation = selectedAnnotation
+            self.selectedAnnotationType = AnnotationType.Selected
+            self.selectedAnnotation.drawBoundingBox = True
 
     def previewAnnotation(self, appPos):
         if self.selectedAnnotator is None:
@@ -552,7 +586,7 @@ class TutorialAnnotator(qt.QMainWindow):
         if self.selectedAnnotationType == AnnotationType.Selecting:
             self.selectionHandler(event.pos())
             return
-        self.annotationHandler(event.pos())
+        self.annotationHandler(event.pos(), event.modifiers() == qt.Qt.ShiftModifier)
 
     def mouseReleaseEvent(self, event):
         pass
@@ -562,14 +596,14 @@ class TutorialAnnotator(qt.QMainWindow):
             self.previewAnnotation(event.pos())
 
     def keyboardEvent(self, event):
-        if event.key() == qt.Qt.Key_Escape:
-            self.setFocus()
-            return False
 
         if self.selectedAnnotationType == AnnotationType.Selected:
             if event.key() == qt.Qt.Key_Delete:
                 self.selectedAnnotation.PERSISTENT = False
                 self.finishCurrentAnnotation()
+            elif event.key() == qt.Qt.Key_Escape:
+                self.finishCurrentAnnotation()
+                self.selectedAnnotationType = AnnotationType.Selecting
 
             elif self.selectedAnnotation.type in [AnnotationType.TextBox, AnnotationType.ArrowText]:
                 # Detect command Ctrl+C copy text
@@ -600,6 +634,10 @@ class TutorialAnnotator(qt.QMainWindow):
             elif event.key() == qt.Qt.Key_Down:
                 self.selectorParentDelta(1)
                 return True
+            
+        if event.key() == qt.Qt.Key_Escape:
+            self.setFocus()
+            return False
 
         return False
     
@@ -678,27 +716,105 @@ class TutorialAnnotator(qt.QMainWindow):
                 qt.QTimer.singleShot(100, callback)
                 return False
         return False
+    
+    def setupCustomSlides(self, widget):
+        # Instead of doing this we should prefab the customs slides and just load them
+        coverPage : AnnotatorSlide = self.slides[0].Slide
+        ackPage : AnnotatorSlide = self.slides[1].Slide
+
+        # Cover Page
+        _title = Annotation(
+            widget,
+            133, 150,
+            1116, 274,
+            self.tutorialInfo["title"],
+            AnnotationType.TextBox
+        )
+        _title.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
+        _title.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+
+        _authors = Annotation(
+            widget,
+            133, 285,
+            1116, 365,
+            self.tutorialInfo["author"],
+            AnnotationType.TextBox
+        )
+        _authors.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
+        _authors.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+        _date = Annotation(
+            widget,
+            133, 368,
+            1116, 420,
+            self.tutorialInfo["date"],
+            AnnotationType.TextBox
+        )
+        _date.penConfig(qt.QColor(255, 255, 255), 18,14, brush=True)
+        _date.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+        _desc = Annotation(
+            widget,
+            133, 424,
+            1116, 600,
+            self.tutorialInfo["desc"],
+            AnnotationType.TextBox
+        )
+        _desc.penConfig(qt.QColor(255, 255, 255), 16,14, brush=True)
+        _desc.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+        coverPage.AddAnnotation(_title)
+        coverPage.AddAnnotation(_authors)
+        coverPage.AddAnnotation(_date)
+        coverPage.AddAnnotation(_desc)
+
+        # Acknownledgements Page
+        _ackText = Annotation(
+            widget,
+            294, 177,
+            985, 327,
+            _("Acknowledgements"),
+            AnnotationType.TextBox
+        )
+        _ackText.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
+        _ackText.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+
+        _ack = Annotation(
+            widget,
+            294, 360,
+            985, 610,
+            "",
+            AnnotationType.TextBox
+        )
+        _ack.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
+        _ack.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+
+        ackPage.AddAnnotation(_ackText)
+        ackPage.AddAnnotation(_ack)
                        
     def loadImagesAndMetadata(self, tutorialData):
         # Setup the Cover and Acknownledgments slides
-        # self.slideGalery.AddSlide(
-        #     qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")),
-        #     [],
-        #     AnnotatorSlideLayoutType.Cover
-        # )
-        # self.slideGalery.AddSlide(
-        #     qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")),
-        #     [],
-        #     AnnotatorSlideLayoutType.Acknowledgment
-        # )
+        pageWidget = {'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]}
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")),
+            [pageWidget],
+            AnnotatorSlideLayoutType.Cover
+        )
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")),
+            [pageWidget],
+            AnnotatorSlideLayoutType.Acknowledgment
+        )
         self.slideGalery.AddSlide(
             qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
-            [],
+            [pageWidget],
             AnnotatorSlideLayoutType.Blank
         )
         
-        #self.slideGalery.ExportSlide(1)
-        #self.slideGalery.ExportSlide(0)
+        self.slideGalery.ExportSlide(1)
+        self.slideGalery.ExportSlide(0)
+
+        self.setupCustomSlides(pageWidget)
 
         for stepIndex, screenshots in enumerate(tutorialData.steps):
             slideWidget = AnnotatorSlideWidget(self.slidesScrollArea.widget())
@@ -735,9 +851,12 @@ class TutorialAnnotator(qt.QMainWindow):
 
             self.slides.append(slideWidget)  # noqa: F821
         def callback():
-            self.windowResizeEvent(None)
             if self.slides:
                 self.changeSelectedSlide(self.slides[0])
+                for slide in self.slides:
+                    slide.Slide.ReDraw()
+            self.windowResizeEvent(None)
+
         qt.QTimer.singleShot(100, callback)
 
     def openJsonFile(self, filepath):
