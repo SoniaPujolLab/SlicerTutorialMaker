@@ -38,3 +38,5 @@ node_modules
 TutorialMaker/Outputs/*
 Languages/*
 TutorialMaker/Languages
+
+*.exe
