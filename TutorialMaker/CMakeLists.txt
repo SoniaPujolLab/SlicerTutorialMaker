@@ -9,7 +9,7 @@ set(MODULE_PYTHON_SCRIPTS
   Lib/GitTools.py
   Lib/TutorialEditor.py
   Lib/TutorialExporter.py
-  Lib/TutorialGUI.py
+  Lib/TutorialAnnotator.py
   Lib/TutorialPainter.py
   Lib/TutorialUtils.py
   )
