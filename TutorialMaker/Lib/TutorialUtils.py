@@ -687,7 +687,7 @@ class ScreenshotTools():
         pass
 
     def saveScreenshotMetadata(self, index):
-        path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ["TUTORIAL_CURRENT_SELFTEST"]}/"
+        path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
 
         oPath = Path(path)
         oPath.mkdir(parents=True, exist_ok=True)
@@ -789,7 +789,7 @@ class Tutorial():
 
     #TODO:Unsafe, there should be a better method to do this, at least add some conditions
     def clearTutorial(self):
-        outputPath = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ["TUTORIAL_CURRENT_SELFTEST"]}/"
+        outputPath = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
         if not os.path.exists(outputPath):
             return
         dirs = os.listdir(outputPath)
@@ -863,7 +863,7 @@ class TutorialScreenshot():
 # TODO: REMOVE THIS, DEPRECATED
 class JSONHandler:
     def __init__(self):
-        self.path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ["TUTORIAL_CURRENT_SELFTEST"]}/"
+        self.path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
         oPath = Path(self.path)
         oPath.mkdir(parents=True, exist_ok=True)
         self.path = str(oPath.resolve()) + "/"
