@@ -2,6 +2,7 @@ import slicer
 import qt
 import os
 import re
+from pathlib import Path
 from slicer.i18n import tr as _
 
 def get_module_basepath(moduleName):
@@ -746,7 +747,11 @@ class ScreenshotTools():
         pass
 
     def saveScreenshotMetadata(self, index):
-        path = get_module_basepath("TutorialMaker") + "/Outputs/Raw/"
+        path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
+
+        oPath = Path(path)
+        oPath.mkdir(parents=True, exist_ok=True)
+        path = str(oPath.resolve()) + "/"
 
         openWindows = []
         for w in slicer.app.topLevelWidgets():
@@ -845,7 +850,7 @@ class Tutorial():
 
     #TODO:Unsafe, there should be a better method to do this, at least add some conditions
     def clearTutorial(self):
-        outputPath = get_module_basepath("TutorialMaker") + "/Outputs/Raw/"
+        outputPath = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
         if not os.path.exists(outputPath):
             return
         dirs = os.listdir(outputPath)
@@ -909,15 +914,20 @@ class TutorialScreenshot():
     
     def getDevicePixelRatio(self):
         """Get the device pixel ratio saved with this screenshot, defaults to 1.0"""
-        nWidgets = JSONHandler.parseJSON(self.metadata)
+        nWidgets = {}
+        try:
+            nWidgets = JSONHandler.parseJSON(self.metadata)
+        except Exception:
+            pass
         return nWidgets.get("_devicePixelRatio", 1.0)
 
 # TODO: REMOVE THIS, DEPRECATED
 class JSONHandler:
     def __init__(self):
-        self.path = get_module_basepath("TutorialMaker") + "/Outputs/Raw/"
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
+        self.path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
+        oPath = Path(self.path)
+        oPath.mkdir(parents=True, exist_ok=True)
+        self.path = str(oPath.resolve()) + "/"
         import json
         self.json = json
         pass

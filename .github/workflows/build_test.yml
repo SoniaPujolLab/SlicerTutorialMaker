@@ -25,9 +25,12 @@ jobs:
         with:
           path: ${{ github.workspace }}/SlicerTutorialMaker
 
+      - name: Update apt
+        run: sudo apt-get update
+
       - name: Install Slicer prerequisites
         run: |
-          sudo apt-get install \
+          sudo apt-get install -y \
             libglu1-mesa \
             libpulse-mainloop-glib0 \
             libnss3 \
@@ -37,7 +40,7 @@ jobs:
 
       - name: Install XVFB prerequisites
         run: |
-          sudo apt-get install \
+          sudo apt-get install -y \
             xvfb \
             x11-xserver-utils
 
