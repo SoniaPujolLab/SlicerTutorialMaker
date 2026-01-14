@@ -19,6 +19,12 @@ class AnnotationType(Flag):
     Click = auto()
     Selecting = auto()
     Selected = auto()  # Not for saving
+    
+class AnnotatorSlideLayoutType(Flag):
+    Screenshot = auto()
+    Cover = auto()
+    Acknowledgment = auto()
+    Blank = auto()
 
 class Annotation:
     def __init__(self,
@@ -49,11 +55,33 @@ class Annotation:
         self.boundingBoxTopLeft = [0,0]
         self.boundingBoxBottomRight = [0,0]
         self.__selectionSlideEffect = 0
+        self.extraOptions = {}
 
         # Need to change this later, make it loaded through resources
-        # TODO: Change this later, make it loaded through resources
-        self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
-        self.icon_click = self.icon_click.scaled(20,30)
+        #self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
+        #self.icon_click = self.icon_click.scaled(20,30)
+        
+    def __getstate__(self):
+        state = {**self.toDict(), **{"targetWidget": self.target, "windowOffset": self.annotationOffset}}
+        return state
+        
+    def __setstate__(self, state):
+        # Not good practice
+        self.__init__(
+            state["targetWidget"],
+            *state["offset"],
+            *state["optional"],
+            state["text"],
+            AnnotationType[state["type"]]
+        )
+        self.penConfig(
+            qt.QColor(state["penSettings"]["color"]),
+            state["penSettings"]["fontSize"],
+            state["penSettings"]["thickness"]
+        )
+        self.extraOptions = state["custom"]
+        self.annotationOffset = state["windowOffset"]
+        self.PERSISTENT = True
 
     def setSelectionBoundingBox(self, topLeftX, topLeftY, bottomRightX, bottomRightY):
         padding = 5
@@ -84,13 +112,13 @@ class Annotation:
                           "type": self.type.name,
                           "offset": [self.offsetX, self.offsetY],
                           "optional": [self.optX, self.optY],
-                          "custom": "",
+                          "custom": self.extraOptions,
                           "penSettings": {"color": self.color.name(),
                                           "thickness": self.thickness,
                                           "fontSize": self.fontSize},
                            "text": self.text}
         return annotationJSON
-
+    
     def setOffset(self, Offset : list[int]):
         self.annotationOffset = Offset
         pass
@@ -258,7 +286,15 @@ class Annotation:
             topLeft = qt.QPoint(arrowTail[0] - textWidth / 2,arrowTail[1] - textHeight / 2)
             bottomRight = qt.QPoint(xPadding*2 + (arrowTail[0] + textWidth / 2), yPadding*2 + (arrowTail[1] + textHeight / 2))
             rectToDraw = qt.QRect(topLeft, bottomRight)
+            
+            # Draw rectangle without border
+            pen.setColor(qt.Qt.transparent)
+            painter.setPen(pen)
             painter.drawRect(rectToDraw)
+            
+            # Reset pen color for text
+            pen.setColor(qt.Qt.black)
+            painter.setPen(pen)
 
             # Adjust text to the center box
             textStart = [topLeft.x() + xPadding, topLeft.y() + fHeight]
@@ -288,12 +324,6 @@ class Annotation:
             brush.setStyle(qt.Qt.SolidPattern)
             painter.setBrush(brush)
 
-            # Padding
-
-            yPadding = 6
-            xPadding = 6
-            lineSpacing = 2
-
             optX = self.optX - targetCenter[0]
             optY = self.optY - targetCenter[1]
 
@@ -302,58 +332,152 @@ class Annotation:
             rectToDraw = qt.QRect(topLeft,bottomRight)
             painter.drawRect(rectToDraw)
 
-            # Calculate the text break and position
+            # Text Color
+            textColor = None
+            if not self.extraOptions:
+                textColor = "#000000"
+            else:
+                textColor = self.extraOptions["textColor"]
+
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
-            pen.setColor(qt.Qt.black)
-            painter.setPen(pen)
+            pen.setColor(qt.QColor(textColor))
+            
+            # Padding
+            yPadding = 6
+            xPadding = 6
+            lineSpacing = 2
 
-            fontMetrics = qt.QFontMetrics(font)
-            fHeight = fontMetrics.height()
+            if not self.extraOptions or self.extraOptions["textAlign"] == "right":
 
-            textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
-            textBoxTopLeft = [targetPos[0], targetPos[1]]
+                # Calculate the text break and position
+                fontMetrics = qt.QFontMetrics(font)
+                fHeight = fontMetrics.height()
 
-            if textBoxBottomRight[0] < textBoxTopLeft[0]:
-                tmp = textBoxTopLeft[0]
-                textBoxTopLeft[0] = textBoxBottomRight[0]
-                textBoxBottomRight[0] = tmp
+                textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
+                textBoxTopLeft = [targetPos[0], targetPos[1]]
 
-            if textBoxBottomRight[1] < textBoxTopLeft[1]:
-                tmp = textBoxTopLeft[1]
-                textBoxTopLeft[1] = textBoxBottomRight[1]
-                textBoxBottomRight[1] = tmp
+                if textBoxBottomRight[0] < textBoxTopLeft[0]:
+                    tmp = textBoxTopLeft[0]
+                    textBoxTopLeft[0] = textBoxBottomRight[0]
+                    textBoxBottomRight[0] = tmp
 
-            textStart = [textBoxTopLeft[0] + xPadding,
-                         textBoxTopLeft[1] + yPadding + fHeight]
+                if textBoxBottomRight[1] < textBoxTopLeft[1]:
+                    tmp = textBoxTopLeft[1]
+                    textBoxTopLeft[1] = textBoxBottomRight[1]
+                    textBoxBottomRight[1] = tmp
 
-            textToWrite = self.text
-            if textToWrite == "":
-                textToWrite = _("Write something here")
+                textStart = [textBoxTopLeft[0] + xPadding,
+                             textBoxTopLeft[1] + yPadding + fHeight]
 
-            displayLines = []
-            textLines = textToWrite.splitlines()
-            for tLines in textLines:
-                textTokens = tLines.split()
-                line = ""
-                for token in textTokens:
-                    if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
-                        displayLines.append(copy.deepcopy(line))
-                        line = f"{token} "
-                        continue
-                    line += f"{token} "
-                displayLines.append(line)
+                textToWrite = self.text
+                if textToWrite == "":
+                    textToWrite = _("Write your text here")
 
-            for lineIndex, line in enumerate(displayLines):
-                painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight*lineIndex, line)
+                maxWidth = 0
+                maxHeight = 0
 
-            self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
+                displayLines = []
+                textLines = textToWrite.splitlines()
+                for tLines in textLines:
+                    textTokens = tLines.split()
+                    line = ""
+                    for token in textTokens:
+                        if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
+                            if line:
+                                displayLines.append(copy.deepcopy(line))
+                            line = f"{token} "
+                            continue
+                        line += f"{token} "
+                    displayLines.append(line)
+
+                for line in displayLines:
+                    if fontMetrics.width(line) > maxWidth:
+                        maxWidth = fontMetrics.width(line)
+                
+                maxHeight = len(displayLines)*(fHeight + lineSpacing) - lineSpacing
+
+                textFitBottomRight = [textBoxTopLeft[0] + 2*xPadding + maxWidth,textBoxTopLeft[1] + 2*yPadding + maxHeight]
+                finalRectBottomRight = [max(textBoxBottomRight[0], textFitBottomRight[0]), max(textBoxBottomRight[1], textFitBottomRight[1])]
+
+                painter.drawRect(qt.QRect(
+                    qt.QPoint(*textBoxTopLeft),
+                    qt.QPoint(*finalRectBottomRight)
+                ))
+
+                painter.setPen(pen)
+
+                for lineIndex, line in enumerate(displayLines):
+                    painter.drawText(textStart[0], textStart[1] + lineSpacing + fHeight*lineIndex, line)
+
+                self.setSelectionBoundingBox(*textBoxTopLeft, *finalRectBottomRight)
+
+            elif self.extraOptions["textAlign"] == "center":
+
+                # Calculate the text break and position
+
+                fontMetrics = qt.QFontMetrics(font)
+                fHeight = fontMetrics.height()
+
+                textBoxBottomRight = [targetPos[0] + optX, targetPos[1] + optY]
+                textBoxTopLeft = [targetPos[0], targetPos[1]]
+
+                if textBoxBottomRight[0] < textBoxTopLeft[0]:
+                    tmp = textBoxTopLeft[0]
+                    textBoxTopLeft[0] = textBoxBottomRight[0]
+                    textBoxBottomRight[0] = tmp
+
+                if textBoxBottomRight[1] < textBoxTopLeft[1]:
+                    tmp = textBoxTopLeft[1]
+                    textBoxTopLeft[1] = textBoxBottomRight[1]
+                    textBoxBottomRight[1] = tmp
+
+                textToWrite = self.text
+                if textToWrite == "":
+                    textToWrite = _("Write something here")
+
+                displayLines = []
+                textLines = textToWrite.splitlines()
+                for tLines in textLines:
+                    textTokens = tLines.split()
+                    line = ""
+                    for token in textTokens:
+                        if fontMetrics.width(line + token) > textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding:
+                            displayLines.append(copy.deepcopy(line))
+                            line = f"{token} "
+                            continue
+                        line += f"{token} "
+                    displayLines.append(line)
+                
+                while True:
+                    fHeight = fontMetrics.height()
+                    maxHeight = len(displayLines)*(fHeight + lineSpacing) - lineSpacing
+                    if maxHeight < textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding*2:
+                        break
+                    font.setPointSize(font.pointSize() - 1)
+                    fontMetrics = qt.QFontMetrics(font)
+                    if font.pointSize() < 1:
+                        break
+                
+                textStart = [textBoxTopLeft[0] + xPadding,
+                             textBoxTopLeft[1] + yPadding + fHeight]
+
+                top_whitespace = ( (fHeight + lineSpacing)*len(displayLines) - lineSpacing + fHeight/2) - (textBoxBottomRight[1] - textBoxTopLeft[1] - yPadding)
+                painter.setFont(font)
+
+                painter.setPen(pen)
+
+                for lineIndex, line in enumerate(displayLines):
+                    right_whitespace = fontMetrics.width(line) - (textBoxBottomRight[0] - textBoxTopLeft[0] - xPadding)
+                    painter.drawText(textStart[0] - right_whitespace/2, (textStart[1] - top_whitespace/2) + lineSpacing + fHeight*lineIndex, line)
+
+                self.setSelectionBoundingBox(targetPos[0], targetPos[1], targetPos[0] + optX, targetPos[1] + optY)
 
         elif self.type == AnnotationType.Click:
             bottomRight = [targetPos[0] + targetSize[0],
                            targetPos[1] + targetSize[1]]
 
-            painter.drawImage(qt.QPoint(*bottomRight), self.icon_click)
+            #painter.drawImage(qt.QPoint(*bottomRight), self.icon_click)
 
             self.setSelectionBoundingBox(*bottomRight, bottomRight[0] + 20,bottomRight[1] + 30)
         pass
@@ -387,7 +511,6 @@ class Annotation:
             rectToDraw = qt.QRect(topLeft,bottomRight)
             painter.drawRect(rectToDraw)
 
-
 class AnnotatorSlide:
     def __init__(self, BackgroundImage : qt.QPixmap, Metadata : dict, Annotations : list[Annotation] = None, WindowOffset : list[int] = None):
 
@@ -402,12 +525,35 @@ class AnnotatorSlide:
         self.annotations = Annotations
         self.Active = True
 
-        self.SlideLayout = "Screenshot"
+        for annotation in Annotations:
+            annotation.setOffset(self.windowOffset)
+
+        self.SlideLayout = AnnotatorSlideLayoutType.Screenshot
         self.SlideTitle = ""
         self.SlideBody = ""
         
         self.devicePixelRatio = 1.0
+        self.screenshotPaths : list[str] = []
+        self.imagePath = "" # Only used on the painter
         pass
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state["image"], state["outputImage"]
+        
+        ba = qt.QByteArray()
+        buff = qt.QBuffer(ba)
+        buff.open(qt.QIODevice.WriteOnly)
+        self.image.save(buff, "PNG")
+        state["image_data"] = ba.data()
+        return state
+
+    def __setstate__(self, state):
+        data = state.pop("image_data")
+        self.__dict__.update(state)
+        self.image = qt.QPixmap()
+        self.image.loadFromData(qt.QByteArray(data), "PNG")
+        self.outputImage = self.image.copy()
 
     def AddAnnotation(self, annotation : Annotation):
         annotation.setOffset(self.windowOffset)
@@ -488,15 +634,228 @@ class AnnotatorSlide:
 class AnnotatedTutorial:
     
     @staticmethod
-    def GetLocalizedDict(lang, tutorialName = ""):
-        dictPath = f"{os.path.dirname(__file__)}/../Outputs" + "/Annotations/text_dict_default.json"
+    def GetLocalizedDict(lang, tutorialName = "", path = ""):
+        if path == "":
+            annotationDir = f"{os.path.dirname(__file__)}/../Outputs" + "/Annotations"
+        else:
+            annotationDir = os.path.dirname(path)
+
+        DefaultDictPath = f"{annotationDir}/text_dict_default.json"
+        LocalizedDictPath = f"{annotationDir}/text_dict_{lang}.json"
         textDict = {}
-        with open(dictPath, encoding='utf-8') as file:
+        if os.path.isfile(LocalizedDictPath):
+            with open(LocalizedDictPath, encoding='utf-8') as file:
                 textDict = json.load(file)
+        else:
+            with open(DefaultDictPath, encoding='utf-8') as file:
+                textDict = json.load(file)
+        
         return textDict
 
     @staticmethod
+    def GetCompositeSlide(tutorialScreenshots : list[TutorialScreenshot]):
+        finalImage = tutorialScreenshots[0].getImage().toImage()
+        finalJson = copy.deepcopy(tutorialScreenshots[0].getWidgets())
+        painter = qt.QPainter(finalImage)
+        for slide in tutorialScreenshots[1:]:
+
+            finalJson.extend(copy.deepcopy(slide.getWidgets()))
+
+            nextImage = slide.getImage().toImage()
+
+            mainWidget = slide.getWidgets()[0]
+            painter.drawImage(qt.QRect(mainWidget["position"][0],
+                                       mainWidget["position"][1],
+                                       nextImage.width(),
+                                       nextImage.height()),
+                                       nextImage)
+        painter.end()
+        return [qt.QPixmap().fromImage(finalImage), finalJson]
+    
+    @staticmethod
     def LoadAnnotatedTutorial(path):
+        with open(path, encoding='utf-8') as file:
+            rawData = json.load(file)
+
+        if not ("TutorialMaker_version" in rawData):
+            return AnnotatedTutorial.LoadAnnotatedTutorial_Legacy(path)
+
+        outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
+
+        settings = slicer.app.userSettings()
+        currentLanguage = settings.value("language")
+
+        slides : list[AnnotatorSlide] = []
+
+        textDict = AnnotatedTutorial.GetLocalizedDict(currentLanguage, path=path)
+
+        TutorialInfo = {
+            "title": rawData["title"],
+            "author": rawData["author"],
+            "date": rawData["date"],
+            "desc": rawData["desc"],
+            "TMversion": rawData["TutorialMaker_version"]
+        }
+
+        for slideData in rawData["slides"]:
+            slideMetadata = []
+            windowOffset = [0,0]
+            slideImage : qt.QImage = None
+
+            layoutSelected = AnnotatorSlideLayoutType[slideData["SlideLayout"]]
+
+            devicePixelRatio = 1.0  # Default for backward compatibility
+            if layoutSelected == AnnotatorSlideLayoutType.Screenshot:
+
+                rawStepPaths : list[str] = []
+                for rawSlides in slideData['SlideCode']:
+                    slideStep, windowIndex = rawSlides.split("/")
+                    rawStepPaths.append(f"{outputFolder}/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/{slideStep}/{windowIndex}")
+
+                if len(rawStepPaths) == 1:
+                    tsParser = TutorialScreenshot()
+                    tsParser.metadata = rawStepPaths[0] + ".json"
+                    slideMetadata = tsParser.getWidgets()
+                    devicePixelRatio = tsParser.getDevicePixelRatio()
+                    slideImage = qt.QImage(rawStepPaths[0] + ".png")
+                elif len(rawStepPaths) > 1:
+                    screenshots : list[TutorialScreenshot] = []
+                    for rawStepPath in rawStepPaths:
+                        tsParser = TutorialScreenshot()
+                        tsParser.metadata = rawStepPath + ".json"
+                        devicePixelRatio = tsParser.getDevicePixelRatio()
+                        tsParser.screenshot = rawStepPath + ".png"
+                        screenshots.append(tsParser)
+                    slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
+                    slideImage = slideImage.toImage()
+                
+                if(not slideData['SlideCode'][0].split("/")[1] == "0"):
+                    windowOffset = slideMetadata[0]["position"]
+
+            elif layoutSelected == AnnotatorSlideLayoutType.Cover:
+                slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
+            
+            elif layoutSelected == AnnotatorSlideLayoutType.Acknowledgment:
+                slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")
+            else:
+                slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
+
+            annotations = []
+            for annotationData in slideData["Annotations"]:
+                targetWidget = {
+                    "position": [0,0],
+                    "size": [1,1]
+                }
+                for widget in slideMetadata:
+                    if annotationData["widgetPath"] == widget["path"]:
+                        targetWidget = widget
+                annotation = Annotation(
+                    targetWidget,
+                    *annotationData["offset"],
+                    *annotationData["optional"],
+                    textDict.get(annotationData["text"], ""),
+                    AnnotationType[annotationData["type"]]
+                )
+                annotation.penConfig(
+                    qt.QColor(annotationData["penSettings"]["color"]),
+                    annotationData["penSettings"]["fontSize"],
+                    annotationData["penSettings"]["thickness"]
+                )
+                annotation.extraOptions = annotationData["custom"]
+                annotation.PERSISTENT = True
+                annotations.append(annotation)
+            
+            pixmap = qt.QPixmap.fromImage(slideImage)
+            if devicePixelRatio > 1.0:
+                logicalWidth = int(pixmap.width() / devicePixelRatio)
+                logicalHeight = int(pixmap.height() / devicePixelRatio)
+                pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
+            pixmap.setDevicePixelRatio(1.0)
+            
+            annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations, WindowOffset=windowOffset)
+            annotatedSlide.devicePixelRatio = 1.0
+            annotatedSlide.SlideTitle = textDict.get(slideData["SlideTitle"], "")
+            annotatedSlide.SlideBody = textDict.get(slideData["SlideDesc"], "")
+            annotatedSlide.SlideLayout = layoutSelected
+            annotatedSlide.screenshotPaths = slideData["SlideCode"]
+            annotatedSlide.imagePath = slideData["ImagePath"]
+
+            slides.append(annotatedSlide)
+        return [TutorialInfo, slides]
+
+    @staticmethod
+    def SaveAnnotatedTutorial(tutorialInfo, slides : list[AnnotatorSlide], tutorialName = "", path = ""):
+        import re
+        from pathlib import Path
+        outputFolder = f"{os.path.dirname(__file__)}/../Outputs/Annotations"
+        if path:
+            outputFolder = path
+        if tutorialName:
+            outputFolder += f"/{tutorialName}"
+        
+        outputPath = Path(outputFolder)
+        outputPath.mkdir(parents=True, exist_ok=True)
+
+        outputFolder = outputPath.resolve()
+
+        outputFileAnnotations = {**tutorialInfo}
+        outputFileTextDict = {}
+
+        outputFileAnnotations["TutorialMaker_version"] = "1.0"
+
+        outputFileAnnotations["slides"] = []
+
+        for slideIndex, slide in enumerate(slides):
+
+            cleanSlideTitle = slide.SlideTitle.replace(' ', '')
+            cleanSlideTitle = re.sub(r'[^a-zA-Z0-9]', '', cleanSlideTitle)
+
+            slidePrefix = f"{slideIndex}"
+            slideTitle = f"{slidePrefix}_{cleanSlideTitle}"
+            slideImagePath = f"{outputFolder}/{slideTitle}"
+            if cleanSlideTitle == "":
+                slideTitle += "slide"
+                slideImagePath += "slide"
+
+            #slideImage.save(slideImagePath + ".png", "PNG")
+
+            textDict = {f"{slideTitle}_title": slide.SlideTitle,
+                        f"{slideTitle}_body": slide.SlideBody}
+
+            slideInfo = {"ImagePath": f"{slideTitle}.png",
+                         "SlideCode": slide.screenshotPaths,
+                         "SlideLayout": slide.SlideLayout.name,
+                         "SlideTitle": f"{slideTitle}_title",
+                         "SlideDesc": f"{slideTitle}_body",
+                         "Annotations": []}
+
+            for annIndex, annotation in enumerate(slide.annotations):
+                info = annotation.toDict()
+                textDict[f"{slidePrefix}_{info['type']}_{annIndex}"] = info["text"]
+                slideInfo["Annotations"].append({"widgetPath": info["widgetPath"],
+                                                 "type": info["type"],
+                                                 "offset": info["offset"],
+                                                 "optional": info["optional"],
+                                                 "custom": info["custom"],
+                                                 "penSettings": info["penSettings"],
+                                                  "text": f"{slidePrefix}_{info['type']}_{annIndex}"})
+                pass
+            outputFileAnnotations["slides"].append(slideInfo)
+            outputFileTextDict = {**outputFileTextDict, **textDict}
+
+        with open(file= f"{outputFolder}/annotations.json", mode='w', encoding="utf-8") as fd:
+            json.dump(outputFileAnnotations, fd, ensure_ascii=False, indent=4)
+
+        with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
+            json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
+
+        return outputFolder
+
+    @staticmethod
+    def LoadAnnotatedTutorial_Legacy(path):
         outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
 
         settings = slicer.app.userSettings()

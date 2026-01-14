@@ -14,7 +14,7 @@ from slicer.util import VTKObservationMixin
 from slicer.i18n import tr as _
 from slicer.i18n import translate
 from Lib.TutorialEditor import TutorialEditor
-import Lib.TutorialGUI
+import Lib.TutorialAnnotator
 from Lib.CreateTutorial import CreateTutorial
 from Lib.TutorialUtils import SelfTestTutorialLayer
 
@@ -66,7 +66,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.__selectedTutorial = None
         self.isDebug = slicer.app.settings().value("Developer/DeveloperMode")
 
-        print(_("Version Date: {}").format("2025/11/11-08:00AM"))
+        print(_("Version Date: {}").format("2026/01/01-08:00AM"))
 
         #PROTOTYPE FOR PLAYBACK
 
@@ -77,7 +77,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         Called when the user opens the module the first time and the widget is initialized.
         """
         import importlib
-        importlib.reload(Lib.TutorialGUI)
+        importlib.reload(Lib.TutorialAnnotator)
         importlib.reload(Lib.TutorialUtils)
 
         ScriptedLoadableModuleWidget.setup(self) # noqa: F405
@@ -105,7 +105,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.ui.pushButtonLoad.connect('clicked(bool)', self.logic.Load)
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
         self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
-        self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.logic.OpenAnnotator)
+        self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.openAnnotatorButton)
         self.ui.pushButtonFetchFromGithub.connect('clicked(bool)', self.getFromGithub)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
@@ -115,13 +115,16 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         if self.isDebug != True: # noqa: E712
             self.ui.CollapsibleButtonTutorialMaking.setVisible(0)
             self.ui.pushButtonNewTutorial.setVisible(0)
-            self.logic.loadTutorialsFromRepos()
+            self.ui.pushButtonFetchFromGithub.setVisible(0)
+            #self.logic.loadTutorialsFromRepos()
 
         # Make sure parameter node is initialized (needed for module reload)
         self.initializeParameterNode()
 
         #Update GUI
         self.populateTutorialList()
+
+        self.tutorialSelectionChanged()
 
     def cleanup(self):
         # that will make an exception: AttributeError: 'NoneType' object has no attribute 'exitTutorialEditor'
@@ -175,10 +178,19 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
     def captureButton(self):
         self.logic.Capture(self.__selectedTutorial)
 
+    def openAnnotatorButton(self):
+        self.logic.OpenAnnotator(self.__selectedTutorial)
+
     def tutorialSelectionChanged(self):
-        self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
+        self.__selectedTutorial = None
+        try:
+            self.__selectedTutorial = self.ui.listWidgetTutorials.selectedItems()[0].data(0)
+        except:
+            pass
+        os.environ["TUTORIAL_CURRENT_SELFTEST"] = self.__selectedTutorial or ""
         self.ui.pushButtonCapture.setEnabled(self.__selectedTutorial is not None)
         self.ui.pushButtonGenerate.setEnabled(self.__selectedTutorial is not None)
+        self.ui.pushButtonOpenAnnotator.setEnabled(self.__selectedTutorial is not None)
 
     def getFromGithub(self):
         slicer.util.infoDisplay(_("Fetching tutorials from GitHub.\n" 
@@ -392,7 +404,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
 
     def Generate(self, tutorialName):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
-        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
+        annotationsPath = modulePath + f"/Outputs/Annotations/{tutorialName}/annotations.json"
         
         if not os.path.exists(annotationsPath):
             slicer.util.warningDisplay(
@@ -424,9 +436,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         Tutorial_Win.show()
         pass
 
-    def OpenAnnotator(Self):
+    def OpenAnnotator(Self, tutorialName = ""):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
-        rawTutorialPath = modulePath + "/Outputs/Raw/Tutorial.json"
+        rawTutorialPath = modulePath + f"/Outputs/Raw/{tutorialName}/Tutorial.json"
         annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
         
         if not os.path.exists(rawTutorialPath):
@@ -438,7 +450,8 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             return
         
         fileToLoad = rawTutorialPath
-        if os.path.exists(annotationsPath):
+        #TODO: enable option to load existing annotations, this will divide the button action in two different ones
+        if False:
             loadAnnotations = slicer.util.confirmYesNoDisplay(
                 _("An existing annotations file was found.\n\n"
                   "Would you like to load the existing annotations?\n\n"
@@ -448,9 +461,10 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             )
             if loadAnnotations:
                 fileToLoad = annotationsPath
-        
-        Annotator = Lib.TutorialGUI.TutorialGUI()
-        Annotator.open_json_file(fileToLoad)
+
+        Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
+        Annotator.forceTutorialOutputName(tutorialName)
+        Annotator.openJsonFile(fileToLoad)
         Annotator.show()
         pass
 

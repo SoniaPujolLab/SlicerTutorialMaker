@@ -9,7 +9,7 @@ set(MODULE_PYTHON_SCRIPTS
   Lib/GitTools.py
   Lib/TutorialEditor.py
   Lib/TutorialExporter.py
-  Lib/TutorialGUI.py
+  Lib/TutorialAnnotator.py
   Lib/TutorialPainter.py
   Lib/TutorialUtils.py
   )
@@ -30,7 +30,6 @@ set(MODULE_PYTHON_RESOURCES
   Resources/Icons/ScreenshotAnnotator/act4.png
   Resources/Icons/ScreenshotAnnotator/act4_p.png
   Resources/Icons/ScreenshotAnnotator/act5.png
-  Resources/Icons/ScreenshotAnnotator/act5_p.png
   Resources/Icons/ScreenshotAnnotator/actselect.png
   Resources/Icons/ScreenshotAnnotator/add.png
   Resources/Icons/ScreenshotAnnotator/arrow_disabled.png
