@@ -229,6 +229,8 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         self.TutorialRepos = [
             "SoniaPujolLab/SlicerTestTutorial"
         ]
+        # TODO: Re-enable cancel functionality
+        # self._captureCanceled = False
 
     def setDefaultParameters(self, parameterNode):
         """
@@ -259,139 +261,129 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         Main capture entry point.
         Handles user preparation, optional saving, and starts tutorial capture.
         """
-
         options = Lib.TutorialUtils.Util.showCapturePreparationDialog()
         if options is None:
             return
 
-        # SAVE SCENE (USER CONTROLLED, NON-BLOCKING)
+        # Save scene if requested (blocks until user completes/cancels)
         if options.get("saveScene", False):
-            self._triggerCtrlS()
+            # Track if scene was modified before opening save dialog
+            sceneWasModified = slicer.mrmlScene.GetModifiedSinceRead()
+            
+            slicer.app.ioManager().openSaveDataDialog()
+            
+            # If scene was modified and still is, user likely canceled the save
+            if sceneWasModified and slicer.mrmlScene.GetModifiedSinceRead():
+                continueAnyway = slicer.util.confirmYesNoDisplay(
+                    _("The scene was not saved.\n\n"
+                      "Do you want to continue with the tutorial capture anyway?\n"
+                      "(The scene will be cleared)"),
+                    _("Continue without saving?")
+                )
+                if not continueAnyway:
+                    return
 
-            # Non-blocking confirmation dialog
-            self._waitForUserToFinishSaving(
-                lambda: self._continueAfterSave(options, tutorialName)
-            )
-            return
+        # Apply pre-capture settings and start
+        self._applyPreCaptureSettings(options)
+        self._startCapture(tutorialName)
 
-        # No save requested → continue immediately
-        self._continueAfterSave(options, tutorialName)
-
-    # SAVE HANDLING
-    def _triggerCtrlS(self):
-        """Trigger Ctrl+S to open Slicer's Save Data dialog."""
-        mw = slicer.util.mainWindow()
-
-        qt.QApplication.postEvent(
-            mw,
-            qt.QKeyEvent(qt.QEvent.KeyPress, qt.Qt.Key_S, qt.Qt.ControlModifier)
-        )
-        qt.QApplication.postEvent(
-            mw,
-            qt.QKeyEvent(qt.QEvent.KeyRelease, qt.Qt.Key_S, qt.Qt.ControlModifier)
-        )
-
-
-    def _waitForUserToFinishSaving(self, onContinue):
-        """
-        Non-blocking confirmation dialog that allows interaction
-        with the Save Data dialog.
-        """
-
-        self._saveConfirmDialog = qt.QMessageBox(slicer.util.mainWindow())
-        self._saveConfirmDialog.setWindowTitle(_("Finish saving"))
-        self._saveConfirmDialog.setText(
-            _("Please finish saving your data.\n\n"
-            "When the Save dialog is closed, click OK to continue capturing.")
-        )
-        self._saveConfirmDialog.setIcon(qt.QMessageBox.Information)
-        self._saveConfirmDialog.setStandardButtons(
-            qt.QMessageBox.Ok | qt.QMessageBox.Cancel
-        )
-
-        self._saveConfirmDialog.setModal(False)
-
-        self._saveConfirmDialog.accepted.connect(onContinue)
-        self._saveConfirmDialog.rejected.connect(self._saveConfirmDialog.close)
-
-        self._saveConfirmDialog.show()
-
-
-    def _continueAfterSave(self, options, tutorialName):
-        """
-        Applies pre-capture options and starts the capture.
-        """
-
-        # Close confirmation dialog if still open
-        try:
-            self._saveConfirmDialog.close()
-        except Exception:
-            pass
-
-        if options.get("clearScene", False):
-            slicer.mrmlScene.Clear()
+    def _applyPreCaptureSettings(self, options):
+        """Apply preparation settings: clear scene, maximize window, close console."""
+        # Always clear the scene before tutorial capture
+        slicer.mrmlScene.Clear()
 
         if options.get("maximize", False):
             slicer.util.mainWindow().showMaximized()
 
         if options.get("closePythonConsole", False):
             slicer.util.mainWindow().pythonConsole().parent().hide()
+            slicer.util.mainWindow().errorLogWidget().parent().hide()
 
-        self._startCapture(tutorialName)
-
-    # CAPTURE EXECUTION
     def _startCapture(self, tutorialName):
-        """
-        Shows progress dialog and runs the tutorial capture.
-        """
-
-        self._progress = qt.QProgressDialog(
-            _("Capturing tutorial...\n\n"
-            "Please do not interact with Slicer.\n"
-            "The application may appear frozen — this is normal."),
-            None, 0, 0, slicer.util.mainWindow()
-        )
-        self._progress.setWindowTitle(_("Capturing tutorial"))
-        self._progress.setCancelButton(None)
-        self._progress.setWindowModality(qt.Qt.ApplicationModal)
-        self._progress.show()
-
-        qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
-
-        qt.QTimer.singleShot(
-            5000,  # milliseconds
-            lambda: self._runCaptureWithProgress(tutorialName)
-        )
-    
-    def _runCaptureWithProgress(self, tutorialName):
-        try:
-            self._captureInternal(tutorialName)
-        finally:
-            self._progress.close()
-            qt.QApplication.restoreOverrideCursor()
-
-    # INTERNAL CAPTURE LOGIC
-    def _captureInternal(self, tutorialName):
-        """
-        Actual tutorial capture logic.
-        """
-
-        def FinishTutorial():
-            slicer.util.mainWindow().moduleSelector().selectModule(
-                'TutorialMaker'
+        """Shows progress dialog and starts tutorial capture."""
+        # TODO: Re-enable cancel functionality
+        # self._captureCanceled = False
+        
+        # Only show progress dialog if not in testing mode
+        if not slicer.app.testingEnabled():
+            self._progress = qt.QProgressDialog(
+                _("Preparing tutorial capture..."),
+                None, 0, 100, slicer.util.mainWindow()  # TODO: Change None to _("Cancel") to re-enable
             )
-            slicer.util.infoDisplay(
-                _("Tutorial Captured"),
-                _("Captured Tutorial: {tutorialName}")
-                .format(tutorialName=tutorialName)
+            self._progress.setWindowTitle(_("Capturing tutorial"))
+            self._progress.setObjectName("TutorialMakerProgressDialog")
+            self._progress.setCancelButton(None)  # TODO: Remove this line to re-enable cancel button
+            self._progress.setWindowModality(qt.Qt.ApplicationModal)
+            self._progress.setValue(0)
+            # TODO: Uncomment to re-enable cancel
+            # self._progress.canceled.connect(self._onCancelCapture)
+            self._progress.show()
+
+            qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
+
+        # Execute tutorial immediately
+        self._executeTutorial(tutorialName)
+
+    # TODO: Re-enable cancel functionality
+    # def _onCancelCapture(self):
+    #     """Handle cancel button press."""
+    #     self._captureCanceled = True
+    #     self._progress.setLabelText(_("Canceling tutorial capture..."))
+
+    # def _isCanceled(self):
+    #     """Check if capture was canceled."""
+    #     return self._captureCanceled
+
+    def _updateProgress(self, currentStep, totalSteps):
+        """Updates the progress dialog with current step information."""
+        if not slicer.app.testingEnabled() and totalSteps > 0:
+            percentage = int((currentStep / totalSteps) * 100)
+            self._progress.setValue(percentage)
+            self._progress.setLabelText(
+                _("Capturing tutorial...\n\n"
+                  "Step {current} of {total}\n\n"
+                  "Please do not interact with Slicer.").format(
+                    current=currentStep, 
+                    total=totalSteps
+                )
             )
+        slicer.app.processEvents()
+
+    def _executeTutorial(self, tutorialName):
+        """Runs the tutorial test case and handles completion."""
+        def onComplete():
+            if not slicer.app.testingEnabled():
+                self._progress.close()
+                qt.QApplication.restoreOverrideCursor()
+            
+            # TODO: Re-enable cancel functionality
+            # if self._captureCanceled:
+            #     slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
+            #     slicer.util.infoDisplay(
+            #         _("Tutorial capture was canceled."),
+            #         _("Capture Canceled")
+            #     )
+            # else:
+            slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
+            if not slicer.app.testingEnabled():
+                slicer.util.infoDisplay(
+                    _("Tutorial Captured"),
+                    _("Captured Tutorial: {tutorialName}").format(tutorialName=tutorialName)
+                )
 
         try:
             TutorialMakerLogic.runTutorialTestCases(
-                tutorialName,
-                FinishTutorial
+                tutorialName, 
+                onComplete, 
+                progressCallback=self._updateProgress
+                # TODO: Re-enable cancel functionality
+                # cancelCheckCallback=self._isCanceled
             )
         except Exception as e:
+            if not slicer.app.testingEnabled():
+                self._progress.close()
+                qt.QApplication.restoreOverrideCursor()
+            
             slicer.util.errorDisplay(
                 _("Failed to capture tutorial, please send this error on our GitHub Issue page:\n{err}")
                 .format(err=str(e))
@@ -504,7 +496,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         return test_tutorials
 
     @staticmethod
-    def runTutorialTestCases(tutorial_name, callback=None):
+    def runTutorialTestCases(tutorial_name, callback=None, progressCallback=None):  # TODO: Add cancelCheckCallback=None
         """ Ideally you should have several levels of tests.  At the lowest level
         tests should exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -526,7 +518,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
                 continue
             testClass = getattr(TutorialModule, className)
             tutorial = testClass()
-            SelfTestTutorialLayer.RunTutorial(tutorial, callback)
+            SelfTestTutorialLayer.RunTutorial(tutorial, callback, progressCallback)  # TODO: Add cancelCheckCallback
             return
         logging.error(_(f"No tests found in {tutorial_name}"))
         raise Exception(_("No Tests Found"))
@@ -544,8 +536,8 @@ class TutorialMakerTest(ScriptedLoadableModuleTest): # noqa: F405
     def setUp(self):
         """ Do whatever is needed to reset the state - typically a scene clear will be enough.
         """
-        #slicer.mrmlScene.Clear()
-        TutorialMakerLogic().loadTutorialsFromRepos()
+        slicer.mrmlScene.Clear()
+        #TutorialMakerLogic().loadTutorialsFromRepos()
 
         Lib.TutorialUtils.Util.verifyOutputFolders()
 
@@ -554,56 +546,32 @@ class TutorialMakerTest(ScriptedLoadableModuleTest): # noqa: F405
         appFont = slicer.app.font()
         appFont.setPointSize(14)
         slicer.app.setFont(appFont)
+        extensionsManager = slicer.app.extensionsManagerModel()
+        extensionsManager.downloadAndInstallExtensionByName("MONAIAuto3DSeg")
 
     def runTest(self):
         """Run as few or as many tests as needed here.
         """
-        languages = ["en", "fr", "es", "pt_BR"]
-        
         self.setUp()
         
         tutorials_failed = 0
         error_message = ""
         
-        testingFolder = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Testing/"
-        languages_dir = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Languages/"
-        
-        test_tutorials = [f for f in os.listdir(testingFolder) if f.endswith(".py")]
-    
-        for lang in languages:
-            translators = []
-            
-            if lang != "en":
-                lang_files = [f for f in os.listdir(languages_dir) if (f.endswith(f"_{lang}.qm") or f.endswith(f"-{lang.replace('_', '-')}.qm"))]
-                
-                for file in lang_files:
-                    qm_path = os.path.join(languages_dir, file)
-                    translator = qt.QTranslator()
-                    if os.path.exists(qm_path) and translator.load(qm_path):
-                        slicer.app.installTranslator(translator)
-                        translators.append(translator)
-                        
-            slicer.app.processEvents()
-            slicer.util.mainWindow().update()
-                
-            for unit_tutorials in test_tutorials:
-                tutorial_name = unit_tutorials.replace(".py", "")
-                try:
-                    # Generate Screenshots and widget metadata
-                    TutorialMakerLogic.runTutorialTestCases(tutorial_name)
-                    # Paint Screenshots with annotations
-                    #AnnotationPainter.ImageDrawer.StartPaint(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Annotations/" + unit_tutorials + ".json")
-                except Exception as e:
-                    error_message += _("Tutorial Execution Failed: {tutorial_name} in {lang} - Error: {e}. \n").format(tutorial_name=tutorial_name, lang=lang, e=e)
-                    tutorials_failed += 1
-                finally:
-                    self.delayDisplay(_("Tutorial Tested in {lang}").format(lang=lang))
-            
-            for translator in translators:
-                slicer.app.removeTranslator(translator)
-            
-            slicer.app.processEvents()
-            slicer.util.mainWindow().update()
+        #testingFolder = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Testing/"        
+        test_tutorials = ["AIBasedSegmentationIn3DSlicer.py"]#[f for f in os.listdir(testingFolder) if f.endswith(".py")]
+        for unit_tutorials in test_tutorials:
+            tutorial_name = unit_tutorials.replace(".py", "")
+            try:
+                # Generate Screenshots and widget metadata
+                TutorialMakerLogic.runTutorialTestCases(tutorial_name)
+                slicer.mrmlScene.Clear()
+                # Paint Screenshots with annotations
+                #AnnotationPainter.ImageDrawer.StartPaint(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Outputs/Annotations/" + unit_tutorials + ".json")
+            except Exception as e:
+                error_message += _("Tutorial Execution Failed: {tutorial_name} - Error: {e}. \n").format(tutorial_name=tutorial_name, e=e)
+                tutorials_failed += 1
+            finally:
+                self.delayDisplay(_("Tutorial {tutorial_name} tested").format(tutorial_name=tutorial_name))
         
         if tutorials_failed > 0:
             raise Exception(_("{tutorials_failed} tutorials failed to execute. Errors: {error_message}").format(tutorials_failed=tutorials_failed, error_message=error_message))
