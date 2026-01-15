@@ -4,6 +4,7 @@ import os
 import re
 from pathlib import Path
 from slicer.i18n import tr as _
+from slicer.i18n import translate as tr
 
 def get_module_basepath(moduleName):
     try:
@@ -29,6 +30,9 @@ class Widget():
             self.actions = []
         else:
             self.actions = self.__widgetData.actions()
+
+        if (not self.name) and self.className == "QMenu":
+            self.name = self.__QMenuAsName()
 
     def __str__(self):
         string = "Widget:\n"
@@ -64,8 +68,9 @@ class Widget():
         if not hasattr(self.__widgetData, 'children'):
             return None
         for child in self.__widgetData.children():
+            child = Widget(child)
             if child.name == childName:
-                return Widget(child)
+                return child
         return None
 
     def getChildren(self):
@@ -178,16 +183,27 @@ class Widget():
             action = actions[actionIndex]
             if not action.isVisible():
                 continue
-            __itemData = SimpleNamespace(name= f"XmenuWidgetAction_{actionIndex}",
-            className= lambda:"XmenuWidgetAction",
-            text= action.text,
-            mapToGlobal= self.__widgetData.mapToGlobal,
-            rect= self.__widgetData.actionGeometry(action),
-            parent=lambda: self.__widgetData,
-            isVisible= self.__widgetData.isVisible)
+            __itemData = SimpleNamespace(
+                name= f"XmenuWidgetAction_{ action.data() or actionIndex}",
+                className= lambda:"XmenuWidgetAction",
+                text= action.text,
+                mapToGlobal= self.__widgetData.mapToGlobal,
+                rect= self.__widgetData.actionGeometry(action),
+                parent=lambda: self.__widgetData,
+                isVisible= self.__widgetData.isVisible)
             virtualChildren.append(Widget(__itemData))
 
         return virtualChildren
+    def __QMenuAsName(self):
+        actionsData = []
+        actions = self.__widgetData.actions()
+        for action in actions:
+            if action.data():
+                actionsData.append(action.data())
+        actionsData.sort()
+        if len(actionsData) > 0 and actionsData[0]:
+            return f"QMenu_act_{actionsData[0]}"
+        return ""
 
 class Util():
     mw = None
