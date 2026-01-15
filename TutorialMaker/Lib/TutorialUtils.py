@@ -5,11 +5,13 @@ import re
 from pathlib import Path
 from slicer.i18n import tr as _
 
+
 def get_module_basepath(moduleName):
     try:
         return os.path.dirname(slicer.util.modulePath(moduleName))
     except Exception:
         raise Exception(f"Module {moduleName} not found")
+
 
 class Widget():
     def __init__(self, widgetData) -> None:
@@ -37,7 +39,7 @@ class Widget():
         string += "\tToolTip:   " + self.toolTip + "\n"
         string += "\tClassName: " + self.className + "\n"
         string += "\tID:        " + hex(id(self.__widgetData)) + "\n"
-        string += "\tAction:    " + str(self.actions)+ "\n"
+        string += "\tAction:    " + str(self.actions) + "\n"
         string += "\tPath:      " + Util.uniqueWidgetPath(self)
         return string
 
@@ -90,14 +92,15 @@ class Widget():
     def click(self):
         result = self.__widgetData.click()
         self.__widgetData.update()
-        #slicer.app.processEvents(qt.QEventLoop.AllEvents, 70)
+        # slicer.app.processEvents(qt.QEventLoop.AllEvents, 70)
         return result
 
     def getGlobalPos(self):
         mw = slicer.util.mainWindow()
         windowPos = mw.mapToGlobal(mw.rect.topLeft())
 
-        globalPosTopLeft = self.__widgetData.mapToGlobal(self.__widgetData.rect.topLeft())
+        globalPosTopLeft = self.__widgetData.mapToGlobal(
+            self.__widgetData.rect.topLeft())
         return [(globalPosTopLeft.x() - windowPos.x())*slicer.app.desktop().devicePixelRatioF(), (globalPosTopLeft.y() - windowPos.y())*slicer.app.desktop().devicePixelRatioF()]
 
     def getSize(self):
@@ -110,13 +113,14 @@ class Widget():
         virtualChildren = []
         for ItemIndex in range(self.__widgetData.count):
             item = self.__widgetData.item(ItemIndex)
-            __itemData = SimpleNamespace(name= f"XlistWidgetItem_{ItemIndex}",
-            className= lambda:"XlistWidgetItem",
-            text= item.text(),
-            mapToGlobal= self.__widgetData.mapToGlobal,
-            rect= self.__widgetData.visualItemRect(item),
-            parent=lambda: self.__widgetData,
-            isVisible= self.__widgetData.isVisible)
+            __itemData = SimpleNamespace(name=f"XlistWidgetItem_{ItemIndex}",
+                                         className=lambda: "XlistWidgetItem",
+                                         text=item.text(),
+                                         mapToGlobal=self.__widgetData.mapToGlobal,
+                                         rect=self.__widgetData.visualItemRect(
+                                             item),
+                                         parent=lambda: self.__widgetData,
+                                         isVisible=self.__widgetData.isVisible)
             virtualChildren.append(Widget(__itemData))
         return virtualChildren
 
@@ -132,6 +136,7 @@ class Widget():
             return virtualChildren
 
         NodeIndex = 0
+
         def nodeTreeTraverser(_node):
             nonlocal NodeIndex
             if hasattr(_node, "child"):
@@ -147,7 +152,7 @@ class Widget():
                         yIndex += 1
                     xIndex += 1
 
-            #Create fake widgets to represent the nodes in the list
+            # Create fake widgets to represent the nodes in the list
             _fRect = self.__widgetData.visualRect(_node)
             if (_fRect.size().height() == 0 or _fRect.size().width() == 0):
                 return
@@ -156,20 +161,21 @@ class Widget():
             if _node.data(0) is not None:
                 _fText = _node.data(0)
 
-            __itemData = SimpleNamespace(name= f"XtreeViewWidget_{NodeIndex}",
-            className= lambda:"XtreeViewWidget",
-            text= _fText,
-            mapToGlobal= self.__widgetData.viewport().mapToGlobal,
-            rect= _fRect,
-            parent=lambda: self.__widgetData,
-            isVisible= self.__widgetData.isVisible)
+            __itemData = SimpleNamespace(name=f"XtreeViewWidget_{NodeIndex}",
+                                         className=lambda: "XtreeViewWidget",
+                                         text=_fText,
+                                         mapToGlobal=self.__widgetData.viewport().mapToGlobal,
+                                         rect=_fRect,
+                                         parent=lambda: self.__widgetData,
+                                         isVisible=self.__widgetData.isVisible)
             virtualChildren.append(Widget(__itemData))
 
             NodeIndex += 1
 
-        nodeTreeTraverser(model.index(0,0))
+        nodeTreeTraverser(model.index(0, 0))
 
         return virtualChildren
+
     def __QMenuActionAsChildren(self):
         from types import SimpleNamespace
         virtualChildren = []
@@ -178,32 +184,34 @@ class Widget():
             action = actions[actionIndex]
             if not action.isVisible():
                 continue
-            __itemData = SimpleNamespace(name= f"XmenuWidgetAction_{actionIndex}",
-            className= lambda:"XmenuWidgetAction",
-            text= action.text,
-            mapToGlobal= self.__widgetData.mapToGlobal,
-            rect= self.__widgetData.actionGeometry(action),
-            parent=lambda: self.__widgetData,
-            isVisible= self.__widgetData.isVisible)
+            __itemData = SimpleNamespace(name=f"XmenuWidgetAction_{actionIndex}",
+                                         className=lambda: "XmenuWidgetAction",
+                                         text=action.text,
+                                         mapToGlobal=self.__widgetData.mapToGlobal,
+                                         rect=self.__widgetData.actionGeometry(
+                                             action),
+                                         parent=lambda: self.__widgetData,
+                                         isVisible=self.__widgetData.isVisible)
             virtualChildren.append(Widget(__itemData))
 
         return virtualChildren
+
 
 class Util():
     mw = None
 
     __shortcutDict = {
-        "Scene3D"     : "CentralWidget/CentralWidgetLayoutFrame/ThreeDWidget1",
-        "SceneRed"    : "CentralWidget/CentralWidgetLayoutFrame/qMRMLSliceWidgetRed",
-        "SceneYellow" : "CentralWidget/CentralWidgetLayoutFrame/qMRMLSliceWidgetYellow",
-        "SceneGreen"  : "CentralWidget/CentralWidgetLayoutFrame/qMRMLSliceWidgetGreen",
-        "Module"      : "PanelDockWidget/dockWidgetContents/ModulePanel/ScrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents"
+        "Scene3D": "CentralWidget/CentralWidgetLayoutFrame/ThreeDWidget1",
+        "SceneRed": "CentralWidget/CentralWidgetLayoutFrame/qMRMLSliceWidgetRed",
+        "SceneYellow": "CentralWidget/CentralWidgetLayoutFrame/qMRMLSliceWidgetYellow",
+        "SceneGreen": "CentralWidget/CentralWidgetLayoutFrame/qMRMLSliceWidgetGreen",
+        "Module": "PanelDockWidget/dockWidgetContents/ModulePanel/ScrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents"
     }
-    
+
     @staticmethod
     def loadMainWindow():
         Util.mw = Widget(slicer.util.mainWindow())
-        
+
     @staticmethod
     def listOnScreenWidgets():
         if Util.mw is None:
@@ -241,9 +249,9 @@ class Util():
         widgets = []
         children = widget.getChildren()
         for child in children:
-            #If the widget is a window, do not add it outside of its own window
+            # If the widget is a window, do not add it outside of its own window
             if hasattr(child.inner(), "isWindow") and child.inner().isWindow():
-                #print("Not expanding :" +child.className)
+                # print("Not expanding :" +child.className)
                 continue
             widgets.append(child)
             widgets = widgets + Util.__getWidgetsRecursive(child, depth + 1)
@@ -319,8 +327,8 @@ class Util():
         if path == "":
             path = Util.__classtoname(widgetToID)
             pass
-     
-        while(True):
+
+        while (True):
             parent = parent.parent()
             if not parent:
                 break
@@ -367,47 +375,65 @@ class Util():
             os.mkdir(testingFolder)
 
     @staticmethod
-    def mapFromTo(value : float, inputMin : float, inputMax : float, outputMin : float, outputMax : float) -> float:
+    def mapFromTo(value: float, inputMin: float, inputMax: float, outputMin: float, outputMax: float) -> float:
         if Util.mw is None:
             Util.loadMainWindow()
-        result=(value-inputMin)/(inputMax-inputMin)*(outputMax-outputMin)+outputMin
+        result = (value-inputMin)/(inputMax-inputMin) * \
+            (outputMax-outputMin)+outputMin
         return result
-        
+
     @staticmethod
     def showCapturePreparationDialog():
+
+        if slicer.app.testingEnabled():
+            return {
+                "saveScene": False,
+                "maximize": True,
+                "closePythonConsole": True
+            }
+
         dialog = qt.QDialog(slicer.util.mainWindow())
         dialog.setWindowTitle(_("Prepare tutorial capture"))
         dialog.setModal(True)
 
         layout = qt.QVBoxLayout()
-        dialog.setLayout(layout)  
+        dialog.setLayout(layout)
 
-        introLabel = qt.QLabel(
-            _("Before capturing the tutorial, please review the following options:")
+        # Warning message
+        warningLabel = qt.QLabel(
+            _("<b>⚠ Warning:</b> The scene will be cleared after preparation.")
         )
-        introLabel.wordWrap = True
-        layout.addWidget(introLabel)
+        warningLabel.wordWrap = True
+        warningLabel.setStyleSheet("QLabel { color: #d9534f; padding: 8px; }")
+        layout.addWidget(warningLabel)
 
-        saveSceneCheck = qt.QCheckBox(_("Save scene"))
+        # Separator
+        line = qt.QFrame()
+        line.setFrameShape(qt.QFrame.HLine)
+        line.setFrameShadow(qt.QFrame.Sunken)
+        layout.addWidget(line)
+
+        # Options
+        saveSceneCheck = qt.QCheckBox(_("Save current scene before clearing"))
         saveSceneCheck.checked = False
+        saveSceneCheck.setToolTip(_("Opens the Save Data dialog to save your work before the scene is cleared"))
 
-        clearSceneCheck = qt.QCheckBox(_("Clear scene before capture"))
-        clearSceneCheck.checked = True
-
-        maximizeCheck = qt.QCheckBox(_("Slicer is in full screen"))
+        maximizeCheck = qt.QCheckBox(_("Maximize Slicer window"))
         maximizeCheck.checked = True
+        maximizeCheck.setToolTip(_("Ensures consistent screenshot dimensions"))
 
-        closePythonConsoleCheck = qt.QCheckBox(_("Close Python console"))
+        closePythonConsoleCheck = qt.QCheckBox(_("Close Python console and error log"))
         closePythonConsoleCheck.checked = True
+        closePythonConsoleCheck.setToolTip(_("Hides developer tools for cleaner screenshots"))
 
         for cb in (
             saveSceneCheck,
-            clearSceneCheck,
             maximizeCheck,
             closePythonConsoleCheck
         ):
             layout.addWidget(cb)
 
+        # Buttons
         buttons = qt.QDialogButtonBox()
         buttons.setStandardButtons(
             qt.QDialogButtonBox.Ok | qt.QDialogButtonBox.Cancel
@@ -417,27 +443,25 @@ class Util():
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
 
-        dialog.adjustSize()  
-        dialog.show()       
+        dialog.adjustSize()
+        dialog.show()
 
         if not dialog.exec_():
             return None
 
         return {
             "saveScene": saveSceneCheck.checked,
-            "clearScene": clearSceneCheck.checked,
             "maximize": maximizeCheck.checked,
             "closePythonConsole": closePythonConsoleCheck.checked
         }
-
-
 
 
 class WidgetFinder(qt.QWidget):
     def __init__(self, parent=None):
         super().__init__(None)
         self.setAttribute(qt.Qt.WA_StyledBackground)
-        self.setStyleSheet("QWidget { background-color: rgba(153, 51, 153, 50)}")
+        self.setStyleSheet(
+            "QWidget { background-color: rgba(153, 51, 153, 50)}")
         self.focusPolicy = qt.Qt.StrongFocus
         self.LanguageToolsLogic = None
         self.shortcutKeySequence = qt.QKeySequence("Ctrl+6")
@@ -463,7 +487,7 @@ class WidgetFinder(qt.QWidget):
         else:
             self.shortcut = qt.QShortcut(self.parent())
             self.shortcut.setKey(self.shortcutKeySequence)
-            self.shortcut.connect( "activated()", self.showFullSize)
+            self.shortcut.connect("activated()", self.showFullSize)
 
     def showPointCursor(self, enable):
         if enable == self.cursorOverridden:
@@ -512,9 +536,10 @@ class WidgetFinder(qt.QWidget):
         self.currentWidget = widget
 
     def paintEvent(self, event):
-        #we need to work on this
+        # we need to work on this
         self.setFixedSize(self.aux.size)
         self.pos = self.aux.pos
+
 
 class Shapes(qt.QWidget):
     def __init__(self, parent=None):
@@ -549,27 +574,29 @@ class Shapes(qt.QWidget):
 
         pen = qt.QPen()
         pen.setWidth(20)
-        pen.setColor(qt.QColor(255,0,0))
+        pen.setColor(qt.QColor(255, 0, 0))
 
         pos = widget.mapToGlobal(qt.QPoint())
         pos = self.parent().mapFromGlobal(pos)
         painter = qt.QPainter(self)
         painter.setPen(pen)
-        painter.drawEllipse(pos.x() - (200/2) + widget.rect.width()/2, pos.y() - (200/2) + widget.rect.height()/2, 200, 200)
+        painter.drawEllipse(pos.x() - (200/2) + widget.rect.width()/2,
+                            pos.y() - (200/2) + widget.rect.height()/2, 200, 200)
+
 
 class SelfTestTutorialLayer():
 
     directives = {
-        "id" : "TUTORIALMAKER",
-        "begin" : "BEGIN",
-        "end" : "END",
-        "metadata" : "INFO",
-        "metadata_title" : "TITLE",
-        "metadata_author" : "AUTHOR",
-        "metadata_date" : "DATE",
-        "metadata_desc" : "DESC",
-        "metadata_dependencies" : "DEPENDENCIES",
-        "takeScreenshot" : "SCREENSHOT",
+        "id": "TUTORIALMAKER",
+        "begin": "BEGIN",
+        "end": "END",
+        "metadata": "INFO",
+        "metadata_title": "TITLE",
+        "metadata_author": "AUTHOR",
+        "metadata_date": "DATE",
+        "metadata_desc": "DESC",
+        "metadata_dependencies": "DEPENDENCIES",
+        "takeScreenshot": "SCREENSHOT",
     }
 
     @staticmethod
@@ -622,30 +649,35 @@ class SelfTestTutorialLayer():
                 f"{' '*8}def TUTORIAL_GETINFO():\n"
                 f"{' '*12}return ['{tutorial_title}','{tutorial_author}', '{tutorial_date}', '{tutorial_desc}', '{tutorial_dependencies}']\n"
             )
-            
+
             tutorial_functions = []
             for idx, test_function in enumerate(re.findall(functionMatcher, test_module)):
                 _functionSignature = f"def TUTORIAL_SCREENSHOT_{idx}(_locals):\n"
                 lines = test_function.split("\n")
-                _indentation = lines[0].count(" ") # THIS DOESN'T WORK
-                _indentation = 8 #TODO: NEED TO FIND A FAST WAY TO GET THIS DINAMICALLY
+                _indentation = lines[0].count(" ")  # THIS DOESN'T WORK
+                _indentation = 8  # TODO: NEED TO FIND A FAST WAY TO GET THIS DINAMICALLY
                 lines[0] = ""
                 _newFunction = "\n" + " "*_indentation + _functionSignature
-                _newFunction += " "*(_indentation + 4) + "globals().update(_locals)\n"
+                _newFunction += " "*(_indentation + 4) + \
+                    "globals().update(_locals)\n"
 
                 for line in lines:
                     _newFunction += " "*4 + line + "\n"
-                
-                _newFunction += " "*(_indentation + 4) + "_locals.update(locals())\n"
+
+                _newFunction += " "*(_indentation + 4) + \
+                    "_locals.update(locals())\n"
 
                 tutorial_functions.append(_newFunction)
                 pass
             tutorial_functions[0] = info_func + tutorial_functions[0]
-            tutorial_functions[len(tutorial_functions) - 1] = tutorial_functions[len(tutorial_functions) - 1] + f"{' '*8}return locals()\n"
+            tutorial_functions[len(tutorial_functions) - 1] = tutorial_functions[len(
+                tutorial_functions) - 1] + f"{' '*8}return locals()\n"
             counter.count = 0
-            tutorial_tests.append(re.sub(functionMatcher, lambda match : tutorial_functions[counter.next()], test_module))
+            tutorial_tests.append(re.sub(
+                functionMatcher, lambda match: tutorial_functions[counter.next()], test_module))
         counter.count = 0
-        finalFile = re.sub(tutorialMatcher, lambda match : tutorial_tests[counter.next()], code_contents)
+        finalFile = re.sub(
+            tutorialMatcher, lambda match: tutorial_tests[counter.next()], code_contents)
 
         path = get_module_basepath("TutorialMaker") + "/Outputs/"
 
@@ -654,37 +686,85 @@ class SelfTestTutorialLayer():
         pass
 
     @staticmethod
-    def RunTutorial(tutorialClass, callback = None):
+    def RunTutorial(tutorialClass, callback=None, progressCallback=None):  # TODO: Add cancelCheckCallback=None
         import inspect
         import functools
         TUTORIAL_STEP_INTERVAL = 3000
         TUTORIAL_STEP_DICT = {
             -1: True,
             "FINISHED": False
+            # TODO: Re-enable cancel functionality
+            # "CANCELED": False
         }
 
-        def ScreenshotCallable(tutorial, callback, _locals, _stepdict, _index=0):
+        def ScreenshotCallable(tutorial, callback, _locals, _stepdict, _index=0, _totalSteps=0):
+            # TODO: Re-enable cancel functionality
+            # if cancelCheckCallback is not None and cancelCheckCallback():
+            #     _stepdict["CANCELED"] = True
+            #     _stepdict["FINISHED"] = True
+            #     return
+            
             if not _stepdict[_index - 1]:
-                timerCallback = functools.partial(ScreenshotCallable, tutorial, callback, _locals, _stepdict, _index=_index)
+                timerCallback = functools.partial(
+                    ScreenshotCallable, tutorial, callback, _locals, _stepdict, _index=_index, _totalSteps=_totalSteps)
                 qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL, timerCallback)
                 return
             if _index > 0:
                 tutorial.nextScreenshot()
+            
+            # Update progress
+            if progressCallback is not None:
+                progressCallback(_index, _totalSteps)
+            
             callback(_locals)
             _stepdict[_index] = True
 
-        def ScreenshotCallableLast(tutorial, _index=0):
+        def ScreenshotCallableLast(tutorial, _index=0, _totalSteps=0):
+            # TODO: Re-enable cancel functionality
+            # if cancelCheckCallback is not None and cancelCheckCallback():
+            #     TUTORIAL_STEP_DICT["CANCELED"] = True
+            #     TUTORIAL_STEP_DICT["FINISHED"] = True
+            #     return
+            
             if not TUTORIAL_STEP_DICT[_index - 1]:
-                endCallback = functools.partial(ScreenshotCallableLast, tutorial, _index)
+                endCallback = functools.partial(
+                    ScreenshotCallableLast, tutorial, _index, _totalSteps)
                 qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL, endCallback)
                 return
             tutorial.nextScreenshot()
+            
+            # Update progress to final step
+            if progressCallback is not None:
+                progressCallback(_totalSteps, _totalSteps)
+            
             tutorial.endTutorial()
             TUTORIAL_STEP_DICT["FINISHED"] = True
 
         tutorialSource = inspect.getsource(tutorialClass.runTest)
         funcMatcher = rf"(?m)(?<=self\.).+(?=\()"
         functionIndex = 0
+        totalSteps = 0
+        
+        # First pass: count total steps
+        for funcName in re.findall(funcMatcher, tutorialSource):
+            func = getattr(tutorialClass, funcName)
+            _locals = func()
+            if _locals is None:
+                continue
+            if not type(_locals) == dict:
+                continue
+            if _locals.get("TUTORIAL_GETINFO") is not None:
+                # Count screenshot functions
+                idx = 0
+                while f"TUTORIAL_SCREENSHOT_{idx}" in _locals:
+                    totalSteps += 1
+                    idx += 1
+                break
+        
+        # Notify total steps
+        if progressCallback is not None:
+            progressCallback(0, totalSteps)
+        
         for funcName in re.findall(funcMatcher, tutorialSource):
             func = getattr(tutorialClass, funcName)
             _locals = func()
@@ -699,47 +779,60 @@ class SelfTestTutorialLayer():
                 tutorial.clearTutorial()
                 tutorial.beginTutorial()
                 _stepIndex = 0
-                while True:
+                while True:  # TODO: Add: and not TUTORIAL_STEP_DICT["CANCELED"]
                     TUTORIAL_STEP_DICT[functionIndex] = False
                     try:
-                        timerCallback = functools.partial(ScreenshotCallable, tutorial, _locals[f"TUTORIAL_SCREENSHOT_{functionIndex}"], _locals, TUTORIAL_STEP_DICT, _index=_stepIndex)
-                        qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL*functionIndex, timerCallback)
+                        timerCallback = functools.partial(
+                            ScreenshotCallable, tutorial, _locals[f"TUTORIAL_SCREENSHOT_{functionIndex}"], 
+                            _locals, TUTORIAL_STEP_DICT, _index=_stepIndex, _totalSteps=totalSteps)
+                        qt.QTimer.singleShot(
+                            TUTORIAL_STEP_INTERVAL*functionIndex, timerCallback)
                         functionIndex += 1
                         _stepIndex += 1
                     except Exception as e:
                         print(e)
                         break
-                endCallback = functools.partial(ScreenshotCallableLast, tutorial, _stepIndex)
-                qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL*functionIndex, endCallback)
+                endCallback = functools.partial(
+                    ScreenshotCallableLast, tutorial, _stepIndex, totalSteps)
+                qt.QTimer.singleShot(
+                    TUTORIAL_STEP_INTERVAL*functionIndex, endCallback)
         # This needs to happen only after every possible tutorial is ran
         if callback is not None:
             def FinishCallback(callback):
                 if not TUTORIAL_STEP_DICT["FINISHED"]:
-                    finishCallback = functools.partial(FinishCallback, callback)
-                    qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL, finishCallback)
+                    finishCallback = functools.partial(
+                        FinishCallback, callback)
+                    qt.QTimer.singleShot(
+                        TUTORIAL_STEP_INTERVAL, finishCallback)
                     return
                 callback()
 
             finishCallback = functools.partial(FinishCallback, callback)
-            qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL*(functionIndex + 1), finishCallback)
+            qt.QTimer.singleShot(TUTORIAL_STEP_INTERVAL *
+                                 (functionIndex + 1), finishCallback)
+
 
 class NextCounter():
     def __init__(self, count=0):
         self.count = count
+
     def next(self):
         self.count += 1
         return self.count - 1
 
+
 class SignalManager(qt.QObject):
     received = qt.Signal(object)
+
     def __init__(self):
         super().__init__(None)
 
-    def connect(self,func):
+    def connect(self, func):
         self.received.connect(func)
 
     def emit(self, msg):
         self.received.emit(msg)
+
 
 class ScreenshotTools():
     def __init__(self) -> None:
@@ -747,7 +840,8 @@ class ScreenshotTools():
         pass
 
     def saveScreenshotMetadata(self, index):
-        path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
+        path = get_module_basepath(
+            "TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
 
         oPath = Path(path)
         oPath.mkdir(parents=True, exist_ok=True)
@@ -755,10 +849,10 @@ class ScreenshotTools():
 
         openWindows = []
         for w in slicer.app.topLevelWidgets():
-            if hasattr(w, "isVisible") and not w.isVisible():
+            if (hasattr(w, "isVisible") and not w.isVisible()) or w.objectName == "TutorialMakerProgressDialog":
                 continue
             if w.objectName == "qSlicerMainWindow":
-                openWindows.insert(0,w)
+                openWindows.insert(0, w)
             else:
                 openWindows.append(w)
             pass
@@ -770,11 +864,14 @@ class ScreenshotTools():
                 pass
 
             screenshotData = TutorialScreenshot()
-            screenshotData.screenshot = path + str(index) + "/" + str(wIndex) + ".png"
-            screenshotData.metadata = path + str(index) + "/" + str(wIndex) + ".json"
+            screenshotData.screenshot = path + \
+                str(index) + "/" + str(wIndex) + ".png"
+            screenshotData.metadata = path + \
+                str(index) + "/" + str(wIndex) + ".json"
 
             self.saveScreenshot(screenshotData.screenshot, openWindows[wIndex])
-            self.saveAllWidgetsData(screenshotData.metadata, openWindows[wIndex])
+            self.saveAllWidgetsData(
+                screenshotData.metadata, openWindows[wIndex])
 
             windows.append(screenshotData)
             pass
@@ -782,7 +879,7 @@ class ScreenshotTools():
         return windows
 
     def getPixmap(self, window):
-        #slicer.app.processEvents(qt.QEventLoop.AllEvents, 70)
+        # slicer.app.processEvents(qt.QEventLoop.AllEvents, 70)
         pixmap = window.grab()
         return pixmap
 
@@ -798,30 +895,33 @@ class ScreenshotTools():
             try:
                 if hasattr(widgets[index].inner(), "isVisible") and not widgets[index].inner().isVisible():
                     continue
-                data[index] = {"name": widgets[index].name, "path": Util.uniqueWidgetPath(widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
+                data[index] = {"name": widgets[index].name, "path": Util.uniqueWidgetPath(
+                    widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
                 pass
             except AttributeError:
-                #Working as expected, so to not save QObjects that are not QWidgets
+                # Working as expected, so to not save QObjects that are not QWidgets
                 pass
             except Exception as e:
                 print(e)
                 pass
         self.handler.saveScreenshotMetadata(data, filename)
 
+
 class Tutorial():
     def __init__(self,
-            title,
-            author,
-            date,
-            description,
-            dependencies=""
-    ):
+                 title,
+                 author,
+                 date,
+                 description,
+                 dependencies=""
+                 ):
         self.metadata = {}
         self.metadata["title"] = title
         self.metadata["author"] = author
         self.metadata["date"] = date
         self.metadata["desc"] = description
-        self.metadata["dependencies"] = dependencies.split(",") if dependencies != "" else []
+        self.metadata["dependencies"] = dependencies.split(
+            ",") if dependencies != "" else []
 
         self.steps = []
 
@@ -830,7 +930,8 @@ class Tutorial():
             try:
                 slicer.util.modulePath(dependency)
             except Exception:
-                raise Exception(_("Modules: {dependencies} not found. Please install the required modules before running the tutorial.").format(dependencies=self.metadata["dependencies"]))
+                raise Exception(_("Modules: {dependencies} not found. Please install the required modules before running the tutorial.").format(
+                    dependencies=self.metadata["dependencies"]))
 
     def beginTutorial(self):
         screenshotTools = ScreenshotTools()
@@ -844,13 +945,14 @@ class Tutorial():
         # if answer:
         #     slicer.util.mainWindow().pythonConsole().parent().setVisible(False)
         #     slicer.util.mainWindow().errorLogWidget().parent().setVisible(False)
-        #Screenshot counter
+        # Screenshot counter
         self.nSteps = 0
         self.screenshottools = screenshotTools
 
-    #TODO:Unsafe, there should be a better method to do this, at least add some conditions
+    # TODO:Unsafe, there should be a better method to do this, at least add some conditions
     def clearTutorial(self):
-        outputPath = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
+        outputPath = get_module_basepath(
+            "TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
         if not os.path.exists(outputPath):
             return
         dirs = os.listdir(outputPath)
@@ -865,10 +967,12 @@ class Tutorial():
 
     def nextScreenshot(self, overwriteName=None):
         if type(overwriteName) is str:
-            self.steps.append(self.screenshottools.saveScreenshotMetadata(overwriteName))
+            self.steps.append(
+                self.screenshottools.saveScreenshotMetadata(overwriteName))
             self.nSteps = self.nSteps + 1
             return
-        self.steps.append(self.screenshottools.saveScreenshotMetadata(self.nSteps))
+        self.steps.append(
+            self.screenshottools.saveScreenshotMetadata(self.nSteps))
         self.nSteps = self.nSteps + 1
     pass
 
@@ -885,33 +989,38 @@ class TutorialScreenshot():
     def getImage(self):
         image = qt.QImage(self.screenshot)
         pixmap = qt.QPixmap.fromImage(image)
-        
+
         dpr = self.getDevicePixelRatio()
         if dpr > 1.0:
             logicalWidth = int(pixmap.width() / dpr)
             logicalHeight = int(pixmap.height() / dpr)
-            pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
-        
+            pixmap = pixmap.scaled(
+                logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
+
         pixmap.setDevicePixelRatio(1.0)
         return pixmap
+
     def getWidgets(self):
         widgets = []
         nWidgets = JSONHandler.parseJSON(self.metadata)
         dpr = self.getDevicePixelRatio()
-        
+
         for keys in nWidgets:
             if isinstance(keys, str) and keys.startswith("_"):
                 continue
-            
-            widget = nWidgets[keys].copy() if hasattr(nWidgets[keys], 'copy') else dict(nWidgets[keys])
-            
+
+            widget = nWidgets[keys].copy() if hasattr(
+                nWidgets[keys], 'copy') else dict(nWidgets[keys])
+
             if dpr > 1.0:
-                widget["position"] = [widget["position"][0] / dpr, widget["position"][1] / dpr]
-                widget["size"] = [widget["size"][0] / dpr, widget["size"][1] / dpr]
-            
+                widget["position"] = [widget["position"]
+                                      [0] / dpr, widget["position"][1] / dpr]
+                widget["size"] = [widget["size"]
+                                  [0] / dpr, widget["size"][1] / dpr]
+
             widgets.append(widget)
         return widgets
-    
+
     def getDevicePixelRatio(self):
         """Get the device pixel ratio saved with this screenshot, defaults to 1.0"""
         nWidgets = {}
@@ -924,7 +1033,8 @@ class TutorialScreenshot():
 # TODO: REMOVE THIS, DEPRECATED
 class JSONHandler:
     def __init__(self):
-        self.path = get_module_basepath("TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
+        self.path = get_module_basepath(
+            "TutorialMaker") + f"/Outputs/Raw/{os.environ['TUTORIAL_CURRENT_SELFTEST']}/"
         oPath = Path(self.path)
         oPath.mkdir(parents=True, exist_ok=True)
         self.path = str(oPath.resolve()) + "/"
@@ -952,7 +1062,7 @@ class JSONHandler:
                     )
                     tutorial.steps.append(wScreenshot)
             return tutorial
-        #TODO: Non inline parser
+        # TODO: Non inline parser
         return tutorial
 
     def parseJSON(path):
@@ -963,15 +1073,16 @@ class JSONHandler:
             data = json.load(file)
         return data
 
-
     def saveTutorial(self, metadata, stepsList):
         metadata["steps"] = []
         for step in stepsList:
             windows = []
             for screenshot in step:
                 datapair = {}
-                datapair["window"] = screenshot.screenshot.replace(self.path, "")
-                datapair["metadata"] = screenshot.metadata.replace(self.path, "")
+                datapair["window"] = screenshot.screenshot.replace(
+                    self.path, "")
+                datapair["metadata"] = screenshot.metadata.replace(
+                    self.path, "")
                 windows.append(datapair)
             pass
             metadata["steps"].append(windows)
