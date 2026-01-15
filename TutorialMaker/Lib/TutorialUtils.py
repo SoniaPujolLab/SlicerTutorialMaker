@@ -183,8 +183,12 @@ class Widget():
             action = actions[actionIndex]
             if not action.isVisible():
                 continue
+            menuAction = ""
+            if( action.menu()):
+                if(not action.data()):
+                    menuAction = Widget(action.menu()).name
             __itemData = SimpleNamespace(
-                name= f"XmenuWidgetAction_{ action.data() or actionIndex}",
+                name= f"XmenuWidgetAction_{ menuAction or action.data() or actionIndex}",
                 className= lambda:"XmenuWidgetAction",
                 text= action.text,
                 mapToGlobal= self.__widgetData.mapToGlobal,
@@ -202,8 +206,11 @@ class Widget():
                 actionsData.append(action.data())
         actionsData.sort()
         if len(actionsData) > 0 and actionsData[0]:
-            return f"QMenu_act_{actionsData[0]}"
+            return f"QMenu_XAct_{actionsData[0]}"
         return ""
+    def __QActionAsQMenu(self):
+
+        pass
 
 class Util():
     mw = None
