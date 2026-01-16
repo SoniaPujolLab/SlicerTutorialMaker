@@ -337,6 +337,14 @@ class Annotation:
             bottomRight = qt.QPoint(targetPos[0] + optX, targetPos[1] + optY)
             rectToDraw = qt.QRect(topLeft,bottomRight)
 
+            #TODO: Remove this on the future
+            if not self.extraOptions:
+                self.extraOptions = {
+                    "textColor": "#000000",
+                    "textAlign": "right",
+                    "textFit": False
+                }
+
             # Text Color
             textColor = self.extraOptions["textColor"]
 
