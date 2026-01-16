@@ -56,6 +56,12 @@ class Annotation:
         self.boundingBoxBottomRight = [0,0]
         self.__selectionSlideEffect = 0
         self.extraOptions = {}
+        if Type == AnnotationType.TextBox:
+            self.extraOptions = {
+                "textColor": "#000000",
+                "textAlign": "right",
+                "textFit": False
+            }
 
         # Need to change this later, make it loaded through resources
         #self.icon_click = qt.QImage(os.path.dirname(__file__) + '/../Resources/Icons/Painter/click_icon.png')
@@ -330,14 +336,9 @@ class Annotation:
             topLeft = qt.QPoint(targetPos[0], targetPos[1])
             bottomRight = qt.QPoint(targetPos[0] + optX, targetPos[1] + optY)
             rectToDraw = qt.QRect(topLeft,bottomRight)
-            painter.drawRect(rectToDraw)
 
             # Text Color
-            textColor = None
-            if not self.extraOptions:
-                textColor = "#000000"
-            else:
-                textColor = self.extraOptions["textColor"]
+            textColor = self.extraOptions["textColor"]
 
             font = qt.QFont("Arial", self.fontSize)
             painter.setFont(font)
@@ -348,7 +349,7 @@ class Annotation:
             xPadding = 6
             lineSpacing = 2
 
-            if not self.extraOptions or self.extraOptions["textAlign"] == "right":
+            if self.extraOptions["textAlign"] == "right":
 
                 # Calculate the text break and position
                 fontMetrics = qt.QFontMetrics(font)
@@ -398,7 +399,10 @@ class Annotation:
                 maxHeight = len(displayLines)*(fHeight + lineSpacing) - lineSpacing
 
                 textFitBottomRight = [textBoxTopLeft[0] + 2*xPadding + maxWidth,textBoxTopLeft[1] + 2*yPadding + maxHeight]
-                finalRectBottomRight = [max(textBoxBottomRight[0], textFitBottomRight[0]), max(textBoxBottomRight[1], textFitBottomRight[1])]
+                if not self.extraOptions["textFit"]: 
+                    finalRectBottomRight = [max(textBoxBottomRight[0], textFitBottomRight[0]), max(textBoxBottomRight[1], textFitBottomRight[1])]
+                else:
+                    finalRectBottomRight = textFitBottomRight
 
                 painter.drawRect(qt.QRect(
                     qt.QPoint(*textBoxTopLeft),
@@ -415,6 +419,8 @@ class Annotation:
             elif self.extraOptions["textAlign"] == "center":
 
                 # Calculate the text break and position
+
+                painter.drawRect(rectToDraw)
 
                 fontMetrics = qt.QFontMetrics(font)
                 fHeight = fontMetrics.height()
