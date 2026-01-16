@@ -921,11 +921,17 @@ class DraggableLabel(qt.QLabel):
         return [x + width/2, y + height/2]
 
     def SetCenter(self, x : int, y : int):
+        newPos = self.GetCenter()
+        if x > 0 and x < self.parent().width:
+            newPos[0] = x
+        if y > 0 and y < self.parent().height:
+            newPos[1] = y
+
         size = self.size
         width = size.width()
         height = size.height()
 
-        self.move(x - width/2, y - height/2)
+        self.move(newPos[0] - width/2, newPos[1] - height/2)
 
     def SetActive(self, state : bool):
         if state:
@@ -943,12 +949,7 @@ class DraggableLabel(qt.QLabel):
                 if event.button() == 0: # Left Button pressed
                     sPos = event.screenPos().toPoint()
                     pos = self.parent().mapFromGlobal(sPos)
-                    newPos = self.GetCenter()
-                    if pos.x() > 0 and pos.x() < self.parent().width:
-                        newPos[0] = pos.x()
-                    if pos.y() > 0 and pos.y() < self.parent().height:
-                        newPos[1] = pos.y()
-                    self.SetCenter(*newPos)
+                    self.SetCenter(pos.x(), pos.y())
 
 class ClickableLabel(qt.QLabel):
     clicked = qt.Signal()
