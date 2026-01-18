@@ -400,7 +400,13 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         
         if not os.path.exists(annotationsPath):
             # In testing/CI mode, print warning instead of showing modal dialog
-            if slicer.app.testingEnabled():
+            # Check multiple indicators for testing mode
+            is_testing = (slicer.app.testingEnabled() or 
+                         os.environ.get('CI') == 'true' or 
+                         os.environ.get('GITHUB_ACTIONS') == 'true' or
+                         os.environ.get('SLICER_TESTING') == 'true')
+            
+            if is_testing:
                 print(f"⚠️ Warning: No annotations found for {tutorialName}")
                 return
             slicer.util.warningDisplay(
@@ -414,9 +420,11 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(annotationsPath)
             outputPath = modulePath + "/Outputs/"
             
-            # Check if we're in testing/CI mode
-            is_testing = slicer.app.testingEnabled()
-            is_ci_mode = os.environ.get('CI') == 'true' or os.environ.get('GITHUB_ACTIONS') == 'true'
+            # Check if we're in testing/CI mode - check all possible indicators
+            is_testing = (slicer.app.testingEnabled() or 
+                         os.environ.get('SLICER_TESTING') == 'true')
+            is_ci_mode = (os.environ.get('CI') == 'true' or 
+                         os.environ.get('GITHUB_ACTIONS') == 'true')
             
             # Only try to open file explorer and show message box in interactive mode
             if not is_testing and not is_ci_mode:

@@ -405,8 +405,13 @@ class Util():
 
     @staticmethod
     def showCapturePreparationDialog():
-
-        if slicer.app.testingEnabled():
+        # Check all possible testing/CI mode indicators
+        is_testing = (slicer.app.testingEnabled() or 
+                     os.environ.get('CI') == 'true' or 
+                     os.environ.get('GITHUB_ACTIONS') == 'true' or
+                     os.environ.get('SLICER_TESTING') == 'true')
+        
+        if is_testing:
             return {
                 "saveScene": False,
                 "maximize": True,
