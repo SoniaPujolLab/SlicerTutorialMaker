@@ -399,6 +399,10 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         annotationsPath = modulePath + f"/Outputs/Annotations/{tutorialName}/annotations.json"
         
         if not os.path.exists(annotationsPath):
+            # In testing/CI mode, print warning instead of showing modal dialog
+            if slicer.app.testingEnabled():
+                print(f"⚠️ Warning: No annotations found for {tutorialName}")
+                return
             slicer.util.warningDisplay(
                 _("You don't have any annotations to export.\n"
                   "Please annotate your screenshots first using \"Edit Annotations\"."),
@@ -409,17 +413,34 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         with slicer.util.tryWithErrorDisplay(_("Failed to generate tutorial")):
             AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(annotationsPath)
             outputPath = modulePath + "/Outputs/"
-            if platform.system() == "Windows":
+            
+            # Check if we're in testing/CI mode
+            is_testing = slicer.app.testingEnabled()
+            is_ci_mode = os.environ.get('CI') == 'true' or os.environ.get('GITHUB_ACTIONS') == 'true'
+            
+            # Only try to open file explorer and show message box in interactive mode
+            if not is_testing and not is_ci_mode:
+                if platform.system() == "Windows":
+                        try:
+                            import subprocess
+                            subprocess.Popen(["explorer", os.path.realpath(outputPath)])
+                        except Exception as e:
+                            print("The folder could not be opened:", e)
+                else:
+                    import subprocess, sys
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
                     try:
-                        import subprocess
-                        subprocess.Popen(["explorer", os.path.realpath(outputPath)])
+                        # Add timeout to prevent hanging
+                        subprocess.call([opener, outputPath], timeout=2)
                     except Exception as e:
-                        print("The folder could not be opened:", e)
+                        print(f"Could not open output folder: {e}")
+                
+                # Show success message box only in interactive mode
+                qt.QMessageBox.information(slicer.util.mainWindow(), _("Tutorial Generated"), _("Generated Tutorial: {tutorialName}").format(tutorialName=tutorialName))
             else:
-                import subprocess, sys
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, outputPath])
-            qt.QMessageBox.information(slicer.util.mainWindow(), _("Tutorial Generated"), _("Generated Tutorial: {tutorialName}").format(tutorialName=tutorialName))
+                # In testing/CI mode, just print the message
+                print(f"✅ Tutorial Generated: {tutorialName}")
+                print(f"   Output path: {outputPath}")
         pass
 
     def CreateNewTutorial(self):
@@ -434,11 +455,15 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
         
         if not os.path.exists(rawTutorialPath):
-            slicer.util.warningDisplay(
-                _("Before editing annotations you should run the capture of the screenshots.\n"
-                  "Select a tutorial and click on \"Capture Screenshots\"."),
-                _("No Screenshots Found")
-            )
+            # In testing/CI mode, print warning instead of showing modal dialog
+            if slicer.app.testingEnabled():
+                print(f"⚠️ Warning: No screenshots found for {tutorialName}")
+            else:
+                slicer.util.warningDisplay(
+                    _("Before editing annotations you should run the capture of the screenshots.\n"
+                      "Select a tutorial and click on \"Capture Screenshots\"."),
+                    _("No Screenshots Found")
+                )
             return
         
         fileToLoad = rawTutorialPath
