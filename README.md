@@ -93,11 +93,11 @@ It's possible to change the slide title and descriptions
 ![dg2](https://github.com/user-attachments/assets/a0264344-6c3d-403d-ae49-db8b30507623)
 
 ## Developer mode
-- If you have set the developer mode (Edit > Application Settings > Developer > Enable developer mode) on Slicer, you will notice the extension is a bit different. These are features and unstable processes that we are currently testing.
+- If you have enabled developer mode (Edit > Application Settings > Developer > Enable developer mode) in Slicer, you may notice additional options within the extension. These represent experimental features and unstable processes currently undergoing test
 <img width="598" height="1007" alt="image" src="https://github.com/user-attachments/assets/ce9478fa-e195-4cc8-b2ef-f90b3d4c9ed1" />
 
-- Fetch From Github: Its a feature that downloads the tutorials from a list of repositories that have created their own tutorials. By now is disabled due to the issue related to GitHub API Limit.
-- Tutorial Making: Some features that help you to create new tutorials, here you can "record" widget names and paths.
+- The Fetch From GitHub feature allows users to download tutorials directly from a curated list of external repositories. Currently, this feature is disabled to prevent issues regarding GitHub API rate limits.
+- .Tutorial Creation Tools: These features assist in developing new tutorials by allowing you to record widget names and paths automatically.
 
 ## Writing tutorials
-- To create new tutorials, follow this example from [SlicerTestRepository](https://github.com/SoniaPujolLab/SlicerTestTutorial).
+- For guidance on developing your own tutorials, please follow the template and examples hosted at the SlicerTestRepository (https://github.com/SoniaPujolLab/SlicerTestTutorial).
