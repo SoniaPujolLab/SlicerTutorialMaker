@@ -12,6 +12,10 @@ set(MODULE_PYTHON_SCRIPTS
   Lib/TutorialAnnotator.py
   Lib/TutorialPainter.py
   Lib/TutorialUtils.py
+  Testing/AIBasedSegmentationIn3DSlicer.py
+  Testing/FourMinuteTutorial.py 
+  Testing/VisualizationTutorial.py 
+  Testing/WelcomeTutorial.py 
   )
 
 set(MODULE_PYTHON_RESOURCES
