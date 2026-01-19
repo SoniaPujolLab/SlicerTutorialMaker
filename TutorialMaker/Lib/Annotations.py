@@ -470,7 +470,7 @@ class Annotation:
                         break
                     font.setPointSize(font.pointSize() - 1)
                     fontMetrics = qt.QFontMetrics(font)
-                    if font.pointSize() < 1:
+                    if font.pointSize() < 2:
                         break
                 
                 textStart = [textBoxTopLeft[0] + xPadding,
