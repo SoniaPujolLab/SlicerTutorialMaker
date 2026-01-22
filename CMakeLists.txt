@@ -15,14 +15,7 @@ set(EXTENSION_CONTRIBUTORS "Douglas Gonçalves (Universidade de São Paulo), Enr
                                     Steve Pieper (Isomics Inc.), Adriana Vilchis-Gonzalez (Universidad Autónoma del Estado de México), 
                                     Luiz Otavio Murta Junior (Universidade de São Paulo), Andras Lasso (Queen’s University), 
                                     Sonia Pujol (Brigham and Women’s Hospital, Harvard Medical School)")
-set(EXTENSION_DESCRIPTION "<strong>Tutorial Maker</strong> allows you to build and share tutorials and documentations multi-lingual automatically.
-                           <p>Workflow:</p>
-                           <ul>
-                              <li>Create a Python script defining the tutorial steps.</li>
-                              <li>Run this module to execute the tutorial and generate screenshots.</li>
-                              <li>Annotate the tutorial.</li>
-                              <li>Apply translations (manual or Weblate) to produce localized versions.</li>
-                           </ul>")
+set(EXTENSION_DESCRIPTION "The Tutorial Maker is currently in an experimental development phase. It provides a framework for generating 3D Slicer tutorials that can be translated into multiple languages.")
 set(EXTENSION_ICONURL "https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/TutorialMaker.png")
 set(EXTENSION_SCREENSHOTURLS "https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo1.png https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo2.png https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo3.png https://raw.githubusercontent.com/SoniaPujolLab/SlicerTutorialMaker/main/DOCS/aibasedseg_demo4.png")
 set(EXTENSION_DEPENDS "NA") # Specified as a list or "NA" if no dependencies
