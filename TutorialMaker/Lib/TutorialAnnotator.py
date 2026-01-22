@@ -1046,6 +1046,12 @@ class SlideGalery(qt.QDialog):
             annotations = self._mountCustomSlide(self.slides[index])
         self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex + 1, self.slides[index]["path"], annotations)
 
+    def ExportSlideClick(self, index):
+        self.ExportSlide(index)
+        def callback():
+            self.parent().changeSelectedSlide(self.parent().slides[ self.parent().selectedSlideIndex ])
+        qt.QTimer.singleShot(100, callback)
+
 
     def AddSlide(self, image : qt.QPixmap, metadata : list = [], _type = AnnotatorSlideLayoutType.Blank, path : list[str] = ["0/0"]):
         slide = {"image": image, "metadata": metadata, "type": _type, "path": path}
@@ -1055,7 +1061,7 @@ class SlideGalery(qt.QDialog):
         container_widget.setPixmap(slide["image"].scaled(*self.thumbnailSize, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation))
         container_widget.setStyleSheet("border: 2px solid black; background-color: lightgray; padding: 5px;")
         index = len(self.slides)
-        container_widget.clicked.connect(lambda : self.ExportSlide(index))
+        container_widget.clicked.connect(lambda : self.ExportSlideClick(index))
 
         item = qt.QListWidgetItem(self.listWidget)
         item.setSizeHint(qt.QSize(320, 220))
