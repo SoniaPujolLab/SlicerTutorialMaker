@@ -490,7 +490,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         test_tutorials = []
         test_contents = os.listdir(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Testing/")
         for content in test_contents:
-            if(".py" not in content):
+            if(not content.endswith(".py")):
                 continue
             test_tutorials.append(content.replace(".py", ""))
         return test_tutorials
