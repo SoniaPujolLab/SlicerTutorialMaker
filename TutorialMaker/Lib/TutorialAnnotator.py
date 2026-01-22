@@ -735,8 +735,7 @@ class TutorialAnnotator(qt.QMainWindow):
             [pageWidget],
             AnnotatorSlideLayoutType.Blank
         )
-        
-        self.slideGalery.ExportSlide(1)
+        # Export Cover page
         self.slideGalery.ExportSlide(0)
 
         for stepIndex, screenshots in enumerate(tutorialData.steps):
@@ -773,6 +772,11 @@ class TutorialAnnotator(qt.QMainWindow):
                 
 
             self.slides.append(slideWidget)  # noqa: F821
+
+        # Export Acknownledgments page
+        self.changeSelectedSlide(self.slides[ len(self.slides) - 1 ])
+        self.slideGalery.ExportSlide(1)
+
         def callback():
             if self.slides:
                 self.changeSelectedSlide(self.slides[0])
@@ -1040,7 +1044,7 @@ class SlideGalery(qt.QDialog):
         annotations = None
         if self.slides[index]["type"] in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank:
             annotations = self._mountCustomSlide(self.slides[index])
-        self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex, self.slides[index]["path"], annotations)
+        self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex + 1, self.slides[index]["path"], annotations)
 
 
     def AddSlide(self, image : qt.QPixmap, metadata : list = [], _type = AnnotatorSlideLayoutType.Blank, path : list[str] = ["0/0"]):
