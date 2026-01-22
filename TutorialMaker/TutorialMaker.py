@@ -40,7 +40,15 @@ class TutorialMaker(ScriptedLoadableModule): # noqa: F405
                                     "Luiz Otavio Murta Junior (Universidade de São Paulo)", "Andras Lasso (Queen’s University)", 
                                     "Sonia Pujol (Brigham and Women’s Hospital, Harvard Medical School)"]
         # TODO: update with short description of the module and a link to online module documentation
-        self.parent.helpText = """help text"""
+        self.parent.helpText = """
+        This module automates the creation of illustrated tutorials. 
+        <p>
+        It executes a user-defined Python script to run a sequence of actions within Slicer, 
+        automatically capturing and saving screenshots to the repository. 
+        It also supports multi-language generation using Weblate translations.
+        </p>
+        <p>For more details, visit the <a href="https://github.com/SoniaPujolLab/SlicerTutorialMaker">online module documentation</a>.</p>
+        """
         # TODO: replace with organization, grant and thanks
         self.parent.acknowledgementText = _("""
         The development of this module has been made possible in part by a grant from the Chan Zuckerberg Initiative
