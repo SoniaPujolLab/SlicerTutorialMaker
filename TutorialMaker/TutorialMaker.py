@@ -492,7 +492,10 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         for content in test_contents:
             if(not content.endswith(".py")):
                 continue
-            test_tutorials.append(content.replace(".py", ""))
+            tutorial_name = content.replace(".py", "")
+            if not tutorial_name:
+                continue
+            test_tutorials.append(tutorial_name)
         return test_tutorials
 
     @staticmethod
