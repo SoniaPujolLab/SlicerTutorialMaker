@@ -71,6 +71,7 @@ set(MODULE_PYTHON_RESOURCES
   Resources/UI/CreateNewTutorial.ui
   Resources/UI/ScreenshotAnnotator.ui
   Resources/UI/TutorialEditor.ui
+  Resources/UI/TutorialAnnotator.ui
   Resources/UI/WidgetAnnotator.ui
   )
 
