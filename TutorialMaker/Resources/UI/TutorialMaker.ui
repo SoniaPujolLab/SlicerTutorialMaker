@@ -88,14 +88,14 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Capture screenshots</string>
+      <string>Capture Screenshots</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButtonOpenAnnotator">
      <property name="text">
-      <string>Edit annotations</string>
+      <string>Edit Annotations</string>
      </property>
     </widget>
    </item>
@@ -105,7 +105,7 @@
       <bool>true</bool>
      </property>
      <property name="text">
-      <string>Generate output</string>
+      <string>Generate Tutorial</string>
      </property>
     </widget>
    </item>
