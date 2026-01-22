@@ -318,7 +318,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
                 _("Preparing tutorial capture..."),
                 None, 0, 100, slicer.util.mainWindow()  # TODO: Change None to _("Cancel") to re-enable
             )
-            self._progress.setWindowTitle(_("Capturing tutorial"))
+            self._progress.setWindowTitle(_("Screenshot Capture in Progress"))
             self._progress.setObjectName("TutorialMakerProgressDialog")
             self._progress.setCancelButton(None)  # TODO: Remove this line to re-enable cancel button
             self._progress.setWindowModality(qt.Qt.ApplicationModal)
@@ -348,9 +348,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             percentage = int((currentStep / totalSteps) * 100)
             self._progress.setValue(percentage)
             self._progress.setLabelText(
-                _("Capturing tutorial...\n\n"
+                _("Capturing Tutorial Screenshots...\n\n"
                   "Step {current} of {total}\n\n"
-                  "Please do not interact with Slicer.").format(
+                  "Please do not use the mouse or keyboard to interact with 3D Slicer until the screenshot capture is completed.").format(
                     current=currentStep, 
                     total=totalSteps
                 )
@@ -375,7 +375,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             slicer.util.mainWindow().moduleSelector().selectModule('TutorialMaker')
             if not slicer.app.testingEnabled():
                 slicer.util.infoDisplay(
-                    _("Tutorial Captured"),
+                    _("Screenshot Capture Completed"),
                     _("Captured Tutorial: {tutorialName}").format(tutorialName=tutorialName)
                 )
 
@@ -531,7 +531,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         test_tutorials = []
         test_contents = os.listdir(Lib.TutorialUtils.get_module_basepath("TutorialMaker") + "/Testing/")
         for content in test_contents:
-            if(".py" not in content):
+            if(not content.endswith(".py")):
                 continue
             test_tutorials.append(content.replace(".py", ""))
         return test_tutorials
