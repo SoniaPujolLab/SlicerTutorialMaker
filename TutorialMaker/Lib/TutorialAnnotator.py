@@ -337,7 +337,7 @@ class TutorialAnnotator(qt.QMainWindow):
         pass
 
     def deleteSelectedAnnotation(self):
-        if self.selectedAnnotator.SlideLayout in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment:
+        if self.selectedAnnotator.SlideLayout in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank:
             return
         self.selectedAnnotation.PERSISTENT = False
         self.finishCurrentAnnotation()
