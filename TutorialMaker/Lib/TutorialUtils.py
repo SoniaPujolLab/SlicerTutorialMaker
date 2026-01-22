@@ -414,7 +414,7 @@ class Util():
             }
 
         dialog = qt.QDialog(slicer.util.mainWindow())
-        dialog.setWindowTitle(_("Prepare tutorial capture"))
+        dialog.setWindowTitle(_("Screenshot Capture Environment Setup"))
         dialog.setModal(True)
 
         layout = qt.QVBoxLayout()
@@ -422,7 +422,7 @@ class Util():
 
         # Warning message
         warningLabel = qt.QLabel(
-            _("<b>⚠ Warning:</b> The scene will be cleared after preparation.")
+            _("<b>⚠ Warning:</b> The current scene data will be cleared before starting the screenshots capture.")
         )
         warningLabel.wordWrap = True
         warningLabel.setStyleSheet("QLabel { color: #d9534f; padding: 8px; }")
@@ -435,15 +435,15 @@ class Util():
         layout.addWidget(line)
 
         # Options
-        saveSceneCheck = qt.QCheckBox(_("Save current scene before clearing"))
+        saveSceneCheck = qt.QCheckBox(_("Save current scene data"))
         saveSceneCheck.checked = False
         saveSceneCheck.setToolTip(_("Opens the Save Data dialog to save your work before the scene is cleared"))
 
-        maximizeCheck = qt.QCheckBox(_("Maximize Slicer window"))
+        maximizeCheck = qt.QCheckBox(_("Maximize 3D Slicer window for screen capture"))
         maximizeCheck.checked = True
         maximizeCheck.setToolTip(_("Ensures consistent screenshot dimensions"))
 
-        closePythonConsoleCheck = qt.QCheckBox(_("Close Python console and error log"))
+        closePythonConsoleCheck = qt.QCheckBox(_("Close Python console and Error Log window"))
         closePythonConsoleCheck.checked = True
         closePythonConsoleCheck.setToolTip(_("Hides developer tools for cleaner screenshots"))
 
