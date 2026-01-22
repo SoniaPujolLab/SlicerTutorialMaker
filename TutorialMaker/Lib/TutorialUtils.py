@@ -718,9 +718,11 @@ class SelfTestTutorialLayer():
         TUTORIAL_STEP_INTERVAL = 3000
         TUTORIAL_STEP_DICT = {
             -1: True,
-            "FINISHED": False
+            "FINISHED": False,
             # TODO: Re-enable cancel functionality
             # "CANCELED": False
+            "ERROR": None,
+            "EXCEPTION": None
         }
 
         def ScreenshotCallable(tutorial, callback, _locals, _stepdict, _index=0, _totalSteps=0):
@@ -742,7 +744,14 @@ class SelfTestTutorialLayer():
             if progressCallback is not None:
                 progressCallback(_index, _totalSteps)
             
-            callback(_locals)
+            try:
+                callback(_locals)
+            except Exception as e:
+                _stepdict["FINISHED"] = True
+                _stepdict["ERROR"] = str(e)
+                _stepdict["EXCEPTION"] = e
+                raise
+            
             _stepdict[_index] = True
 
         def ScreenshotCallableLast(tutorial, _index=0, _totalSteps=0):
@@ -816,7 +825,7 @@ class SelfTestTutorialLayer():
                         functionIndex += 1
                         _stepIndex += 1
                     except Exception as e:
-                        print(e)
+                        raise
                         break
                 endCallback = functools.partial(
                     ScreenshotCallableLast, tutorial, _stepIndex, totalSteps)
@@ -831,6 +840,8 @@ class SelfTestTutorialLayer():
                     qt.QTimer.singleShot(
                         TUTORIAL_STEP_INTERVAL, finishCallback)
                     return
+                if TUTORIAL_STEP_DICT["EXCEPTION"] is not None:
+                    raise TUTORIAL_STEP_DICT["EXCEPTION"]
                 callback()
 
             finishCallback = functools.partial(FinishCallback, callback)

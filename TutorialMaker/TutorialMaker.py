@@ -74,7 +74,20 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.__selectedTutorial = None
         self.isDebug = slicer.app.settings().value("Developer/DeveloperMode")
 
-        print(_("Version Date: {}").format("2026/01/01-08:00AM"))
+        # Get build date from extension manager
+        extensionsManager = slicer.app.extensionsManagerModel()
+        buildDate = "Unknown"
+        try:
+            extensionMetadata = extensionsManager.extensionMetadata("TutorialMaker")
+            if extensionMetadata and "build_date" in extensionMetadata:
+                buildDate = extensionMetadata["build_date"]
+            else:
+                extensionDescription = extensionsManager.extensionDescription("TutorialMaker")
+                if extensionDescription and "build_date" in extensionDescription:
+                    buildDate = extensionDescription["build_date"]
+        except:
+            pass
+        print(_("Version Build Date: {}").format(buildDate))
 
         #PROTOTYPE FOR PLAYBACK
 
@@ -562,7 +575,11 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
                 continue
             testClass = getattr(TutorialModule, className)
             tutorial = testClass()
-            SelfTestTutorialLayer.RunTutorial(tutorial, callback, progressCallback)  # TODO: Add cancelCheckCallback
+            try:
+                SelfTestTutorialLayer.RunTutorial(tutorial, callback, progressCallback)  # TODO: Add cancelCheckCallback
+            except Exception as e:
+                logging.error(_(f"Error running tutorial {tutorial_name}: {e}"))
+                raise
             return
         logging.error(_(f"No tests found in {tutorial_name}"))
         raise Exception(_("No Tests Found"))
