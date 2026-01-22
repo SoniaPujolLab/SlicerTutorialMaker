@@ -818,15 +818,15 @@ class TutorialPainter:
             
             if slide.SlideLayout == AnnotatorSlideLayoutType.Cover:
                 page = Exporter.CoverSlide(
-                    self.TutorialInfo['title'],
-                    self.TutorialInfo['author'],
-                    self.TutorialInfo['date'],
-                    self.TutorialInfo['desc'],
+                    slide.annotations[0].text or self.TutorialInfo['title'],
+                    slide.annotations[1].text or self.TutorialInfo['author'],
+                    slide.annotations[2].text or self.TutorialInfo['date'],
+                    slide.annotations[3].text or self.TutorialInfo['desc'],
                     )
             # This doesn't parse the Acknowledgements correctly
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Acknowledgment:
                 page = Exporter.BackCoverSlide(
-                    slide.SlideTitle or "Acknowledgments",
+                    slide.annotations[0].text or "Acknowledgments",
                     slide.annotations[1].text
                 )
 
@@ -837,6 +837,13 @@ class TutorialPainter:
                     slide.SlideTitle,
                     slide.SlideBody,
                     slide.imagePath
+                )
+
+            #TODO: Make custom exporter layout
+            elif slide.SlideLayout == AnnotatorSlideLayoutType.Blank:
+                page = Exporter.BackCoverSlide(
+                    slide.annotations[0].text,
+                    slide.annotations[1].text
                 )
             else:
                 continue
