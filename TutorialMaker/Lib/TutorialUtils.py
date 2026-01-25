@@ -824,9 +824,10 @@ class SelfTestTutorialLayer():
                             TUTORIAL_STEP_INTERVAL*functionIndex, timerCallback)
                         functionIndex += 1
                         _stepIndex += 1
+                    except KeyError as e:
+                        break
                     except Exception as e:
                         raise
-                        break
                 endCallback = functools.partial(
                     ScreenshotCallableLast, tutorial, _stepIndex, totalSteps)
                 qt.QTimer.singleShot(
