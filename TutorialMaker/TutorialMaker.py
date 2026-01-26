@@ -127,6 +127,7 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.ui.pushButtonExportScreenshots.connect('clicked(bool)', self.logic.ExportScreenshots)
         self.ui.pushButtonNewTutorial.connect('clicked(bool)', self.logic.CreateNewTutorial)
         self.ui.pushButtonOpenAnnotator.connect('clicked(bool)', self.openAnnotatorButton)
+        self.ui.pushButtonOpenAnnotatorLoad.connect('clicked(bool)', self.openLastAnnotatorButton)
         self.ui.pushButtonFetchFromGithub.connect('clicked(bool)', self.getFromGithub)
         self.ui.listWidgetTutorials.itemSelectionChanged.connect(self.tutorialSelectionChanged)
 
@@ -201,6 +202,11 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
 
     def openAnnotatorButton(self):
         self.logic.OpenAnnotator(self.__selectedTutorial)
+        self.logic.Annotator.closeCallback(self.tutorialSelectionChanged)
+
+    def openLastAnnotatorButton(self):
+        self.logic.OpenAnnotatorAndLoad(self.__selectedTutorial)
+        self.logic.Annotator.closeCallback(self.tutorialSelectionChanged)
 
     def tutorialSelectionChanged(self):
         self.__selectedTutorial = None
@@ -212,6 +218,11 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.ui.pushButtonCapture.setEnabled(self.__selectedTutorial is not None)
         self.ui.pushButtonGenerate.setEnabled(self.__selectedTutorial is not None)
         self.ui.pushButtonOpenAnnotator.setEnabled(self.__selectedTutorial is not None)
+
+        modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
+        annotationsPath = modulePath + f"/Outputs/Annotations/{self.__selectedTutorial}/annotations.json"
+
+        self.ui.pushButtonOpenAnnotatorLoad.setEnabled((self.__selectedTutorial is not None) and os.path.exists(annotationsPath))
 
     def getFromGithub(self):
         slicer.util.infoDisplay(_("Fetching tutorials from GitHub.\n" 
@@ -478,10 +489,9 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         Tutorial_Win.show()
         pass
 
-    def OpenAnnotator(Self, tutorialName = ""):
+    def OpenAnnotator(self, tutorialName = ""):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
         rawTutorialPath = modulePath + f"/Outputs/Raw/{tutorialName}/Tutorial.json"
-        annotationsPath = modulePath + "/Outputs/Annotations/annotations.json"
         
         if not os.path.exists(rawTutorialPath):
             # In testing/CI mode, print warning instead of showing modal dialog
@@ -496,22 +506,37 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
             return
         
         fileToLoad = rawTutorialPath
-        #TODO: enable option to load existing annotations, this will divide the button action in two different ones
-        if False:
-            loadAnnotations = slicer.util.confirmYesNoDisplay(
-                _("An existing annotations file was found.\n\n"
-                  "Would you like to load the existing annotations?\n\n"
-                  "Yes: Load existing annotations\n"
-                  "No: Start fresh from raw tutorial"),
-                _("Load Existing Annotations?")
-            )
-            if loadAnnotations:
-                fileToLoad = annotationsPath
 
-        Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
-        Annotator.forceTutorialOutputName(tutorialName)
-        Annotator.openJsonFile(fileToLoad)
-        Annotator.show()
+        self.Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
+        self.Annotator.forceTutorialOutputName(tutorialName)
+        self.Annotator.openJsonFile(fileToLoad)
+        self.Annotator.show()
+        pass
+
+    def OpenAnnotatorAndLoad(self, tutorialName = ""):
+        modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
+        annotationsPath = modulePath + f"/Outputs/Annotations/{tutorialName}/annotations.json"
+        rawTutorialPath = modulePath + f"/Outputs/Raw/{tutorialName}/Tutorial.json"
+        
+        if not os.path.exists(rawTutorialPath):
+            # In testing/CI mode, print warning instead of showing modal dialog
+            if slicer.app.testingEnabled():
+                print(f"⚠️ Warning: No screenshots found for {tutorialName}")
+            else:
+                slicer.util.warningDisplay(
+                    _("Before editing annotations you should run the capture of the screenshots.\n"
+                      "Select a tutorial and click on \"Capture Screenshots\"."),
+                    _("No Screenshots Found")
+                )
+            return
+
+        self.Annotator = Lib.TutorialAnnotator.TutorialAnnotator()
+        self.Annotator.forceTutorialOutputName(tutorialName)
+        self.Annotator.openJsonFile(rawTutorialPath)
+        self.Annotator.show()
+        def load():
+            self.Annotator.loadAnnotationFile(annotationsPath)
+        qt.QTimer.singleShot(10, load)
         pass
 
     def loadTutorialsFromRepos(self):

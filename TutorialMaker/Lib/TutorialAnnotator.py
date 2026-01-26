@@ -64,7 +64,12 @@ class TutorialAnnotator(qt.QMainWindow):
         if self.slides is not None:
             self.slides.clear()
         self.removeEventFilter(self)
+        if not self.closeEventCallback is None:
+            self.closeEventCallback()
         event.accept()
+
+    def closeCallback(self, callback):
+        self.closeEventCallback = callback
 
     def setupGUI(self):
         # Get and load UI Fle
@@ -289,7 +294,9 @@ class TutorialAnnotator(qt.QMainWindow):
         self.activateWindow()
         if not os.path.exists(jsonPath):
             return
+        self.loadAnnotationFile(jsonPath)
         
+    def loadAnnotationFile(self, jsonPath):
         [tInfo, tSlides] = AnnotatedTutorial.LoadAnnotatedTutorial(jsonPath)
         self.slides.clear()
 
@@ -303,6 +310,7 @@ class TutorialAnnotator(qt.QMainWindow):
         self.changeSelectedSlide(self.slides[0])
         for slide in self.slides:
             slide.Slide.ReDraw()
+        
         self.windowResizeEvent(None)
         pass
 
