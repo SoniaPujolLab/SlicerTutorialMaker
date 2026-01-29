@@ -201,12 +201,22 @@ class TutorialMakerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin): # 
         self.logic.Capture(self.__selectedTutorial)
 
     def openAnnotatorButton(self):
+        if self.logic.Annotator:
+            self.logic.Annotator.setWindowState(self.logic.Annotator.windowState() & ~qt.Qt.WindowState.WindowMinimized | qt.Qt.WindowState.WindowActive)
+            self.logic.Annotator.activateWindow()
+            return
         self.logic.OpenAnnotator(self.__selectedTutorial)
-        self.logic.Annotator.closeCallback(self.tutorialSelectionChanged)
+        if self.logic.Annotator:
+            self.logic.Annotator.closeCallback(self.tutorialSelectionChanged)
 
     def openLastAnnotatorButton(self):
+        if self.logic.Annotator:
+            self.logic.Annotator.setWindowState(self.logic.Annotator.windowState() & ~qt.Qt.WindowState.WindowMinimized | qt.Qt.WindowState.WindowActive)
+            self.logic.Annotator.activateWindow()
+            return
         self.logic.OpenAnnotatorAndLoad(self.__selectedTutorial)
-        self.logic.Annotator.closeCallback(self.tutorialSelectionChanged)
+        if self.logic.Annotator:
+            self.logic.Annotator.closeCallback(self.tutorialSelectionChanged)
 
     def tutorialSelectionChanged(self):
         self.__selectedTutorial = None
@@ -257,6 +267,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         Called when the logic class is instantiated. Can be used for initializing member variables.
         """
         ScriptedLoadableModuleLogic.__init__(self) # noqa: F405
+        self.Annotator : Lib.TutorialAnnotator = None
         self.tutorialEditor = TutorialEditor()
         self.TutorialRepos = [
             "SoniaPujolLab/SlicerTestTutorial"
