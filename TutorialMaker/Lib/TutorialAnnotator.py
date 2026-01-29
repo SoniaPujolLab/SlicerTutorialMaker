@@ -61,8 +61,8 @@ class TutorialAnnotator(qt.QMainWindow):
 
     def closeEvent(self, event):
         msgBox = qt.QMessageBox()
-        msgBox.setWindowTitle("Exiting Annotator.")
-        msgBox.setText("Do you want to save your changes?")
+        msgBox.setWindowTitle(" ")
+        msgBox.setText(_("The Annotations file has been modified. Do you want to save it before closing the Annotator tool?"))
         msgBox.setStandardButtons(qt.QMessageBox.Save | qt.QMessageBox.Discard | qt.QMessageBox.StandardButton.Cancel)
         msgBox.setDefaultButton(qt.QMessageBox.Save)
         option = msgBox.exec()
@@ -105,11 +105,11 @@ class TutorialAnnotator(qt.QMainWindow):
 
         # Configure the Slide Title and Slide body text boxes
         self.slideTitleWidget = self.findChild(qt.QLineEdit, "lineEdit_slideTitle")
-        self.slideTitleWidget.placeholderText = _("Title for the slide")
+        self.slideTitleWidget.placeholderText = _("Slide Title")
         self.slideTitleWidget.textChanged.connect(self.saveSlideTitle)
 
         self.slideBodyWidget = self.findChild(qt.QTextEdit, "textEdit_slideDescription")
-        self.slideBodyWidget.placeholderText = _("Write a description for the slide")
+        self.slideBodyWidget.placeholderText = _("Slide Description")
         self.slideBodyWidget.textChanged.connect(self.saveSlideBody)
 
         # Left Scroll Area
@@ -460,6 +460,9 @@ class TutorialAnnotator(qt.QMainWindow):
 
         # Block if not screenshot type
         enabled = not (self.selectedAnnotator.SlideLayout in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank)
+        if not enabled:
+            self.slideTitleWidget.setText(" ")
+            self.slideBodyWidget.setText(" ")
         self.slideTitleWidget.enabled = enabled
         self.slideBodyWidget.enabled = enabled
         pass
@@ -1179,7 +1182,7 @@ class SlideGalery(qt.QDialog):
                 slide["metadata"][0],
                 294, 177,
                 985, 327,
-                _("Slide Text"),
+                _("Slide Title"),
                 AnnotationType.TextBox
             )
             _mainText.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
@@ -1189,7 +1192,7 @@ class SlideGalery(qt.QDialog):
                 slide["metadata"][0],
                 294, 360,
                 985, 610,
-                _("Slide Body"),
+                _("Slide Text"),
                 AnnotationType.TextBox
             )
             _bodyText.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
