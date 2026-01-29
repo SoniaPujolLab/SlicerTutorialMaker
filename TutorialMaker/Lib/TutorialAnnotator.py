@@ -60,6 +60,18 @@ class TutorialAnnotator(qt.QMainWindow):
         self.READY_EVENTS = True
 
     def closeEvent(self, event):
+        msgBox = qt.QMessageBox()
+        msgBox.setWindowTitle("Exiting Annotator.")
+        msgBox.setText("Do you want to save your changes?")
+        msgBox.setStandardButtons(qt.QMessageBox.Save | qt.QMessageBox.Discard | qt.QMessageBox.StandardButton.Cancel)
+        msgBox.setDefaultButton(qt.QMessageBox.Save)
+        option = msgBox.exec()
+        if option == qt.QMessageBox.Cancel:
+            event.ignore()
+            return
+        if option == qt.QMessageBox.Save:
+            self.saveAnnotations()
+            
         self.updateTimer.stop()
         if self.slides is not None:
             self.slides.clear()
