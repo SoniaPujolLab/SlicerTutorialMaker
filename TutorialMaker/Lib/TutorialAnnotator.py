@@ -949,9 +949,9 @@ class DraggableLabel(qt.QLabel):
 
     def SetCenter(self, x : int, y : int):
         newPos = self.GetCenter()
-        if x > 0 and x < self.parent().width:
+        if x >= 0 and x <= self.parent().width:
             newPos[0] = x
-        if y > 0 and y < self.parent().height:
+        if y >= 0 and y <= self.parent().height:
             newPos[1] = y
 
         size = self.size
