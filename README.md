@@ -100,4 +100,4 @@ It's possible to change the slide title and descriptions
 - .Tutorial Creation Tools: These features assist in developing new tutorials by allowing you to record widget names and paths automatically.
 
 ## Writing tutorials
-- For guidance on developing your own tutorials, please follow the template and examples hosted at the SlicerTestRepository (https://github.com/SoniaPujolLab/SlicerTestTutorial).
+- For guidance on developing your own tutorials, please follow the template and examples hosted at the SlicerTutorialMakerCollection (https://github.com/SoniaPujolLab/SlicerTutorialMakerCollection).
