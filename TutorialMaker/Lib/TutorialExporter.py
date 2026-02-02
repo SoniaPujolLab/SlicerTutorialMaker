@@ -82,6 +82,27 @@ HTML_TEMPLATES = {
                     </ul>
                 </div>
             </div>
+        """,
+        'section': """
+            <div class="sectionSlide">
+                <div class="sectionContent">
+                    <h1 class="sectionTitle">{title}</h1>
+                </div>
+            </div>
+        """,
+        'text': """
+            <div class="textSlide">
+                <div class="textContent">
+                    <h2 class="textTitle">{title}</h2>
+                    <div class="textBody">{body}</div>
+                </div>
+            </div>
+        """,
+        'blank': """
+            <div class="blankSlide">
+                <div class="blankContent">
+                </div>
+            </div>
         """
     },
     Theme.CLASSIC: {
@@ -119,6 +140,29 @@ HTML_TEMPLATES = {
                     </div>
                 </div>
             </div>
+        """,
+        'section': """
+            <div class="sectionSlide classic">
+                <div class="sectionContent">
+                    <div class="coverBorder">
+                        <h1 class="sectionTitle">{title}</h1>
+                    </div>
+                </div>
+            </div>
+        """,
+        'text': """
+            <div class="textSlide classic">
+                <div class="textContent">
+                    <h2 class="textTitle">{title}</h2>
+                    <div class="textBody">{body}</div>
+                </div>
+            </div>
+        """,
+        'blank': """
+            <div class="blankSlide classic">
+                <div class="blankContent">
+                </div>
+            </div>
         """
     },
     Theme.MINIMAL: {
@@ -150,6 +194,27 @@ HTML_TEMPLATES = {
                     <ul class="coverAcknowledgments">
                         {items}
                     </ul>
+                </div>
+            </div>
+        """,
+        'section': """
+            <div class="sectionSlide minimal">
+                <div class="sectionContent">
+                    <h1 class="sectionTitle">{title}</h1>
+                </div>
+            </div>
+        """,
+        'text': """
+            <div class="textSlide minimal">
+                <div class="textContent">
+                    <h2 class="textTitle">{title}</h2>
+                    <div class="textBody">{body}</div>
+                </div>
+            </div>
+        """,
+        'blank': """
+            <div class="blankSlide minimal">
+                <div class="blankContent">
                 </div>
             </div>
         """
@@ -218,6 +283,37 @@ MARKDOWN_TEMPLATES = {
 </div>
 
 ---
+''',
+        'section': '''
+<div style="text-align: center; padding: 60px; background: linear-gradient(135deg, {primary} 0%, {secondary} 100%); color: white; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); margin: 30px auto; max-width: 1200px; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+
+# <span style="font-size: 3.5rem; font-weight: 700; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); display: block;">{title}</span>
+
+</div>
+
+---
+''',
+        'text': '''
+<div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px;">
+
+## <span style="color: {primary}; font-size: 2.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
+
+<div style="font-size: 1.2rem; line-height: 1.8; color: #444; text-align: justify;">
+
+{body}
+
+</div>
+
+</div>
+
+---
+''',
+        'blank': '''
+<div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px; min-height: 600px;">
+
+</div>
+
+---
 '''
     },
     Theme.CLASSIC: {
@@ -275,6 +371,41 @@ MARKDOWN_TEMPLATES = {
 </div>
 
 </div>
+
+</div>
+
+---
+''',
+        'section': '''
+<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+
+<div style="border: 3px double {primary}; padding: 60px; text-align: center;">
+
+# <span style="font-size: 3.5rem; font-weight: 700; line-height: 1.3; color: {primary}; font-family: Georgia, serif; display: block;">{title}</span>
+
+</div>
+
+</div>
+
+---
+''',
+        'text': '''
+<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px;">
+
+## <span style="color: {primary}; font-size: 2.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
+
+<div style="font-size: 1.15rem; line-height: 1.9; color: {text}; text-align: justify;">
+
+{body}
+
+</div>
+
+</div>
+
+---
+''',
+        'blank': '''
+<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px; min-height: 600px;">
 
 </div>
 
@@ -340,6 +471,37 @@ MARKDOWN_TEMPLATES = {
 </div>
 
 ---
+''',
+        'section': '''
+<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; border-left: 8px solid {primary}; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+
+# <span style="font-size: 3.2rem; font-weight: 300; line-height: 1.2; color: {primary}; letter-spacing: -1px; display: block;">{title}</span>
+
+</div>
+
+---
+''',
+        'text': '''
+<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px;">
+
+## <span style="color: {primary}; font-size: 2rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
+
+<div style="font-size: 1.1rem; line-height: 1.8; color: {text};">
+
+{body}
+
+</div>
+
+</div>
+
+---
+''',
+        'blank': '''
+<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; min-height: 600px;">
+
+</div>
+
+---
 '''
     }
 }
@@ -363,7 +525,7 @@ CSS_TEMPLATES = {
         }}
 
         /* Slide Containers */
-        .slide, .cover, .backCover {{
+        .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
             background: white;
             max-width: 1200px;
             margin: 30px auto;
@@ -372,10 +534,11 @@ CSS_TEMPLATES = {
             overflow: hidden;
             page-break-after: always;
             page-break-inside: avoid;
+            min-height: 600px;
         }}
 
         /* Content Wrappers */
-        .slideContent, .coverContent, .backCoverContent {{
+        .slideContent, .coverContent, .backCoverContent, .sectionContent, .textContent, .blankContent {{
             padding: 40px;
         }}
 
@@ -383,7 +546,6 @@ CSS_TEMPLATES = {
         .cover {{
             background: linear-gradient(135deg, {primary} 0%, {secondary} 100%);
             color: white;
-            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -464,12 +626,13 @@ CSS_TEMPLATES = {
             color: white;
             min-height: 600px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
         }}
 
         .backCoverContent {{
             max-width: 800px;
+            width: 100%;
         }}
 
         .backCover .coverTitle {{
@@ -510,6 +673,66 @@ CSS_TEMPLATES = {
             margin: 0;
         }}
 
+        /* Section Slide */
+        .sectionSlide {{
+            background: linear-gradient(135deg, {primary} 0%, {secondary} 100%);
+            color: white;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+
+        .sectionTitle {{
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }}
+
+        /* Text Slide */
+        .textSlide {{
+            background: white;
+        }}
+
+        .textTitle {{
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: {primary};
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid {primary};
+        }}
+
+        .textBody {{
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }}
+
+        /* Blank Slide */
+        .blankSlide {{
+            background: white;
+        }}
+
+        .blankTitle {{
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: {primary};
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid {primary};
+        }}
+
+        .blankBody {{
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }}
+
         /* Print Styles */
         @media print {{
             body {{
@@ -517,7 +740,7 @@ CSS_TEMPLATES = {
                 padding: 0;
             }}
 
-            .slide, .cover, .backCover {{
+            .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
                 margin: 0;
                 box-shadow: none;
                 border-radius: 0;
@@ -546,7 +769,7 @@ CSS_TEMPLATES = {
             padding: 20px;
         }}
 
-        .slide, .cover, .backCover {{
+        .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
             background: #fefefe;
             max-width: 1200px;
             margin: 30px auto;
@@ -554,15 +777,15 @@ CSS_TEMPLATES = {
             overflow: hidden;
             page-break-after: always;
             page-break-inside: avoid;
+            min-height: 600px;
         }}
 
-        .slideContent, .coverContent, .backCoverContent {{
+        .slideContent, .coverContent, .backCoverContent, .sectionContent, .textContent, .blankContent {{
             padding: 50px;
         }}
 
         .cover {{
             background: white;
-            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -638,10 +861,9 @@ CSS_TEMPLATES = {
 
         .backCover {{
             background: white;
-            min-height: 600px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
         }}
 
         .backCover .coverTitle {{
@@ -680,13 +902,82 @@ CSS_TEMPLATES = {
             margin: 0;
         }}
 
+        /* Section Slide */
+        .sectionSlide {{
+            background: #fefefe;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+
+        .sectionSlide .coverBorder {{
+            border: 3px double {primary};
+            padding: 60px;
+        }}
+
+        .sectionTitle {{
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: {primary};
+            font-family: Georgia, serif;
+            text-align: center;
+        }}
+
+        /* Text Slide */
+        .textSlide {{
+            background: #fefefe;
+        }}
+
+        .textTitle {{
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: {primary};
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid {primary};
+            text-align: center;
+            font-family: Georgia, serif;
+        }}
+
+        .textBody {{
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: {text};
+            text-align: justify;
+        }}
+
+        /* Blank Slide */
+        .blankSlide {{
+            background: #fefefe;
+        }}
+
+        .blankTitle {{
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: {primary};
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid {primary};
+            text-align: center;
+            font-family: Georgia, serif;
+        }}
+
+        .blankBody {{
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: {text};
+            text-align: justify;
+        }}
+
         @media print {{
             body {{
                 background: white;
                 padding: 0;
             }}
 
-            .slide, .cover, .backCover {{
+            .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
                 margin: 0;
                 border: none;
                 min-height: 100vh;
@@ -714,21 +1005,21 @@ CSS_TEMPLATES = {
             padding: 20px;
         }}
 
-        .slide, .cover, .backCover {{
+        .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
             background: white;
             max-width: 1200px;
             margin: 30px auto;
             overflow: hidden;
             page-break-after: always;
             page-break-inside: avoid;
+            min-height: 600px;
         }}
-
-        .slideContent, .coverContent, .backCoverContent {{
+        
+        .slideContent, .coverContent, .backCoverContent, .sectionContent, .textContent, .blankContent {{
             padding: 60px;
         }}
 
         .cover {{
-            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -791,10 +1082,9 @@ CSS_TEMPLATES = {
         }}
 
         .backCover {{
-            min-height: 600px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             border-left: 8px solid {primary};
         }}
 
@@ -833,13 +1123,72 @@ CSS_TEMPLATES = {
             margin: 0;
         }}
 
+        /* Section Slide */
+        .sectionSlide {{
+            background: white;
+            border-left: 8px solid {primary};
+            display: flex;
+            min-height: 600px;
+            align-items: center;
+            justify-content: center;
+        }}
+
+        .sectionTitle {{
+            font-size: 3.2rem;
+            font-weight: 300;
+            line-height: 1.2;
+            color: {primary};
+            letter-spacing: -1px;
+            text-align: center;
+        }}
+
+        /* Text Slide */
+        .textSlide {{
+            background: white;
+        }}
+
+        .textTitle {{
+            font-size: 2rem;
+            font-weight: 400;
+            color: {primary};
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid {primary};
+        }}
+
+        .textBody {{
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: {text};
+        }}
+
+        /* Blank Slide */
+        .blankSlide {{
+            background: white;
+        }}
+
+        .blankTitle {{
+            font-size: 2rem;
+            font-weight: 400;
+            color: {primary};
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid {primary};
+        }}
+
+        .blankBody {{
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: {text};
+        }}
+
         @media print {{
             body {{
                 background: white;
                 padding: 0;
             }}
 
-            .slide, .cover, .backCover {{
+            .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
                 margin: 0;
                 min-height: 100vh;
                 height: auto;
@@ -998,10 +1347,72 @@ class SimpleSlide():
             **colors
         )
 
+class SimpleSection():
+    def __init__(self, Title: str):
+        self.Title = Title
+    
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+        template = HTML_TEMPLATES[theme]['section']
+        colors = PALETTE_COLORS[palette]
+        return template.format(
+            title=self.Title,
+            **colors
+        )
+    
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+        template = MARKDOWN_TEMPLATES[theme]['section']
+        colors = PALETTE_COLORS[palette]
+        return template.format(
+            title=self.Title,
+            **colors
+        )
+
+class SimpleText():
+    def __init__(self, Title: str, Body: str):
+        self.Title = Title
+        self.Body = Body
+    
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+        template = HTML_TEMPLATES[theme]['text']
+        colors = PALETTE_COLORS[palette]
+        return template.format(
+            title=self.Title,
+            body=self.Body,
+            **colors
+        )
+    
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+        template = MARKDOWN_TEMPLATES[theme]['text']
+        colors = PALETTE_COLORS[palette]
+        return template.format(
+            title=self.Title,
+            body=self.Body,
+            **colors
+        )
+
+class BlankSlide():
+    def __init__(self):
+        pass
+    
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+        template = HTML_TEMPLATES[theme]['blank']
+        colors = PALETTE_COLORS[palette]
+        return template.format(**colors)
+    
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+        template = MARKDOWN_TEMPLATES[theme]['blank']
+        colors = PALETTE_COLORS[palette]
+        return template.format(**colors)
+
+# Slide Model and Exporter
+
 class SlideModel():
     Cover= CoverSlide
     SimpleSlide = SimpleSlide
     BackCover = BackCoverSlide
+    SimpleSection = SimpleSection
+    SimpleText = SimpleText
+    Blank = BlankSlide
 
 class SlidePage():
     def __init__(self, Model:SlideModel = SlideModel.SimpleSlide):

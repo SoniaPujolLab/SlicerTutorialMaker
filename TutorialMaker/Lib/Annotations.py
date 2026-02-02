@@ -24,6 +24,8 @@ class AnnotatorSlideLayoutType(Flag):
     Screenshot = auto()
     Cover = auto()
     Acknowledgment = auto()
+    Section = auto()
+    Text = auto()
     Blank = auto()
 
 class Annotation:
