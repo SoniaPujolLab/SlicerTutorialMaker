@@ -503,8 +503,8 @@ class Annotation:
             brush.setStyle(qt.Qt.NoBrush)
             painter.setBrush(brush)
             painter.setPen(pen)
-            topLeft = qt.QPoint(self.target["position"][0], self.target["position"][1])
-            bottomRight = qt.QPoint(self.target["position"][0] + self.target["size"][0],self.target["position"][1] + self.target["size"][1])
+            topLeft = qt.QPoint(self.target["position"][0] - self.annotationOffset[0], self.target["position"][1] - self.annotationOffset[1])
+            bottomRight = qt.QPoint(self.target["position"][0] - self.annotationOffset[0] + self.target["size"][0],self.target["position"][1] - self.annotationOffset[1] + self.target["size"][1])
             rectToDraw = qt.QRect(topLeft,bottomRight)
             painter.drawRect(rectToDraw)
         if self.drawBoundingBox:
