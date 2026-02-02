@@ -499,8 +499,9 @@ class TutorialAnnotator(qt.QMainWindow):
             return
         optValuesInImage = self.selectedAnnotator.MapImageToScreen(qt.QPointF(annotation.optX, annotation.optY,), self.selectedSlideWidget)
         self.OptHelperWidget.SetCenter(*optValuesInImage)
-        _offsetPos = self.selectedAnnotator.MapImageToScreen(qt.QPointF(annotation.target["position"][0] + annotation.offsetX,
-                                                                       annotation.target["position"][1] + annotation.offsetY), self.selectedSlideWidget)
+        _offsetPos = self.selectedAnnotator.MapImageToScreen(qt.QPointF(annotation.target["position"][0] + annotation.offsetX - annotation.annotationOffset[0],
+                                                                        annotation.target["position"][1] + annotation.offsetY - annotation.annotationOffset[1]),
+                                                                        self.selectedSlideWidget)
 
         self.OffsetHelperWidget.SetCenter(*_offsetPos)
 
@@ -534,8 +535,8 @@ class TutorialAnnotator(qt.QMainWindow):
 
 
             _helperPos = self.selectedAnnotator.MapScreenToImage(qt.QPointF(*self.OffsetHelperWidget.GetCenter()), self.selectedSlideWidget)
-            offsetFromTargetWidget = [_helperPos[0] - self.selectedAnnotation.target["position"][0],
-                                      _helperPos[1] - self.selectedAnnotation.target["position"][1]]
+            offsetFromTargetWidget = [_helperPos[0] - self.selectedAnnotation.target["position"][0] + self.selectedAnnotator.windowOffset[0],
+                                      _helperPos[1] - self.selectedAnnotation.target["position"][1] + self.selectedAnnotator.windowOffset[1]]
 
             self.selectedAnnotation.setValuesOffset(*offsetFromTargetWidget)
 
@@ -579,7 +580,9 @@ class TutorialAnnotator(qt.QMainWindow):
 
         # Configure The Annotation Offset Helper so it defaults to zero
         # Probably one the ugliest way to do this, maybe find someway better
-        _reversePostion = self.selectedAnnotator.MapImageToScreen(qt.QPointF(*selectedWidget["position"]), self.selectedSlideWidget)
+        _reversePostion = self.selectedAnnotator.MapImageToScreen(qt.QPointF(selectedWidget["position"][0] - self.selectedAnnotator.windowOffset[0],
+                                                                             selectedWidget["position"][1] - self.selectedAnnotator.windowOffset[1]), 
+                                                                             self.selectedSlideWidget)
         self.OffsetHelperWidget.SetCenter(*_reversePostion)
 
         ApplyHelper()
@@ -949,9 +952,9 @@ class DraggableLabel(qt.QLabel):
 
     def SetCenter(self, x : int, y : int):
         newPos = self.GetCenter()
-        if x > 0 and x < self.parent().width:
+        if x >= 0 and x <= self.parent().width:
             newPos[0] = x
-        if y > 0 and y < self.parent().height:
+        if y >= 0 and y <= self.parent().height:
             newPos[1] = y
 
         size = self.size

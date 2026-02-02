@@ -832,11 +832,11 @@ class TutorialPainter:
 
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Screenshot:
-                title = slide.SlideTitle 
+                full_image_path = os.path.join(localizedScreenshotsPath, slide.imagePath)
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
                     slide.SlideBody,
-                    slide.imagePath
+                    full_image_path
                 )
 
             #TODO: Make custom exporter layout
@@ -857,11 +857,15 @@ class TutorialPainter:
         export = Exporter.TutorialExporter(pages, self.TutorialInfo["title"])
         html = export.ToHtml()
         markdown = export.ToMarkdown()
+        # pdf = export.ToPdf()
 
         with open(tutorialPath + ".html", "w") as fd:
             fd.write(html)
 
         with open(tutorialPath + ".md", "w") as fd:
             fd.write(markdown)
+        
+        # with open(tutorialPath + ".pdf", "wb") as fd:
+        #     fd.write(pdf)
             
         pass
