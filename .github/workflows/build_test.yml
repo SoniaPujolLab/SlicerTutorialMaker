@@ -49,10 +49,10 @@ jobs:
         run: |
           download_dir=$(pwd)
 
-          package_name=Slicer-5.8.0-linux-amd64
+          package_name=Slicer-5.10.0-linux-amd64
           filename=${package_name}.tar.gz
-          url=https://download.slicer.org/bitstream/679325961357655fd585ffb5
-          sha512=122ae2611d6d8761f66ef6a316dfff08442df072bf80a23327e374a09935da5e829e60bcf780ffc687b8e208ca696a34a4811218afe89bfcedfc755b823a933d
+          url=https://download.slicer.org/bitstream/6911b598ac7b1c95e7934427
+          sha512=2ea56b6f0c027fa73c832b23c34948e69b1b5124edf337a35f6a062f5cb78e7feb792c11bc02a4986f26e458ddfd954b00255953018bf6cc7d73834aba9f0267
 
           if [[ ! -f ${download_dir}/${filename} ]]; then
             echo "[slicer-download] Downloading ${filename}"
