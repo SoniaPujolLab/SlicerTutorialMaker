@@ -718,7 +718,6 @@ class AnnotatedTutorial:
 
             layoutSelected = AnnotatorSlideLayoutType[slideData["SlideLayout"]]
 
-            devicePixelRatio = 1.0  # Default for backward compatibility
             if layoutSelected == AnnotatorSlideLayoutType.Screenshot:
 
                 rawStepPaths : list[str] = []
@@ -729,15 +728,14 @@ class AnnotatedTutorial:
                 if len(rawStepPaths) == 1:
                     tsParser = TutorialScreenshot()
                     tsParser.metadata = rawStepPaths[0] + ".json"
+                    tsParser.screenshot = rawStepPaths[0] + ".png"
                     slideMetadata = tsParser.getWidgets()
-                    devicePixelRatio = tsParser.getDevicePixelRatio()
-                    slideImage = qt.QImage(rawStepPaths[0] + ".png")
+                    slideImage = tsParser.getImage().toImage()
                 elif len(rawStepPaths) > 1:
                     screenshots : list[TutorialScreenshot] = []
                     for rawStepPath in rawStepPaths:
                         tsParser = TutorialScreenshot()
                         tsParser.metadata = rawStepPath + ".json"
-                        devicePixelRatio = tsParser.getDevicePixelRatio()
                         tsParser.screenshot = rawStepPath + ".png"
                         screenshots.append(tsParser)
                     slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
@@ -783,11 +781,6 @@ class AnnotatedTutorial:
                 annotations.append(annotation)
             
             pixmap = qt.QPixmap.fromImage(slideImage)
-            if devicePixelRatio > 1.0:
-                logicalWidth = int(pixmap.width() / devicePixelRatio)
-                logicalHeight = int(pixmap.height() / devicePixelRatio)
-                pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
-            pixmap.setDevicePixelRatio(1.0)
             
             annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations, WindowOffset=windowOffset)
             annotatedSlide.devicePixelRatio = 1.0
