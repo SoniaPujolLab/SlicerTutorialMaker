@@ -929,11 +929,14 @@ class ScreenshotTools():
         data = {}
         data["_devicePixelRatio"] = slicer.app.desktop().devicePixelRatioF()
         widgets = Util.getOnScreenWidgets(window)
+        _window = Widget(window)
+        data[0] = {"name": _window.name, "path": Util.uniqueWidgetPath(
+                    _window), "text": _window.text, "position": _window.getGlobalPos(), "size": _window.getSize()}
         for index in range(len(widgets)):
             try:
                 if hasattr(widgets[index].inner(), "isVisible") and not widgets[index].inner().isVisible():
                     continue
-                data[index] = {"name": widgets[index].name, "path": Util.uniqueWidgetPath(
+                data[index + 1] = {"name": widgets[index].name, "path": Util.uniqueWidgetPath(
                     widgets[index]), "text": widgets[index].text, "position": widgets[index].getGlobalPos(), "size": widgets[index].getSize()}
                 pass
             except AttributeError:
