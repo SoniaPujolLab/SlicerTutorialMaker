@@ -764,6 +764,11 @@ class AnnotatedTutorial:
                 for widget in slideMetadata:
                     if annotationData["widgetPath"] == widget["path"]:
                         targetWidget = widget
+
+                if not TutorialInfo["TMversion"] == "1.0":
+                    annotationData["optional"][0] = annotationData["optional"][0]*slideImage.width()
+                    annotationData["optional"][1] = annotationData["optional"][1]*slideImage.height()
+
                 annotation = Annotation(
                     targetWidget,
                     *annotationData["offset"],
@@ -811,7 +816,7 @@ class AnnotatedTutorial:
         outputFileAnnotations = {**tutorialInfo}
         outputFileTextDict = {}
 
-        outputFileAnnotations["TutorialMaker_version"] = "1.0"
+        outputFileAnnotations["TutorialMaker_version"] = "1.1"
 
         outputFileAnnotations["slides"] = []
 
@@ -841,6 +846,10 @@ class AnnotatedTutorial:
 
             for annIndex, annotation in enumerate(slide.annotations):
                 info = annotation.toDict()
+
+                info["optional"][0] = info["optional"][0]/slide.image.width()
+                info["optional"][1] = info["optional"][1]/slide.image.height()
+
                 textDict[f"{slidePrefix}_{info['type']}_{annIndex}"] = info["text"]
                 slideInfo["Annotations"].append({"widgetPath": info["widgetPath"],
                                                  "type": info["type"],
