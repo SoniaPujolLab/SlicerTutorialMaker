@@ -826,19 +826,19 @@ class TutorialPainter:
             # This doesn't parse the Acknowledgements correctly
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Acknowledgment:
                 page = Exporter.BackCoverSlide(
-                    slide.annotations[0].text or "Acknowledgments",
+                    slide.annotations[0].text or _("Acknowledgments"),
                     slide.annotations[1].text
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Section:
                 page = Exporter.SimpleSection(
-                    slide.annotations[0].text or "Section Title"
+                    slide.annotations[0].text or _("Section Title")
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Text:
                 page = Exporter.SimpleText(
-                    slide.annotations[0].text or "Title",
-                    slide.annotations[1].text or "Body text"
+                    slide.annotations[0].text or _("Title"),
+                    slide.annotations[1].text or _("Body text")
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Screenshot:

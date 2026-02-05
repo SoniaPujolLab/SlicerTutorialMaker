@@ -747,12 +747,12 @@ class TutorialAnnotator(qt.QMainWindow):
         # Setup the Cover and Acknownledgments slides
         pageWidget = {'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]}
         self.slideGalery.AddSlide(
-            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")),
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
             [pageWidget],
             AnnotatorSlideLayoutType.Cover
         )
         self.slideGalery.AddSlide(
-            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")),
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
             [pageWidget],
             AnnotatorSlideLayoutType.Acknowledgment
         )
@@ -1094,7 +1094,15 @@ class SlideGalery(qt.QDialog):
 
         container_widget = ClickableLabel("")
 
-        container_widget.setPixmap(slide["image"].scaled(*self.thumbnailSize, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation))
+        if slide["type"] in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank | AnnotatorSlideLayoutType.Section | AnnotatorSlideLayoutType.Text:
+            _annotations = self._mountCustomSlide(slide)
+            _annotator = AnnotatorSlide(slide["image"], slide["metadata"], _annotations)
+            _annotator.ReDraw()
+            container_widget.setPixmap(_annotator.GetResized(*self.thumbnailSize, True))
+
+        else:
+            container_widget.setPixmap(slide["image"].scaled(*self.thumbnailSize, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation))
+
         container_widget.setStyleSheet("border: 2px solid black; background-color: lightgray; padding: 5px;")
         index = len(self.slides)
         container_widget.clicked.connect(lambda : self.ExportSlideClick(index))
