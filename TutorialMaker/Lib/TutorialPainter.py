@@ -830,6 +830,16 @@ class TutorialPainter:
                     slide.annotations[1].text
                 )
 
+            elif slide.SlideLayout == AnnotatorSlideLayoutType.Section:
+                page = Exporter.SimpleSection(
+                    slide.annotations[0].text or "Section Title"
+                )
+
+            elif slide.SlideLayout == AnnotatorSlideLayoutType.Text:
+                page = Exporter.SimpleText(
+                    slide.annotations[0].text or "Title",
+                    slide.annotations[1].text or "Body text"
+                )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Screenshot:
                 full_image_path = os.path.join(localizedScreenshotsPath, slide.imagePath)
@@ -839,12 +849,8 @@ class TutorialPainter:
                     full_image_path
                 )
 
-            #TODO: Make custom exporter layout
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Blank:
-                page = Exporter.BackCoverSlide(
-                    slide.annotations[0].text,
-                    slide.annotations[1].text
-                )
+                page = Exporter.BlankSlide()
             else:
                 continue
             pass

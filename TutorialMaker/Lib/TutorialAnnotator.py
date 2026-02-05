@@ -759,6 +759,16 @@ class TutorialAnnotator(qt.QMainWindow):
         self.slideGalery.AddSlide(
             qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
             [pageWidget],
+            AnnotatorSlideLayoutType.Section
+        )
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
+            [pageWidget],
+            AnnotatorSlideLayoutType.Text
+        )
+        self.slideGalery.AddSlide(
+            qt.QPixmap.fromImage(qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")),
+            [pageWidget],
             AnnotatorSlideLayoutType.Blank
         )
         # Export Cover page
@@ -1068,7 +1078,7 @@ class SlideGalery(qt.QDialog):
 
     def ExportSlide(self, index):
         annotations = None
-        if self.slides[index]["type"] in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank:
+        if self.slides[index]["type"] in AnnotatorSlideLayoutType.Cover | AnnotatorSlideLayoutType.Acknowledgment | AnnotatorSlideLayoutType.Blank | AnnotatorSlideLayoutType.Section | AnnotatorSlideLayoutType.Text:
             annotations = self._mountCustomSlide(self.slides[index])
         self.parent().addScreenshotSlide(self.slides[index]["image"], self.slides[index]["metadata"], self.slides[index]["type"], self.parent().selectedSlideIndex + 1, self.slides[index]["path"], annotations)
 
@@ -1180,29 +1190,45 @@ class SlideGalery(qt.QDialog):
             annotations.append(_ackText)
             annotations.append(_ack)
 
-        elif slide["type"] == AnnotatorSlideLayoutType.Blank:
-            _mainText = Annotation(
+        elif slide["type"] == AnnotatorSlideLayoutType.Section:
+            _sectionTitle = Annotation(
+                slide["metadata"][0],
+                294, 300,
+                985, 450,
+                _("Section Title"),
+                AnnotationType.TextBox
+            )
+            _sectionTitle.penConfig(qt.QColor(168, 208, 230), 36,14, brush=True)
+            _sectionTitle.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+
+            annotations.append(_sectionTitle)
+
+        elif slide["type"] == AnnotatorSlideLayoutType.Text:
+            _textTitle = Annotation(
                 slide["metadata"][0],
                 294, 177,
                 985, 327,
-                _("Slide Title"),
+                _("Text Title"),
                 AnnotationType.TextBox
             )
-            _mainText.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
-            _mainText.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
+            _textTitle.penConfig(qt.QColor(168, 208, 230), 26,14, brush=True)
+            _textTitle.extraOptions = {"textAlign" : "center", "textColor": "#FFFFFF"}
 
-            _bodyText = Annotation(
+            _textBody = Annotation(
                 slide["metadata"][0],
                 294, 360,
                 985, 610,
-                _("Slide Text"),
+                _("Text Body"),
                 AnnotationType.TextBox
             )
-            _bodyText.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
-            _bodyText.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
+            _textBody.penConfig(qt.QColor(255, 255, 255), 20,14, brush=True)
+            _textBody.extraOptions = {"textAlign" : "center", "textColor": "#7F7F7F"}
 
-            annotations.append(_mainText)
-            annotations.append(_bodyText)
+            annotations.append(_textTitle)
+            annotations.append(_textBody)
+            
+        elif slide["type"] == AnnotatorSlideLayoutType.Blank:
+            # Blank slide has no annotations - it's blank :)
             pass
 
         return annotations

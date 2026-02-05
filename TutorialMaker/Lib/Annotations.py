@@ -24,6 +24,8 @@ class AnnotatorSlideLayoutType(Flag):
     Screenshot = auto()
     Cover = auto()
     Acknowledgment = auto()
+    Section = auto()
+    Text = auto()
     Blank = auto()
 
 class Annotation:
@@ -718,7 +720,6 @@ class AnnotatedTutorial:
 
             layoutSelected = AnnotatorSlideLayoutType[slideData["SlideLayout"]]
 
-            devicePixelRatio = 1.0  # Default for backward compatibility
             if layoutSelected == AnnotatorSlideLayoutType.Screenshot:
 
                 rawStepPaths : list[str] = []
@@ -729,15 +730,14 @@ class AnnotatedTutorial:
                 if len(rawStepPaths) == 1:
                     tsParser = TutorialScreenshot()
                     tsParser.metadata = rawStepPaths[0] + ".json"
+                    tsParser.screenshot = rawStepPaths[0] + ".png"
                     slideMetadata = tsParser.getWidgets()
-                    devicePixelRatio = tsParser.getDevicePixelRatio()
-                    slideImage = qt.QImage(rawStepPaths[0] + ".png")
+                    slideImage = tsParser.getImage().toImage()
                 elif len(rawStepPaths) > 1:
                     screenshots : list[TutorialScreenshot] = []
                     for rawStepPath in rawStepPaths:
                         tsParser = TutorialScreenshot()
                         tsParser.metadata = rawStepPath + ".json"
-                        devicePixelRatio = tsParser.getDevicePixelRatio()
                         tsParser.screenshot = rawStepPath + ".png"
                         screenshots.append(tsParser)
                     slideImage, slideMetadata = AnnotatedTutorial.GetCompositeSlide(screenshots)
@@ -766,6 +766,11 @@ class AnnotatedTutorial:
                 for widget in slideMetadata:
                     if annotationData["widgetPath"] == widget["path"]:
                         targetWidget = widget
+
+                if not TutorialInfo["TMversion"] == "1.0":
+                    annotationData["optional"][0] = annotationData["optional"][0]*slideImage.width()
+                    annotationData["optional"][1] = annotationData["optional"][1]*slideImage.height()
+
                 annotation = Annotation(
                     targetWidget,
                     *annotationData["offset"],
@@ -783,11 +788,6 @@ class AnnotatedTutorial:
                 annotations.append(annotation)
             
             pixmap = qt.QPixmap.fromImage(slideImage)
-            if devicePixelRatio > 1.0:
-                logicalWidth = int(pixmap.width() / devicePixelRatio)
-                logicalHeight = int(pixmap.height() / devicePixelRatio)
-                pixmap = pixmap.scaled(logicalWidth, logicalHeight, qt.Qt.KeepAspectRatio, qt.Qt.SmoothTransformation)
-            pixmap.setDevicePixelRatio(1.0)
             
             annotatedSlide = AnnotatorSlide(pixmap, slideMetadata, annotations, WindowOffset=windowOffset)
             annotatedSlide.devicePixelRatio = 1.0
@@ -818,7 +818,7 @@ class AnnotatedTutorial:
         outputFileAnnotations = {**tutorialInfo}
         outputFileTextDict = {}
 
-        outputFileAnnotations["TutorialMaker_version"] = "1.0"
+        outputFileAnnotations["TutorialMaker_version"] = "1.1"
 
         outputFileAnnotations["slides"] = []
 
@@ -848,6 +848,10 @@ class AnnotatedTutorial:
 
             for annIndex, annotation in enumerate(slide.annotations):
                 info = annotation.toDict()
+
+                info["optional"][0] = info["optional"][0]/slide.image.width()
+                info["optional"][1] = info["optional"][1]/slide.image.height()
+
                 textDict[f"{slidePrefix}_{info['type']}_{annIndex}"] = info["text"]
                 slideInfo["Annotations"].append({"widgetPath": info["widgetPath"],
                                                  "type": info["type"],
