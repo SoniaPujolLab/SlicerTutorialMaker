@@ -827,7 +827,7 @@ class TutorialPainter:
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Acknowledgment:
                 page = Exporter.BackCoverSlide(
                     slide.annotations[0].text or _("Acknowledgments"),
-                    slide.annotations[1].text
+                    self.SimpleParser(slide.annotations[1].text)
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Section:
@@ -838,14 +838,14 @@ class TutorialPainter:
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Text:
                 page = Exporter.SimpleText(
                     slide.annotations[0].text or _("Title"),
-                    slide.annotations[1].text or _("Body text")
+                    self.SimpleParser(slide.annotations[1].text) or _("Body text")
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Screenshot:
                 full_image_path = os.path.join(localizedScreenshotsPath, slide.imagePath)
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
-                    slide.SlideBody,
+                    self.SimpleParser(slide.SlideBody),
                     full_image_path
                 )
 
@@ -875,3 +875,9 @@ class TutorialPainter:
         #     fd.write(pdf)
             
         pass
+
+    def SimpleParser(self, string):
+        result = ""
+        for paragraph in string.split("\n"):
+            result += f"<p>{paragraph}</p>"
+        return result
