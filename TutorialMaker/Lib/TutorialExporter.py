@@ -56,7 +56,7 @@ HTML_TEMPLATES = {
             <div class="cover">
                 <div class="coverContent">
                     <h1 class="coverTitle">{title}</h1>
-                    <p class="coverAuthor">By {author}</p>
+                    <p class="coverAuthor">{author}</p>
                     <p class="coverDate">{date}</p>
                     <p class="coverDescription">{description}</p>
                 </div>
@@ -111,7 +111,7 @@ HTML_TEMPLATES = {
                 <div class="coverContent">
                     <div class="coverBorder">
                         <h1 class="coverTitle">{title}</h1>
-                        <p class="coverAuthor">By {author}</p>
+                        <p class="coverAuthor">{author}</p>
                         <p class="coverDate">{date}</p>
                         <p class="coverDescription">{description}</p>
                     </div>
@@ -230,13 +230,13 @@ MARKDOWN_TEMPLATES = {
 
 <div style="max-width: 800px;">
 
-# <span style="font-size: 3.5rem; font-weight: 700; margin-bottom: 30px; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); display: block;">{title}</span>
+# <span style="font-size: 5.5rem; font-weight: 700; margin-bottom: 30px; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); display: block;">{title}</span>
 
-<p style="font-size: 1.5rem; font-weight: 300; margin-bottom: 15px; opacity: 0.95;">By {author}</p>
+<p style="font-size: 2.5rem; font-weight: 300; margin-bottom: 15px; opacity: 0.95;">{author}</p>
 
-<p style="font-size: 1.2rem; font-weight: 300; margin-bottom: 40px; opacity: 0.85;">{date}</p>
+<p style="font-size: 2rem; font-weight: 300; margin-bottom: 40px; opacity: 0.85;">{date}</p>
 
-<p style="font-size: 1.3rem; line-height: 1.8; font-weight: 300; opacity: 0.9; max-width: 700px; margin: 0 auto;">{description}</p>
+<p style="font-size: 2.1rem; line-height: 1.8; font-weight: 300; opacity: 0.9; max-width: 700px; margin: 0 auto;">{description}</p>
 
 </div>
 
@@ -247,7 +247,7 @@ MARKDOWN_TEMPLATES = {
         'slide': '''
 <div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px;">
 
-## <span style="color: {primary}; font-size: 2.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
+## <span style="color: {primary}; font-size: 3.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
 
 <div style="text-align: center; margin: 30px 0; background: #fafafa; padding: 20px; border-radius: 4px;">
 
@@ -255,7 +255,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
-<div style="font-size: 1.2rem; line-height: 1.8; color: #444; text-align: justify; margin-top: 25px;">
+<div style="font-size: 2rem; line-height: 1.8; color: #444; text-align: justify; margin-top: 25px;">
 
 {description}
 
@@ -270,7 +270,7 @@ MARKDOWN_TEMPLATES = {
 
 <div style="max-width: 800px;">
 
-# <span style="font-size: 2.8rem; margin-bottom: 40px; display: block; border-bottom: 2px solid rgba(255, 255, 255, 0.3); padding-bottom: 20px;">{title}</span>
+# <span style="font-size: 4.5rem; margin-bottom: 40px; display: block; border-bottom: 2px solid rgba(255, 255, 255, 0.3); padding-bottom: 20px;">{title}</span>
 
 <div style="text-align: left;">
 
@@ -287,7 +287,7 @@ MARKDOWN_TEMPLATES = {
         'section': '''
 <div style="text-align: center; padding: 60px; background: linear-gradient(135deg, {primary} 0%, {secondary} 100%); color: white; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); margin: 30px auto; max-width: 1200px; min-height: 600px; display: flex; align-items: center; justify-content: center;">
 
-# <span style="font-size: 3.5rem; font-weight: 700; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); display: block;">{title}</span>
+# <span style="font-size: 5.5rem; font-weight: 700; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); display: block;">{title}</span>
 
 </div>
 
@@ -296,9 +296,9 @@ MARKDOWN_TEMPLATES = {
         'text': '''
 <div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px;">
 
-## <span style="color: {primary}; font-size: 2.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
+## <span style="color: {primary}; font-size: 3.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
 
-<div style="font-size: 1.2rem; line-height: 1.8; color: #444; text-align: justify;">
+<div style="font-size: 2rem; line-height: 1.8; color: #444; text-align: justify;">
 
 {body}
 
@@ -322,13 +322,13 @@ MARKDOWN_TEMPLATES = {
 
 <div style="border: 3px double {primary}; padding: 60px; text-align: center;">
 
-# <span style="font-size: 3.5rem; font-weight: 700; margin-bottom: 30px; line-height: 1.3; color: {primary}; font-family: Georgia, serif; display: block;">{title}</span>
+# <span style="font-size: 5.5rem; font-weight: 700; margin-bottom: 30px; line-height: 1.3; color: {primary}; font-family: Georgia, serif; display: block;">{title}</span>
 
-<p style="font-size: 1.4rem; margin-bottom: 15px; color: {text}; font-style: italic;">By {author}</p>
+<p style="font-size: 2.2rem; margin-bottom: 15px; color: {text}; font-style: italic;">{author}</p>
 
-<p style="font-size: 1.1rem; margin-bottom: 40px; color: {text};">{date}</p>
+<p style="font-size: 1.9rem; margin-bottom: 40px; color: {text};">{date}</p>
 
-<p style="font-size: 1.2rem; line-height: 1.9; color: {text}; max-width: 700px; margin: 0 auto;">{description}</p>
+<p style="font-size: 2rem; line-height: 1.9; color: {text}; max-width: 700px; margin: 0 auto;">{description}</p>
 
 </div>
 
@@ -339,7 +339,7 @@ MARKDOWN_TEMPLATES = {
         'slide': '''
 <div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px;">
 
-## <span style="color: {primary}; font-size: 2.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
+## <span style="color: {primary}; font-size: 3.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
 
 <div style="text-align: center; margin: 30px 0; padding: 20px; border: 1px solid #ddd;">
 
@@ -347,7 +347,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
-<div style="font-size: 1.15rem; line-height: 1.9; color: {text}; text-align: justify; margin-top: 25px;">
+<div style="font-size: 1.9rem; line-height: 1.9; color: {text}; text-align: justify; margin-top: 25px;">
 
 {description}
 
@@ -362,7 +362,7 @@ MARKDOWN_TEMPLATES = {
 
 <div style="border: 3px double {primary}; padding: 60px; text-align: center;">
 
-# <span style="font-size: 2.5rem; margin-bottom: 40px; color: {primary}; display: block;">{title}</span>
+# <span style="font-size: 3.2rem; margin-bottom: 40px; color: {primary}; display: block;">{title}</span>
 
 <div style="text-align: left;">
 
@@ -381,7 +381,7 @@ MARKDOWN_TEMPLATES = {
 
 <div style="border: 3px double {primary}; padding: 60px; text-align: center;">
 
-# <span style="font-size: 3.5rem; font-weight: 700; line-height: 1.3; color: {primary}; font-family: Georgia, serif; display: block;">{title}</span>
+# <span style="font-size: 5.5rem; font-weight: 700; line-height: 1.3; color: {primary}; font-family: Georgia, serif; display: block;">{title}</span>
 
 </div>
 
@@ -392,9 +392,9 @@ MARKDOWN_TEMPLATES = {
         'text': '''
 <div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px;">
 
-## <span style="color: {primary}; font-size: 2.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
+## <span style="color: {primary}; font-size: 3.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
 
-<div style="font-size: 1.15rem; line-height: 1.9; color: {text}; text-align: justify;">
+<div style="font-size: 1.9rem; line-height: 1.9; color: {text}; text-align: justify;">
 
 {body}
 
@@ -418,13 +418,13 @@ MARKDOWN_TEMPLATES = {
 
 <div>
 
-# <span style="font-size: 3.2rem; font-weight: 300; margin-bottom: 30px; line-height: 1.2; color: {primary}; letter-spacing: -1px; display: block;">{title}</span>
+# <span style="font-size: 5.2rem; font-weight: 300; margin-bottom: 30px; line-height: 1.2; color: {primary}; letter-spacing: -1px; display: block;">{title}</span>
 
-<p style="font-size: 1.3rem; font-weight: 300; margin-bottom: 15px; color: {text};">{author}</p>
+<p style="font-size: 2.1rem; font-weight: 300; margin-bottom: 15px; color: {text};">{author}</p>
 
-<p style="font-size: 1rem; margin-bottom: 40px; color: #666;">{date}</p>
+<p style="font-size: 1.8rem; margin-bottom: 40px; color: #666;">{date}</p>
 
-<p style="font-size: 1.1rem; line-height: 1.7; color: {text}; max-width: 700px;">{description}</p>
+<p style="font-size: 1.9rem; line-height: 1.7; color: {text}; max-width: 700px;">{description}</p>
 
 </div>
 
@@ -435,7 +435,7 @@ MARKDOWN_TEMPLATES = {
         'slide': '''
 <div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px;">
 
-## <span style="color: {primary}; font-size: 2rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
+## <span style="color: {primary}; font-size: 3.3rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
 
 <div style="text-align: center; margin: 30px 0;">
 
@@ -443,7 +443,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
-<div style="font-size: 1.1rem; line-height: 1.8; color: {text}; margin-top: 25px;">
+<div style="font-size: 1.9rem; line-height: 1.8; color: {text}; margin-top: 25px;">
 
 {description}
 
@@ -458,7 +458,7 @@ MARKDOWN_TEMPLATES = {
 
 <div>
 
-# <span style="font-size: 2.5rem; margin-bottom: 40px; color: {primary}; display: block;">{title}</span>
+# <span style="font-size: 4rem; margin-bottom: 40px; color: {primary}; display: block;">{title}</span>
 
 <div style="text-align: left;">
 
@@ -475,7 +475,7 @@ MARKDOWN_TEMPLATES = {
         'section': '''
 <div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; border-left: 8px solid {primary}; min-height: 600px; display: flex; align-items: center; justify-content: center;">
 
-# <span style="font-size: 3.2rem; font-weight: 300; line-height: 1.2; color: {primary}; letter-spacing: -1px; display: block;">{title}</span>
+# <span style="font-size: 5.2rem; font-weight: 300; line-height: 1.2; color: {primary}; letter-spacing: -1px; display: block;">{title}</span>
 
 </div>
 
@@ -484,9 +484,9 @@ MARKDOWN_TEMPLATES = {
         'text': '''
 <div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px;">
 
-## <span style="color: {primary}; font-size: 2rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
+## <span style="color: {primary}; font-size: 3.3rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
 
-<div style="font-size: 1.1rem; line-height: 1.8; color: {text};">
+<div style="font-size: 1.9rem; line-height: 1.8; color: {text};">
 
 {body}
 
@@ -557,7 +557,7 @@ CSS_TEMPLATES = {
         }}
 
         .coverTitle {{
-            font-size: 3.5rem;
+            font-size: 5.5rem;
             font-weight: 700;
             margin-bottom: 30px;
             line-height: 1.2;
@@ -565,21 +565,21 @@ CSS_TEMPLATES = {
         }}
 
         .coverAuthor {{
-            font-size: 1.5rem;
+            font-size: 2.5rem;
             font-weight: 300;
             margin-bottom: 15px;
             opacity: 0.95;
         }}
 
         .coverDate {{
-            font-size: 1.2rem;
+            font-size: 2rem;
             font-weight: 300;
             margin-bottom: 40px;
             opacity: 0.85;
         }}
 
         .coverDescription {{
-            font-size: 1.3rem;
+            font-size: 2.1rem;
             line-height: 1.8;
             font-weight: 300;
             opacity: 0.9;
@@ -589,7 +589,7 @@ CSS_TEMPLATES = {
 
         /* Regular Slides */
         .slideTitle {{
-            font-size: 2.2rem;
+            font-size: 3.5rem;
             font-weight: 600;
             color: {primary};
             margin-bottom: 30px;
@@ -613,7 +613,7 @@ CSS_TEMPLATES = {
         }}
 
         .slideDescription {{
-            font-size: 1.2rem;
+            font-size: 2rem;
             line-height: 1.8;
             color: #444;
             text-align: justify;
@@ -636,7 +636,7 @@ CSS_TEMPLATES = {
         }}
 
         .backCover .coverTitle {{
-            font-size: 2.8rem;
+            font-size: 4.5rem;
             margin-bottom: 40px;
             text-align: center;
             border-bottom: 2px solid rgba(255, 255, 255, 0.3);
@@ -661,13 +661,13 @@ CSS_TEMPLATES = {
 
         .ackItem strong {{
             display: block;
-            font-size: 1.4rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
             color: #fff;
         }}
 
         .ackItem p {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             line-height: 1.6;
             opacity: 0.9;
             margin: 0;
@@ -684,7 +684,7 @@ CSS_TEMPLATES = {
         }}
 
         .sectionTitle {{
-            font-size: 3.5rem;
+            font-size: 5.5rem;
             font-weight: 700;
             line-height: 1.2;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -697,7 +697,7 @@ CSS_TEMPLATES = {
         }}
 
         .textTitle {{
-            font-size: 2.2rem;
+            font-size: 3.5rem;
             font-weight: 600;
             color: {primary};
             margin-bottom: 30px;
@@ -706,7 +706,7 @@ CSS_TEMPLATES = {
         }}
 
         .textBody {{
-            font-size: 1.2rem;
+            font-size: 2rem;
             line-height: 1.8;
             color: #444;
             text-align: justify;
@@ -718,7 +718,7 @@ CSS_TEMPLATES = {
         }}
 
         .blankTitle {{
-            font-size: 2.2rem;
+            font-size: 3.5rem;
             font-weight: 600;
             color: {primary};
             margin-bottom: 30px;
@@ -727,7 +727,7 @@ CSS_TEMPLATES = {
         }}
 
         .blankBody {{
-            font-size: 1.2rem;
+            font-size: 2rem;
             line-height: 1.8;
             color: #444;
             text-align: justify;
@@ -798,7 +798,7 @@ CSS_TEMPLATES = {
         }}
 
         .coverTitle {{
-            font-size: 3.5rem;
+            font-size: 5.5rem;
             font-weight: 700;
             margin-bottom: 30px;
             line-height: 1.3;
@@ -807,20 +807,20 @@ CSS_TEMPLATES = {
         }}
 
         .coverAuthor {{
-            font-size: 1.4rem;
+            font-size: 2.2rem;
             margin-bottom: 15px;
             color: {text};
             font-style: italic;
         }}
 
         .coverDate {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             margin-bottom: 40px;
             color: {text};
         }}
 
         .coverDescription {{
-            font-size: 1.2rem;
+            font-size: 2rem;
             line-height: 1.9;
             color: {text};
             max-width: 700px;
@@ -828,7 +828,7 @@ CSS_TEMPLATES = {
         }}
 
         .slideTitle {{
-            font-size: 2.5rem;
+            font-size: 4rem;
             font-weight: 600;
             color: {primary};
             margin-bottom: 30px;
@@ -852,7 +852,7 @@ CSS_TEMPLATES = {
         }}
 
         .slideDescription {{
-            font-size: 1.15rem;
+            font-size: 1.9rem;
             line-height: 1.9;
             color: {text};
             text-align: justify;
@@ -867,7 +867,7 @@ CSS_TEMPLATES = {
         }}
 
         .backCover .coverTitle {{
-            font-size: 2.5rem;
+            font-size: 4rem;
             margin-bottom: 40px;
             text-align: center;
             color: {primary};
@@ -891,13 +891,13 @@ CSS_TEMPLATES = {
 
         .ackItem strong {{
             display: block;
-            font-size: 1.3rem;
+            font-size: 2.1rem;
             margin-bottom: 10px;
             color: {primary};
         }}
 
         .ackItem p {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             line-height: 1.7;
             margin: 0;
         }}
@@ -917,7 +917,7 @@ CSS_TEMPLATES = {
         }}
 
         .sectionTitle {{
-            font-size: 3.5rem;
+            font-size: 5.5rem;
             font-weight: 700;
             line-height: 1.3;
             color: {primary};
@@ -931,7 +931,7 @@ CSS_TEMPLATES = {
         }}
 
         .textTitle {{
-            font-size: 2.5rem;
+            font-size: 4rem;
             font-weight: 600;
             color: {primary};
             margin-bottom: 30px;
@@ -942,7 +942,7 @@ CSS_TEMPLATES = {
         }}
 
         .textBody {{
-            font-size: 1.15rem;
+            font-size: 1.9rem;
             line-height: 1.9;
             color: {text};
             text-align: justify;
@@ -954,7 +954,7 @@ CSS_TEMPLATES = {
         }}
 
         .blankTitle {{
-            font-size: 2.5rem;
+            font-size: 4rem;
             font-weight: 600;
             color: {primary};
             margin-bottom: 30px;
@@ -965,7 +965,7 @@ CSS_TEMPLATES = {
         }}
 
         .blankBody {{
-            font-size: 1.15rem;
+            font-size: 1.9rem;
             line-height: 1.9;
             color: {text};
             text-align: justify;
@@ -1027,7 +1027,7 @@ CSS_TEMPLATES = {
         }}
 
         .coverTitle {{
-            font-size: 3.2rem;
+            font-size: 5.2rem;
             font-weight: 300;
             margin-bottom: 30px;
             line-height: 1.2;
@@ -1036,27 +1036,27 @@ CSS_TEMPLATES = {
         }}
 
         .coverAuthor {{
-            font-size: 1.3rem;
+            font-size: 2.1rem;
             font-weight: 300;
             margin-bottom: 15px;
             color: {text};
         }}
 
         .coverDate {{
-            font-size: 1rem;
+            font-size: 1.8rem;
             margin-bottom: 40px;
             color: #666;
         }}
 
         .coverDescription {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             line-height: 1.7;
             color: {text};
             max-width: 700px;
         }}
 
         .slideTitle {{
-            font-size: 2rem;
+            font-size: 3.3rem;
             font-weight: 400;
             color: {primary};
             margin-bottom: 30px;
@@ -1075,7 +1075,7 @@ CSS_TEMPLATES = {
         }}
 
         .slideDescription {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             line-height: 1.8;
             color: {text};
             margin-top: 25px;
@@ -1089,7 +1089,7 @@ CSS_TEMPLATES = {
         }}
 
         .backCover .coverTitle {{
-            font-size: 2.5rem;
+            font-size: 4rem;
             margin-bottom: 40px;
             color: {primary};
         }}
@@ -1110,14 +1110,14 @@ CSS_TEMPLATES = {
 
         .ackItem strong {{
             display: block;
-            font-size: 1.2rem;
+            font-size: 2rem;
             margin-bottom: 8px;
             color: {primary};
             font-weight: 500;
         }}
 
         .ackItem p {{
-            font-size: 1rem;
+            font-size: 1.8rem;
             line-height: 1.6;
             color: {text};
             margin: 0;
@@ -1134,7 +1134,7 @@ CSS_TEMPLATES = {
         }}
 
         .sectionTitle {{
-            font-size: 3.2rem;
+            font-size: 5.2rem;
             font-weight: 300;
             line-height: 1.2;
             color: {primary};
@@ -1148,7 +1148,7 @@ CSS_TEMPLATES = {
         }}
 
         .textTitle {{
-            font-size: 2rem;
+            font-size: 3.3rem;
             font-weight: 400;
             color: {primary};
             margin-bottom: 30px;
@@ -1157,7 +1157,7 @@ CSS_TEMPLATES = {
         }}
 
         .textBody {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             line-height: 1.8;
             color: {text};
         }}
@@ -1168,7 +1168,7 @@ CSS_TEMPLATES = {
         }}
 
         .blankTitle {{
-            font-size: 2rem;
+            font-size: 3.3rem;
             font-weight: 400;
             color: {primary};
             margin-bottom: 30px;
@@ -1177,7 +1177,7 @@ CSS_TEMPLATES = {
         }}
 
         .blankBody {{
-            font-size: 1.1rem;
+            font-size: 1.9rem;
             line-height: 1.8;
             color: {text};
         }}
@@ -1264,17 +1264,17 @@ class BackCoverSlide():
             # Create styled acknowledgment items matching HTML structure
             if theme == Theme.MODERN:
                 items = "\n\n".join(
-                    f'<div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 6px; border-left: 4px solid rgba(255, 255, 255, 0.5); margin-bottom: 25px;">\n\n**<span style="font-size: 1.4rem; display: block; margin-bottom: 10px; color: #fff;">{k}</span>**\n\n<p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9; margin: 0;">{v}</p>\n\n</div>'
+                    f'<div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 6px; border-left: 4px solid rgba(255, 255, 255, 0.5); margin-bottom: 25px;">\n\n**<span style="font-size: 1.8rem; display: block; margin-bottom: 10px; color: #fff;">{k}</span>**\n\n<p style="font-size: 1.5rem; line-height: 1.6; opacity: 0.9; margin: 0;">{v}</p>\n\n</div>'
                     for k, v in self.Acknowledgments.items()
                 )
             elif theme == Theme.CLASSIC:
                 items = "\n\n".join(
-                    f'<div style="background: #fafafa; padding: 20px; border-left: 4px solid {colors["primary"]}; color: {colors["text"]}; margin-bottom: 25px;">\n\n**<span style="font-size: 1.3rem; display: block; margin-bottom: 10px; color: {colors["primary"]};">{k}</span>**\n\n<p style="font-size: 1.1rem; line-height: 1.7; margin: 0;">{v}</p>\n\n</div>'
+                    f'<div style="background: #fafafa; padding: 20px; border-left: 4px solid {colors["primary"]}; color: {colors["text"]}; margin-bottom: 25px;">\n\n**<span style="font-size: 1.7rem; display: block; margin-bottom: 10px; color: {colors["primary"]};">{k}</span>**\n\n<p style="font-size: 1.5rem; line-height: 1.7; margin: 0;">{v}</p>\n\n</div>'
                     for k, v in self.Acknowledgments.items()
                 )
             else:  # MINIMAL
                 items = "\n\n".join(
-                    f'<div style="padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 20px;">\n\n**<span style="font-size: 1.2rem; display: block; margin-bottom: 8px; color: {colors["primary"]}; font-weight: 500;">{k}</span>**\n\n<p style="font-size: 1rem; line-height: 1.6; color: {colors["text"]}; margin: 0;">{v}</p>\n\n</div>'
+                    f'<div style="padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 20px;">\n\n**<span style="font-size: 1.6rem; display: block; margin-bottom: 8px; color: {colors["primary"]}; font-weight: 500;">{k}</span>**\n\n<p style="font-size: 1.4rem; line-height: 1.6; color: {colors["text"]}; margin: 0;">{v}</p>\n\n</div>'
                     for k, v in self.Acknowledgments.items()
                 )
         else:
