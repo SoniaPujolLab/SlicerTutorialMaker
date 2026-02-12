@@ -659,12 +659,13 @@ class AnnotatedTutorial:
         DefaultDictPath = f"{annotationDir}/text_dict_default.json"
         LocalizedDictPath = f"{annotationDir}/text_dict_{lang}.json"
         textDict = {}
+
+        with open(DefaultDictPath, encoding='utf-8') as file:
+                textDict = json.load(file)
+
         if os.path.isfile(LocalizedDictPath):
             with open(LocalizedDictPath, encoding='utf-8') as file:
-                textDict = json.load(file)
-        else:
-            with open(DefaultDictPath, encoding='utf-8') as file:
-                textDict = json.load(file)
+                textDict.update(json.load(file))
         
         return textDict
 
@@ -748,11 +749,11 @@ class AnnotatedTutorial:
 
             elif layoutSelected == AnnotatorSlideLayoutType.Cover:
                 slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
-                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/cover_page.png")
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
             
             elif layoutSelected == AnnotatorSlideLayoutType.Acknowledgment:
                 slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
-                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/Acknowledgments.png")
+                slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
             else:
                 slideMetadata.append({'name': 'TutorialAnnootatorPage', 'path': 'TutorialAnnotator/BlankPage', 'text': '', 'position': [0, 0], 'size': [1, 1]})
                 slideImage = qt.QImage(f"{os.path.dirname(__file__)}/../Resources/NewSlide/white.png")
@@ -868,6 +869,12 @@ class AnnotatedTutorial:
             json.dump(outputFileAnnotations, fd, ensure_ascii=False, indent=4)
 
         with open(file= f"{outputFolder}/text_dict_default.json", mode='w', encoding="utf-8") as fd:
+            json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
+
+        settings = slicer.app.userSettings()
+        currentLanguage = settings.value("language")
+
+        with open(file= f"{outputFolder}/text_dict_{currentLanguage}.json", mode='w', encoding="utf-8") as fd:
             json.dump(outputFileTextDict, fd, ensure_ascii=False, indent=4)
 
         return outputFolder
