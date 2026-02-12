@@ -440,6 +440,13 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
     def Generate(self, tutorialName):
         modulePath = Lib.TutorialUtils.get_module_basepath("TutorialMaker")
         annotationsPath = modulePath + f"/Outputs/Annotations/{tutorialName}/annotations.json"
+        currentTutorial = None
+        try:
+            currentTutorial = os.environ["TUTORIAL_CURRENT_SELFTEST"]
+        except e:
+            pass
+
+        os.environ["TUTORIAL_CURRENT_SELFTEST"] = tutorialName
         
         if not os.path.exists(annotationsPath):
             # In testing/CI mode, print warning instead of showing modal dialog
@@ -492,6 +499,8 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
                 # In testing/CI mode, just print the message
                 print(f"✅ Tutorial Generated: {tutorialName}")
                 print(f"   Output path: {outputPath}")
+
+        os.environ["TUTORIAL_CURRENT_SELFTEST"] = currentTutorial
         pass
 
     def CreateNewTutorial(self):
