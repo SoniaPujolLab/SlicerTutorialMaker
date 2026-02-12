@@ -41,7 +41,7 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
         except Exception:
             pass
 
-        # TUTORIALMAKER INFO TITLE Slicer Visualization Tutorial
+        # TUTORIALMAKER INFO TITLE SlicerVisualizationTutorial
         # TUTORIALMAKER INFO AUTHOR Sonia Pujol, Ph.D.
         # TUTORIALMAKER INFO DATE 24/11/2024
         # TUTORIALMAKER INFO DESC This tutorial guides users through 3D Slicer's advanced visualization features, including DICOM data import, volume rendering, slice manipulation, and model clipping techniques.

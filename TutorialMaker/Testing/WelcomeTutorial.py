@@ -45,7 +45,7 @@ class SlicerWelcomeTest(ScriptedLoadableModuleTest):
         self.delayDisplay("Starting the test")
         # TUTORIALMAKER BEGIN
 
-        # TUTORIALMAKER INFO TITLE Slicer Welcome
+        # TUTORIALMAKER INFO TITLE SlicerWelcomeTutorial
         # TUTORIALMAKER INFO AUTHOR Sonia Pujol, Ph.D.
         # TUTORIALMAKER INFO DATE 28/08/2024
         # TUTORIALMAKER INFO DESC This tutorial introduces new users to the Slicer Welcome module, demonstrating basic navigation, sample data loading, and slice view interaction.

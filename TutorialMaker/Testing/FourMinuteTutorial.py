@@ -36,7 +36,7 @@ class Slicer4MinuteTest(ScriptedLoadableModuleTest):
         self.delayDisplay("Starting the test")
         # TUTORIALMAKER BEGIN
 
-        # TUTORIALMAKER INFO TITLE FourMinTutorial
+        # TUTORIALMAKER INFO TITLE FourMinuteTutorial
         # TUTORIALMAKER INFO AUTHOR Sonia Pujol, Ph.D.
         # TUTORIALMAKER INFO DATE 28/08/2024
         # TUTORIALMAKER INFO DESC This tutorial is a 4-minute introduction to the 3D visualization capabilities of the Slicer4 software for medical image analysis.
