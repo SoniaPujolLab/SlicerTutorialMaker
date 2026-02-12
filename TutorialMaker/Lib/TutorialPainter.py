@@ -865,10 +865,10 @@ class TutorialPainter:
         markdown = export.ToMarkdown()
         # pdf = export.ToPdf()
 
-        with open(tutorialPath + ".html", "w") as fd:
+        with open(tutorialPath + ".html", "w", encoding="utf-8") as fd:
             fd.write(html)
 
-        with open(tutorialPath + ".md", "w") as fd:
+        with open(tutorialPath + ".md", "w", encoding="utf-8") as fd:
             fd.write(markdown)
         
         # with open(tutorialPath + ".pdf", "wb") as fd:
