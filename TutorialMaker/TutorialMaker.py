@@ -465,9 +465,18 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
                 _("No Annotations Found")
             )
             return
+        _exception = None
+        try: 
+            AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(annotationsPath)
+        except Exception as error:
+            if (os.environ.get('CI') == 'true' or os.environ.get('GITHUB_ACTIONS') == 'true'):
+                raise error
+            else:
+                _exception = error
         
         with slicer.util.tryWithErrorDisplay(_("Failed to generate tutorial")):
-            AnnotationPainter.TutorialPainter().GenerateHTMLfromAnnotatedTutorial(annotationsPath)
+            if _exception is not None:
+                raise _exception
             outputPath = modulePath + "/Outputs/"
             
             # Check if we're in testing/CI mode - check all possible indicators
