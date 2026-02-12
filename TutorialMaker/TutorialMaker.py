@@ -618,6 +618,7 @@ class TutorialMakerLogic(ScriptedLoadableModuleLogic): # noqa: F405
         module.  For example, if a developer removes a feature that you depend on,
         your test should break so they know that the feature is needed.
         """
+        os.environ["TUTORIAL_CURRENT_SELFTEST"] = tutorial_name
         tPath = Lib.TutorialUtils.get_module_basepath("TutorialMaker") + f"/Testing/{tutorial_name}.py"
         SelfTestTutorialLayer.ParseTutorial(tPath)
         import sys
