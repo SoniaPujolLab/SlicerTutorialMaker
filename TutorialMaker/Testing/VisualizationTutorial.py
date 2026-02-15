@@ -143,10 +143,21 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
 
         # 5 shot: Slice Controller Interaction
         
-        def get_slice_controller(color):
-            return layoutManager.sliceWidget(color).sliceController()
-
-        red_controller = get_slice_controller("Red")
+        slice_view_names = layoutManager.sliceViewNames()
+        if not slice_view_names:
+            raise RuntimeError("No slice views found in current layout")
+        
+        red_controller = None
+        for slice_node_name in slice_view_names:
+            slice_widget = layoutManager.sliceWidget(slice_node_name)
+            if slice_widget and "Red" in slice_widget.objectName:
+                red_controller = slice_widget.sliceController()
+                break
+        
+        if red_controller is None:
+            # Fallback: use first available slice view
+            slice_widget = layoutManager.sliceWidget(slice_view_names[0])
+            red_controller = slice_widget.sliceController()
         
         pin_button = slicer.util.findChild(red_controller, "PinButton")
         if pin_button: pin_button.click()
@@ -159,6 +170,8 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
 
         # TUTORIALMAKER SCREENSHOT
         self.delayDisplay("Screenshot #5: Linked and activated red slice plane.")
+
+        if pin_button: pin_button.click()
 
         # 6 shot: Widescreen Layout
         layoutManager.setLayout(
