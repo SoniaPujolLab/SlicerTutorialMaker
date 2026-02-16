@@ -77,23 +77,11 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
             self.delayDisplay("Extraction complete.")
 
         # Setup DICOM Database
-        # Create and initialize DICOM database directory
+        # Use DICOMUtils.openTemporaryDatabase to properly setup database
         dicomDatabasePath = os.path.join(slicer.app.temporaryPath, "DICOMDatabase")
-        if not os.path.exists(dicomDatabasePath):
-            os.makedirs(dicomDatabasePath)
         
-        # Create database file path
-        databaseFileName = os.path.join(dicomDatabasePath, "ctkDICOM.sql")
-        
-        # Open or create the database
-        slicer.dicomDatabase.openDatabase(databaseFileName)
-        
-        # If database is newly created, initialize it
-        if slicer.dicomDatabase.isOpen:
-            # Initialize creates the necessary tables
-            slicer.dicomDatabase.initializeDatabase()
-        
-        slicer.app.processEvents()
+        # Save original database settings and open temporary database
+        originalDatabaseDir = DICOMUtils.openTemporaryDatabase(dicomDatabasePath)
         
         # Now switch to DICOM module
         mainWindow.moduleSelector().selectModule("DICOM")
