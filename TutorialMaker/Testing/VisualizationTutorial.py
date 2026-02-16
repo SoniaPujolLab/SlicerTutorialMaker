@@ -77,16 +77,18 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
             self.delayDisplay("Extraction complete.")
 
         # Setup DICOM Database
+        # Initialize DICOM database before switching to DICOM module
+        dicomDatabasePath = os.path.join(slicer.app.temporaryPath, "DICOMDatabase")
+        if not os.path.exists(dicomDatabasePath):
+            os.makedirs(dicomDatabasePath)
+        
+        # Use DICOMUtils to properly initialize the database
+        DICOMUtils.openDatabase(dicomDatabasePath)
+        slicer.app.processEvents()
+        
+        # Now switch to DICOM module
         mainWindow.moduleSelector().selectModule("DICOM")
         slicer.app.processEvents()
-
-        if not slicer.dicomDatabase:
-            dicomDatabasePath = os.path.join(slicer.app.temporaryPath, "DICOMDatabase")
-            if not os.path.exists(dicomDatabasePath):
-                os.makedirs(dicomDatabasePath)
-            dicomWidget = slicer.modules.dicom.widgetRepresentation()
-            if hasattr(dicomWidget, "onDatabaseDirectoryChanged"):
-                dicomWidget.onDatabaseDirectoryChanged(dicomDatabasePath)
 
         dicom_data_path = os.path.join(slicer.app.temporaryPath, extraction_subfolder)
         
