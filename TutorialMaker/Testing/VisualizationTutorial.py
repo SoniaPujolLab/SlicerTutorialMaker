@@ -77,13 +77,22 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
             self.delayDisplay("Extraction complete.")
 
         # Setup DICOM Database
-        # Initialize DICOM database before switching to DICOM module
+        # Create and initialize DICOM database directory
         dicomDatabasePath = os.path.join(slicer.app.temporaryPath, "DICOMDatabase")
         if not os.path.exists(dicomDatabasePath):
             os.makedirs(dicomDatabasePath)
         
-        # Use DICOMUtils to properly initialize the database
-        DICOMUtils.openDatabase(dicomDatabasePath)
+        # Create database file path
+        databaseFileName = os.path.join(dicomDatabasePath, "ctkDICOM.sql")
+        
+        # Open or create the database
+        slicer.dicomDatabase.openDatabase(databaseFileName)
+        
+        # If database is newly created, initialize it
+        if slicer.dicomDatabase.isOpen:
+            # Initialize creates the necessary tables
+            slicer.dicomDatabase.initializeDatabase()
+        
         slicer.app.processEvents()
         
         # Now switch to DICOM module
@@ -222,6 +231,8 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
             if collection.GetNumberOfItems() > 0:
                 volumeNode = collection.GetItemAsObject(0)
 
+        volumePropertyNode = None
+        displayNode = None
         if volumeNode:
             volRenLogic = slicer.modules.volumerendering.logic()
             displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
