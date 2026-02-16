@@ -222,6 +222,8 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
             if collection.GetNumberOfItems() > 0:
                 volumeNode = collection.GetItemAsObject(0)
 
+        volumePropertyNode = None
+        displayNode = None
         if volumeNode:
             volRenLogic = slicer.modules.volumerendering.logic()
             displayNode = volRenLogic.CreateDefaultVolumeRenderingNodes(volumeNode)
