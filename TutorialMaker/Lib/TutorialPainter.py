@@ -714,7 +714,7 @@ class TutorialPainter:
         self.slides : list[AnnotatorSlide] = []
         self.imagePaths : list[str] = [] #TODO: Improve this part
         self.TutorialInfo = {}
-        self.currentLanguage = settings.value("language").replace("_", "-") if settings.value("language") else "en-US"
+        self.currentLanguage = settings.value("language")
 
         # TODO: Get a better way to get the module location
         self.outputFolder = f"{os.path.dirname(__file__)}/../Outputs"
