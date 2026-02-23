@@ -842,11 +842,11 @@ class TutorialPainter:
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Screenshot:
-                full_image_path = os.path.join(localizedScreenshotsPath, slide.imagePath)
                 page = Exporter.SimpleSlide(
                     slide.SlideTitle,
                     self.SimpleParser(slide.SlideBody),
-                    full_image_path
+                    slide.imagePath,
+                    base_dir=localizedScreenshotsPath
                 )
 
             elif slide.SlideLayout == AnnotatorSlideLayoutType.Blank:
@@ -860,7 +860,7 @@ class TutorialPainter:
         
         tutorialPath = localizedScreenshotsPath + f"/{clean_title}"
 
-        export = Exporter.TutorialExporter(pages, self.TutorialInfo["title"])
+        export = Exporter.TutorialExporter(pages, self.TutorialInfo["title"], html_dir=localizedScreenshotsPath)
         html = export.ToHtml()
         markdown = export.ToMarkdown()
         # pdf = export.ToPdf()

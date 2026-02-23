@@ -1,105 +1,257 @@
-# Slicer Tutorial Maker
+﻿# Slicer Tutorial Maker
 
-O Slicer Tutorial Maker é uma extensão para o 3D Slicer para agilizar a criação de tutoriais do 3D Slicer em vários idiomas. As seções abaixo fornecem um guia do usuário para a ferramenta.
+O Slicer Tutorial Maker é uma extensão para o 3D Slicer que facilita a criação de tutoriais ilustrados em múltiplos idiomas. Ele automatiza a captura de capturas de tela, oferece um editor visual de anotações e exporta os tutoriais finalizados nos formatos HTML e Markdown.
 
 [English Documentation](https://github.com/SoniaPujolLab/SlicerTutorialMaker/blob/main/README.md)
 [Documentación en español](https://github.com/SoniaPujolLab/SlicerTutorialMaker/blob/main/README_esp.md)
 
-## Instalação (Usando o Gerenciador de Extensões)
-- Instale a versão [3D Slicer 5.10.0](https://download.slicer.org/) ou a [versão estável mais recente disponível](https://download.slicer.org/)
-- Vá para o "Extension Manager" (Gerenciador de Extensões) e procure por "TutorialMaker".
-![TutorialMakenAnnotation](https://github.com/user-attachments/assets/a6060e33-34bd-444c-a230-293c580962ca)
-- Clique para reiniciar e carregar a extensão
-![image](https://github.com/user-attachments/assets/5b035504-fcc3-42e5-9ae3-2d45615daea7)
-- Prossiga para [**Como usar o Tutorial Maker**](#como-usar-o-tutorial-maker)
+---
 
-## Instalação (Manualmente)
-Siga estas etapas se quiser obter a versão mais recente da extensão antes da compilação de pré-visualização (que ocorre pela manhã ~9 EST).
-### Recomendamos fortemente desabilitar o Modo Desenvolvedor, pois ele usa recursos que estão atualmente em desenvolvimento e podem quebrar durante o uso da extensão.
+## Sumário
 
-- Instale a versão estável mais recente do [3D Slicer Stable Release](https://download.slicer.org/) ou a versão de pré-visualização [3D Slicer Preview Release](https://download.slicer.org/)
-- Abra o [repositório do Tutorial Maker no GitHub](https://github.com/SlicerLatinAmerica/TutorialMaker)
-- Clique no botão verde 'Code' e selecione a opção 'Download ZIP' conforme exibido na imagem abaixo para baixar o arquivo 'TutorialMaker.zip' no seu computador
-- Descompacte o arquivo 'TutorialMaker.zip' para acessar o diretório 'TutorialMaker-main'
-- **Usuários Windows** :
-  1. Inicie o 3D Slicer
-  2. Arraste e solte a pasta `TutorialMaker` para a janela do aplicativo Slicer
-  3. Uma primeira janela pop-up, 'Select a reader' (Selecionar um leitor), aparece. Selecione 'Add Python scripted modules to the application' (Adicionar módulos de script Python ao aplicativo) e clique em OK.
-  4. Uma segunda janela pop-up aparece para carregar o módulo Tutorial Maker. Clique em 'Yes' (Sim).
-![TutorialMakerInstall](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83)
+1. [Instalação: Gerenciador de Extensões](#instalação-gerenciador-de-extensões)
+2. [Instalação: Manual / Desenvolvedor](#instalação-manual--desenvolvedor)
+3. [Como Usar o Tutorial Maker](#como-usar-o-tutorial-maker)
+   - [1. Selecionar um Tutorial](#1-selecionar-um-tutorial)
+   - [2. Capturar Capturas de Tela](#2-capturar-capturas-de-tela)
+   - [3. Anotar o Tutorial](#3-anotar-o-tutorial)
+   - [4. Gerar o Tutorial](#4-gerar-o-tutorial)
+4. [Ferramenta de Anotação](#ferramenta-de-anotação)
+   - [Atalhos de Teclado](#atalhos-de-teclado)
+5. [Modo Desenvolvedor](#modo-desenvolvedor)
+6. [Escrevendo Tutoriais](#escrevendo-tutoriais)
+7. [Desinstalação](#desinstalação)
 
-- **Usuários MacOs**:
-   1. Inicie o 3D Slicer
-   2. Selecione 'Edit' (Editar) no menu principal
-   3. Selecione 'Application settings' (Configurações do aplicativo).
-   4. Uma janela 'Parameters' (Parâmetros) aparece: selecione 'Modules' (Módulos) no painel esquerdo
-   5. Selecione o arquivo 'TutoriaMaker.py.'
-   6. Arraste e solte o arquivo `TutorialMaker.py` localizado no subdiretório 'TutorialMaker-main/TutorialMaker/' no campo 'Additional module paths' (Caminhos adicionais de módulos) e clique em OK para reiniciar o Slicer
-![TutorialMakerInstallMac](https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d)
+---
 
+## Instalação: Gerenciador de Extensões
 
-## Como usar o Tutorial Maker
+1. Instale o [3D Slicer 5.10.0](https://download.slicer.org/) ou a [versão estável mais recente](https://download.slicer.org/).
+2. Abra o **Gerenciador de Extensões** e pesquise por `TutorialMaker`.
+   <p align="center"><img src="https://github.com/user-attachments/assets/a6060e33-34bd-444c-a230-293c580962ca" alt="TutorialMakerAnnotation"></p>
+3. Clique em **Instalar** e reinicie o Slicer quando solicitado.
+   <p align="center"><img src="https://github.com/user-attachments/assets/5b035504-fcc3-42e5-9ae3-2d45615daea7" alt="Restart prompt"></p>
+4. Prossiga para [**Como Usar o Tutorial Maker**](#como-usar-o-tutorial-maker).
 
-- Selecione o módulo 'Tutorial Maker' da categoria 'Utilities' (Utilitários) na lista de módulos no Slicer
-![image](https://github.com/user-attachments/assets/61f70e02-fd7c-4f0b-b2ec-b190021eaf5d)
+---
+
+## Instalação: Manual / Desenvolvedor
+
+Siga estas etapas para usar a versão de desenvolvimento mais recente antes que ela apareça no build do Gerenciador de Extensões (publicado todas as manhãs por volta das 9h EST).
+
+> [!WARNING]
+> Recomendamos fortemente manter o **Modo Desenvolvedor desativado**, a menos que você esteja desenvolvendo ativamente a extensão. O Modo Desenvolvedor expõe funcionalidades experimentais que podem causar instabilidade.
+
+1. Instale o [3D Slicer Stable Release](https://download.slicer.org/) ou o [Preview Release](https://download.slicer.org/).
+2. Abra o [repositório TutorialMaker no GitHub](https://github.com/SlicerLatinAmerica/TutorialMaker).
+3. Clique no botão verde **Code** e selecione **Download ZIP** para baixar o arquivo `TutorialMaker.zip`.
+4. Extraia o arquivo para obter o diretório `TutorialMaker-main`.
+
+**Windows**
+
+1. Inicie o 3D Slicer.
+2. Arraste e solte a pasta `TutorialMaker` na janela do aplicativo Slicer.
+3. Na janela **Select a reader**, escolha **Add Python scripted modules to the application** e clique em **OK**.
+4. Quando perguntado sobre carregar o módulo Tutorial Maker, clique em **Yes**.
+
+<p align="center"><img src="https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/17ffda20-ee58-4e52-91c8-755655725d83" alt="TutorialMakerInstall"></p>
+
+**macOS / Linux**
+
+1. Inicie o 3D Slicer.
+2. Acesse **Edit → Application Settings → Modules**.
+3. No campo **Additional module paths**, arraste e solte o arquivo `TutorialMaker.py` localizado dentro do diretório `TutorialMaker-main/TutorialMaker/`.
+4. Clique em **OK** e reinicie o Slicer.
+
+<p align="center"><img src="https://github.com/SlicerLatinAmerica/TutorialMaker/assets/28208639/1aad7764-0eb6-4f2e-8a5e-ba46c3cf373d" alt="TutorialMakerInstallMac"></p>
+
+---
+
+## Como Usar o Tutorial Maker
+
+### 1. Selecionar um Tutorial
+
+Abra o módulo **Tutorial Maker** na categoria **Utilities** no seletor de módulos do Slicer.
+
+<p align="center"><img src="https://github.com/user-attachments/assets/61f70e02-fd7c-4f0b-b2ec-b190021eaf5d" alt="Module selector"></p>
 
 > [!IMPORTANT]
-> Antes de iniciar este tutorial, alterne o Slicer para o modo Tela Cheia e defina o tamanho da fonte para 14pt para garantir que as capturas de tela sejam fáceis de ler.
+> Antes de capturar as capturas de tela, alterne o Slicer para o modo **Tela Cheia** e defina o tamanho da fonte do aplicativo para **14 pt** para garantir que as capturas de tela sejam fáceis de ler.
 
-- Selecione `FourMinuteTutorial`
-![image](https://github.com/user-attachments/assets/33bb0de0-24e6-4edc-b807-69f593443dce)
+Selecione o tutorial desejado na lista, por exemplo `FourMinuteTutorial`.
 
-- Clique em `Capture screenshots` (Capturar capturas de tela) e siga as instruções para fechar a cena e fechar o console Python
-![image](https://github.com/user-attachments/assets/1eac96d9-150f-416c-ba40-18730ef02ccd)
+<p align="center"><img src="https://github.com/user-attachments/assets/33bb0de0-24e6-4edc-b807-69f593443dce" alt="Tutorial list"></p>
 
-- Após capturar o tutorial, clique em `Edit annotations` (Editar anotações).
-![image](https://github.com/user-attachments/assets/e2d1f02c-e8d6-4620-ade8-cc8dd2d30e30)
+---
+
+### 2. Capturar Capturas de Tela
+
+Clique em **Capture Screenshots**. Um diálogo de preparação será exibido antes do início da captura.
+
+<p align="center"><img src="DOCS/README_18_02_2026/1.gif" alt="Capture Screenshots: preparation dialog"></p>
+
+O diálogo **Screenshot Capture Environment Setup** oferece três opções:
+
+| Opção | Padrão | Descrição |
+|-------|--------|-----------|
+| Save current scene data | Desativado | Abre o diálogo Salvar Dados para que você possa preservar seu trabalho antes de a cena ser limpa. |
+| Maximize 3D Slicer window for screen capture | Ativado | Garante dimensões de captura de tela consistentes em todos os slides. |
+| Close Python console and Error Log window | Ativado | Oculta painéis de desenvolvedor para capturas de tela mais limpas. |
+
+> [!WARNING]
+> A cena atual sempre será limpa antes do início da captura, independentemente das opções escolhidas.
+
+Clique em **OK** para prosseguir. Um diálogo de progresso acompanhará cada etapa da captura e exibirá uma mensagem pedindo para não interagir com o Slicer até que a captura seja concluída.
+
+<p align="center"><img src="DOCS/README_18_02_2026/2.gif" alt="Screenshot capture progress dialog"></p>
+
+Quando a captura for concluída, o Slicer retorna ao módulo Tutorial Maker e exibe uma confirmação:
+
+> **Screenshot Capture Completed:** *Captured Tutorial: `<nome do tutorial>`*
+
+---
+
+### 3. Anotar o Tutorial
+
+Após capturar as capturas de tela, o painel exibe dois botões lado a lado:
+
+| Botão | Comportamento |
+|-------|---------------|
+| **Edit Annotations** | Abre o Anotador sem anotações carregadas. Use este botão para começar a anotar do zero ou para descartar completamente o trabalho anterior. |
+| **Resume Annotations** | Abre o Anotador **e recarrega automaticamente** o arquivo `annotations.json` salvo mais recentemente para o tutorial selecionado. Use este botão para continuar o trabalho iniciado em uma sessão anterior. |
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_1.png" alt="Edit Annotations and Resume Annotations buttons"></p>
+
+<p align="center"><img src="DOCS/README_18_02_2026/3.gif" alt="Resume Annotations: annotator opening with saved annotations"></p>
+
+> [!NOTE]
+> **Edit Annotations** é habilitado assim que um tutorial é selecionado. **Resume Annotations** só é habilitado quando já existe um arquivo `annotations.json` para o tutorial selecionado (ou seja, você salvou ao menos uma vez). Quando habilitado, ele restaura todas as anotações (rótulos, posições, estilos, títulos e descrições dos slides) exatamente como você deixou.
+
+---
+
+### 4. Gerar o Tutorial
+
+Após salvar suas anotações, clique em **Generate Tutorial** para produzir os arquivos HTML e Markdown finais.
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_2.png" alt="Generate Tutorial button"></p>
+
+Se nenhum arquivo de anotações for encontrado, você verá um aviso:
+
+> **No Annotations Found:** *You don't have any annotations to export. Please annotate your screenshots first using "Edit Annotations".*
+
+Quando a geração for concluída com sucesso, o Slicer abre a pasta de saída automaticamente e exibe uma confirmação:
+
+> **Tutorial Generated:** *Generated Tutorial: `<nome do tutorial>`*
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_3.png" alt="Output folder opened in File Explorer"></p>
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_4.png" alt="Generated HTML output in browser"></p>
+
+---
 
 ## Ferramenta de Anotação
 
-- As capturas de tela aparecerão à esquerda
-![image](https://github.com/user-attachments/assets/dcabfa14-8454-4458-a32a-a2040d03ef10)
+A janela do Anotador é aberta como uma janela modal separada.
 
-- Cada captura de tela inclui uma seção de título (seta verde) e uma seção de Comentários (seta vermelha)
-![image](https://github.com/user-attachments/assets/de1a97a9-a5e4-4cbd-8c8b-208a9b9e0ebe)
+A faixa de miniaturas à esquerda exibe todos os slides capturados. Clique em qualquer miniatura para selecioná-la.
 
-- Selecione uma das quatro ferramentas de anotação
-![image](https://github.com/user-attachments/assets/3b345eb6-5ac3-46c8-a87f-b2bd935173a9)
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_5.png" alt="Annotator window: full layout overview"></p>
 
-- Após selecionar uma ferramenta, especifique o estilo
-![image](https://github.com/user-attachments/assets/62acbbba-c118-40f9-9a34-97674c64d121)
+**Editando o conteúdo dos slides**
 
-- Em seguida, clique no elemento que receberá a anotação e comece a digitar
-![image](https://github.com/user-attachments/assets/32a7de11-6dc8-4bcc-a78c-5aacc1e83087)
+Nos slides de captura de tela normais, você pode editar os campos **Title** e **Description** no topo do painel a qualquer momento durante a sessão de anotação.
 
-- Após criar todas as anotações, clique em Save file (Salvar arquivo)
-![image](https://github.com/user-attachments/assets/983da69f-78ae-4812-afa2-7d30eeec687f)
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_6_2.png" alt="Slide title and description fields"></p>
 
-As Capturas de Tela com Anotações são salvas agora na pasta do Módulo em Outputs, dentro da pasta de instalação da extensão.
+Slides especiais (como o **Cover Slide**) não possuem campos de Título e Descrição. Em vez disso, eles contêm anotações pré-definidas (autor, data, descrição, etc.) que você pode selecionar e editar diretamente no canvas do slide.
 
-- Clique em `Generate output` (Gerar saída) para gerar os arquivos MD e HTML.
-![image](https://github.com/user-attachments/assets/6422a4fa-bcac-4634-8c1c-c03b20d55aee)
+<p align="center"><img src="DOCS/README_18_02_2026/6.gif" alt="Editing cover slide premade annotations"></p>
 
-- Você receberá uma mensagem avisando sobre a geração
-![image](https://github.com/user-attachments/assets/4f0dd1cc-6d5f-44c6-8d9b-5579145aaa04)
+**Adicionando anotações**
 
-- A extensão abrirá a pasta contendo as capturas de tela anotadas, e também o HTML e MD
-![image](https://github.com/user-attachments/assets/3e1b91bd-0d9f-42f6-8e47-e27ceeba72d4)
+1. Selecione uma ferramenta de anotação na barra de ferramentas (Retângulo, Seta, Texto, etc.).
+   <p align="center"><img src="DOCS/README_18_02_2026/Screenshot_7.png" alt="Annotation toolbar"></p>
+2. Escolha o estilo da anotação (cor, tamanho da fonte, espessura da linha).
+   <p align="center"><img src="DOCS/README_18_02_2026/Screenshot_8.png" alt="Annotation style options"></p>
+3. Clique na área do slide onde deseja colocar a anotação e digite o rótulo.
+   <p align="center"><img src="DOCS/README_18_02_2026/4.gif" alt="Placing a rectangle annotation"></p>
 
-![image](https://github.com/user-attachments/assets/a7201cae-30b6-4ddd-8e4f-cd60079ba9a7)
+**Salvando**
 
-Você também pode alterar o layout do anotador, arrastando os menus.
-![dg](https://github.com/user-attachments/assets/b4269d5d-7c37-43f1-9e2e-f90d8aacb730)
+Clique no botão **Save** na barra de ferramentas para salvar as anotações em `Outputs/Annotations/<nome do tutorial>/annotations.json` dentro da pasta de instalação da extensão.
 
-É possível alterar o título e as descrições do slide
-![dg2](https://github.com/user-attachments/assets/a0264344-6c3d-403d-ae49-db8b30507623)
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_9.png" alt="Save button in toolbar"></p>
+
+> [!NOTE]
+> Ao fechar o Anotador, um diálogo perguntará se você deseja **Salvar**, **Descartar** ou **Cancelar** as alterações não salvas.
+
+**Personalização do layout**
+
+Você pode redimensionar ou reorganizar os painéis arrastando os divisores.
+
+<p align="center"><img src="DOCS/README_18_02_2026/5.gif" alt="Dragging panel dividers to rearrange layout"></p>
+
+---
+
+### Atalhos de Teclado
+
+Os seguintes atalhos de teclado estão disponíveis enquanto a janela do Anotador estiver em foco:
+
+| Tecla | Ação |
+|-------|------|
+| `Del` | Exclui a anotação selecionada. |
+| `Esc` | Deseleciona a anotação atual sem excluí-la. |
+| `Shift` + clique | Coloca uma anotação e **mantém a mesma ferramenta ativa**, permitindo adicionar múltiplas anotações em rápida sucessão sem precisar selecionar a ferramenta novamente. |
+
+<p align="center"><img src="DOCS/README_18_02_2026/7.gif" alt="Shift+click to place multiple annotations in succession"></p>
+
+---
 
 ## Modo Desenvolvedor
-- Se você habilitou o modo desenvolvedor (Edit > Application Settings > Developer > Enable developer mode) no Slicer, você pode notar opções adicionais dentro da extensão. Estas representam recursos experimentais e processos instáveis atualmente em teste
-![image](https://github.com/user-attachments/assets/ce9478fa-e195-4cc8-b2ef-f90b3d4c9ed1)
 
-- O recurso Fetch From GitHub permite que os usuários baixem tutoriais diretamente de uma lista curada de repositórios externos. Atualmente, este recurso está desabilitado para evitar problemas relacionados aos limites de taxa da API do GitHub.
-- .Tutorial Creation Tools: Esses recursos auxiliam no desenvolvimento de novos tutoriais, permitindo gravar nomes e caminhos de widgets automaticamente.
+Se o **Modo Desenvolvedor** estiver habilitado no Slicer (**Edit → Application Settings → Developer → Enable developer mode**), opções adicionais aparecerão no painel do Tutorial Maker.
 
-## Escrevendo tutoriais
-- Para orientações sobre o desenvolvimento de seus próprios tutoriais, siga o modelo e exemplos hospedados no SlicerTestRepository (https://github.com/SoniaPujolLab/SlicerTestTutorial).
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_10.png" alt="Developer Mode extra options"></p>
+
+- **Fetch From GitHub:** Baixa scripts de tutoriais diretamente de uma lista curada de repositórios externos. Atualmente desativado por padrão para evitar problemas com os limites de taxa da API do GitHub.
+- **Tutorial Creation Tools:** Auxilia no desenvolvimento de novos tutoriais registrando nomes e caminhos de widgets automaticamente.
+
+> [!WARNING]
+> Os recursos do Modo Desenvolvedor são experimentais e podem causar instabilidade. Recomendamos fortemente manter o Modo Desenvolvedor desativado para a criação rotineira de tutoriais.
+
+---
+
+## Escrevendo Tutoriais
+
+Para orientações sobre como criar seus próprios scripts de tutorial, siga os modelos e exemplos disponíveis na [SlicerTutorialMakerCollection](https://github.com/SoniaPujolLab/SlicerTutorialMakerCollection).
+
+---
+
+## Desinstalação
+
+### Pelo Gerenciador de Extensões (recomendado)
+
+1. No 3D Slicer, abra **View → Extension Manager** (ou o botão **Extensions Manager** na barra de ferramentas).
+2. Acesse a aba **Installed Extensions**.
+3. Localize **TutorialMaker** na lista.
+4. Clique no botão **Uninstall** (lixeira / remover) ao lado da extensão.
+5. Reinicie o 3D Slicer quando solicitado para concluir a remoção.
+
+<p align="center"><img src="DOCS/README_18_02_2026/8.gif" alt="Uninstalling via Extension Manager"></p>
+
+### Remoção manual (instalação por desenvolvedor / código-fonte)
+
+Se você instalou a extensão adicionando-a aos **Additional module paths**, siga estas etapas:
+
+1. Acesse **Edit → Application Settings → Modules**.
+2. Na lista **Additional module paths**, selecione a entrada que aponta para a pasta `TutorialMaker` (ou `TutorialMaker.py`).
+3. Clique no botão **Remove** (menos) para excluir a entrada do caminho.
+4. Clique em **OK** e reinicie o 3D Slicer.
+5. Após reiniciar, você pode excluir com segurança o diretório `TutorialMaker-main` do seu sistema de arquivos.
+
+> [!NOTE]
+> Remover o caminho do módulo apenas cancela o registro da extensão no Slicer. Você deve excluir manualmente a pasta de origem do disco para remover todos os arquivos.
+
+**Removendo arquivos de saída gerados**
+
+Os arquivos de saída dos tutoriais (capturas de tela, anotações, HTML e Markdown) são armazenados dentro da pasta de instalação da extensão em `TutorialMaker/Outputs/`. Esses arquivos não são removidos automaticamente. Exclua o diretório `Outputs/` manualmente caso não precise mais deles.

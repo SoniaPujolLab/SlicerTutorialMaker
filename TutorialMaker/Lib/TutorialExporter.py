@@ -534,11 +534,26 @@ CSS_TEMPLATES = {
             overflow: hidden;
             page-break-after: always;
             page-break-inside: avoid;
-            min-height: 600px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
         }}
 
-        /* Content Wrappers */
-        .slideContent, .coverContent, .backCoverContent, .sectionContent, .textContent, .blankContent {{
+        /* Stacked content */
+        .slideContent, .textContent, .blankContent {{
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 40px;
+        }}
+
+        /* Centered content */
+        .coverContent, .backCoverContent, .sectionContent {{
+            flex: 0 1 auto;
+            min-height: 0;
+            overflow: hidden;
             padding: 40px;
         }}
 
@@ -546,7 +561,6 @@ CSS_TEMPLATES = {
         .cover {{
             background: linear-gradient(135deg, {primary} 0%, {secondary} 100%);
             color: white;
-            display: flex;
             align-items: center;
             justify-content: center;
         }}
@@ -592,22 +606,29 @@ CSS_TEMPLATES = {
             font-size: 3.5rem;
             font-weight: 600;
             color: {primary};
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 3px solid {primary};
         }}
 
         .containerImage {{
-            text-align: center;
-            margin: 30px 0;
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
             background: #fafafa;
-            padding: 20px;
+            padding: 10px;
             border-radius: 4px;
         }}
 
         .slideImage {{
-            max-width: 90%;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
             height: auto;
+            object-fit: contain;
             border-radius: 4px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }}
@@ -617,17 +638,15 @@ CSS_TEMPLATES = {
             line-height: 1.8;
             color: #444;
             text-align: justify;
-            margin-top: 25px;
+            margin-top: 10px;
         }}
 
         /* Back Cover */
         .backCover {{
             background: linear-gradient(135deg, {secondary} 0%, {primary} 100%);
             color: white;
-            min-height: 600px;
-            display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
         }}
 
         .backCoverContent {{
@@ -677,8 +696,6 @@ CSS_TEMPLATES = {
         .sectionSlide {{
             background: linear-gradient(135deg, {primary} 0%, {secondary} 100%);
             color: white;
-            min-height: 600px;
-            display: flex;
             align-items: center;
             justify-content: center;
         }}
@@ -700,7 +717,7 @@ CSS_TEMPLATES = {
             font-size: 3.5rem;
             font-weight: 600;
             color: {primary};
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 3px solid {primary};
         }}
@@ -735,22 +752,33 @@ CSS_TEMPLATES = {
 
         /* Print Styles */
         @media print {{
+            * {{
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }}
+
             body {{
                 background: white;
                 padding: 0;
             }}
 
             .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
+                max-width: none;
+                width: 297mm;
+                height: 148.5mm;
                 margin: 0;
                 box-shadow: none;
                 border-radius: 0;
-                min-height: 100vh;
-                height: auto;
+                overflow: hidden;
+            }}
+
+            .slideContent, .textContent, .blankContent {{
+                overflow: hidden;
             }}
         }}
 
         @page {{
-            size: A4 landscape;
+            size: 297mm 148.5mm;
             margin: 0;
         }}
     """,
@@ -777,16 +805,29 @@ CSS_TEMPLATES = {
             overflow: hidden;
             page-break-after: always;
             page-break-inside: avoid;
-            min-height: 600px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
         }}
 
-        .slideContent, .coverContent, .backCoverContent, .sectionContent, .textContent, .blankContent {{
+        .slideContent, .textContent, .blankContent {{
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 50px;
+        }}
+
+        .coverContent, .backCoverContent, .sectionContent {{
+            flex: 0 1 auto;
+            min-height: 0;
+            overflow: hidden;
             padding: 50px;
         }}
 
         .cover {{
             background: white;
-            display: flex;
             align-items: center;
             justify-content: center;
         }}
@@ -831,7 +872,7 @@ CSS_TEMPLATES = {
             font-size: 4rem;
             font-weight: 600;
             color: {primary};
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 2px solid {primary};
             text-align: center;
@@ -839,15 +880,22 @@ CSS_TEMPLATES = {
         }}
 
         .containerImage {{
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
             border: 1px solid #ddd;
         }}
 
         .slideImage {{
-            max-width: 85%;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
             height: auto;
+            object-fit: contain;
             border: 1px solid {primary};
         }}
 
@@ -856,14 +904,13 @@ CSS_TEMPLATES = {
             line-height: 1.9;
             color: {text};
             text-align: justify;
-            margin-top: 25px;
+            margin-top: 10px;
         }}
 
         .backCover {{
             background: white;
-            display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
         }}
 
         .backCover .coverTitle {{
@@ -905,8 +952,6 @@ CSS_TEMPLATES = {
         /* Section Slide */
         .sectionSlide {{
             background: #fefefe;
-            min-height: 600px;
-            display: flex;
             align-items: center;
             justify-content: center;
         }}
@@ -934,7 +979,7 @@ CSS_TEMPLATES = {
             font-size: 4rem;
             font-weight: 600;
             color: {primary};
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 2px solid {primary};
             text-align: center;
@@ -972,21 +1017,32 @@ CSS_TEMPLATES = {
         }}
 
         @media print {{
+            * {{
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }}
+
             body {{
                 background: white;
                 padding: 0;
             }}
 
             .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
+                max-width: none;
+                width: 297mm;
+                height: 148.5mm;
                 margin: 0;
                 border: none;
-                min-height: 100vh;
-                height: auto;
+                overflow: hidden;
+            }}
+
+            .slideContent, .textContent, .blankContent {{
+                overflow: hidden;
             }}
         }}
 
         @page {{
-            size: A4 landscape;
+            size: 297mm 148.5mm;
             margin: 0;
         }}
     """,
@@ -1012,15 +1068,28 @@ CSS_TEMPLATES = {
             overflow: hidden;
             page-break-after: always;
             page-break-inside: avoid;
-            min-height: 600px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
         }}
         
-        .slideContent, .coverContent, .backCoverContent, .sectionContent, .textContent, .blankContent {{
+        .slideContent, .textContent, .blankContent {{
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 60px;
+        }}
+
+        .coverContent, .backCoverContent, .sectionContent {{
+            flex: 0 1 auto;
+            min-height: 0;
+            overflow: hidden;
             padding: 60px;
         }}
 
         .cover {{
-            display: flex;
             align-items: center;
             justify-content: center;
             border-left: 8px solid {primary};
@@ -1059,32 +1128,39 @@ CSS_TEMPLATES = {
             font-size: 3.3rem;
             font-weight: 400;
             color: {primary};
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid {primary};
         }}
 
         .containerImage {{
-            text-align: center;
-            margin: 30px 0;
+            flex: 1 1 0;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 10px;
         }}
 
         .slideImage {{
             max-width: 100%;
+            max-height: 100%;
+            width: auto;
             height: auto;
+            object-fit: contain;
         }}
 
         .slideDescription {{
             font-size: 1.9rem;
             line-height: 1.8;
             color: {text};
-            margin-top: 25px;
+            margin-top: 10px;
         }}
 
         .backCover {{
-            display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
             border-left: 8px solid {primary};
         }}
 
@@ -1127,8 +1203,6 @@ CSS_TEMPLATES = {
         .sectionSlide {{
             background: white;
             border-left: 8px solid {primary};
-            display: flex;
-            min-height: 600px;
             align-items: center;
             justify-content: center;
         }}
@@ -1151,7 +1225,7 @@ CSS_TEMPLATES = {
             font-size: 3.3rem;
             font-weight: 400;
             color: {primary};
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid {primary};
         }}
@@ -1182,21 +1256,36 @@ CSS_TEMPLATES = {
             color: {text};
         }}
 
+        .slideContent p, .textContent p, .blankContent p {{
+            margin: 0 0 0.4em;
+        }}
+
         @media print {{
+            * {{
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }}
+
             body {{
                 background: white;
                 padding: 0;
             }}
 
             .slide, .cover, .backCover, .sectionSlide, .textSlide, .blankSlide {{
+                max-width: none;
+                width: 297mm;
+                height: 148.5mm;
                 margin: 0;
-                min-height: 100vh;
-                height: auto;
+                overflow: hidden;
+            }}
+
+            .slideContent, .textContent, .blankContent {{
+                overflow: hidden;
             }}
         }}
 
         @page {{
-            size: A4 landscape;
+            size: 297mm 148.5mm;
             margin: 0;
         }}
     """
@@ -1212,7 +1301,7 @@ class CoverSlide():
         self.Description = description
         pass
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = HTML_TEMPLATES[theme]['cover']
         colors = PALETTE_COLORS[palette]
         return template.format(
@@ -1223,7 +1312,7 @@ class CoverSlide():
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = MARKDOWN_TEMPLATES[theme]['cover']
         colors = PALETTE_COLORS[palette]
         return template.format(
@@ -1239,7 +1328,7 @@ class BackCoverSlide():
         self.Title = title
         self.Acknowledgments = Acknowledgments 
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         if isinstance(self.Acknowledgments, dict):
             items = "".join(
                 f"<li><div class='ackItem'><strong>{k}</strong><p>{v}</p></div></li>"
@@ -1257,7 +1346,7 @@ class BackCoverSlide():
             **colors
         )
 
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         colors = PALETTE_COLORS[palette]
         
         if isinstance(self.Acknowledgments, dict):
@@ -1289,13 +1378,18 @@ class BackCoverSlide():
         )
 
 class SimpleSlide():
-    def __init__(self, Title: str, Description: str, ImagePath: str):
+    def __init__(self, Title: str, Description: str, ImagePath: str, base_dir: str = None):
         self.Title = Title
         self.Description = Description
         self.ImagePath = ImagePath
+        self.BaseDir = base_dir
     
-    def _get_image_data_url(self, image_path):
-        if not image_path or not os.path.exists(image_path):
+    def _get_image_data_url(self, image_path, base_dir: str = None):
+        if not image_path:
+            return image_path
+        if base_dir and not os.path.isabs(image_path):
+            image_path = os.path.join(base_dir, image_path)
+        if not os.path.exists(image_path):
             return image_path
         
         try:
@@ -1319,11 +1413,14 @@ class SimpleSlide():
             print(f"Warning: Could not convert image to base64 ({image_path}): {e}")
             return image_path
         
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = HTML_TEMPLATES[theme]['slide']
         colors = PALETTE_COLORS[palette]
-        
-        image_src = self._get_image_data_url(self.ImagePath)
+        base_dir = self.BaseDir
+        if embed:
+            image_src = self._get_image_data_url(self.ImagePath, base_dir=base_dir)
+        else:
+            image_src = self.ImagePath or ""
 
         return template.format(
             title=self.Title,
@@ -1333,11 +1430,14 @@ class SimpleSlide():
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = MARKDOWN_TEMPLATES[theme]['slide']
         colors = PALETTE_COLORS[palette]
-        
-        image_src = self._get_image_data_url(self.ImagePath)
+        base_dir = self.BaseDir
+        if embed:
+            image_src = self._get_image_data_url(self.ImagePath, base_dir=base_dir)
+        else:
+            image_src = self.ImagePath or ""
         
         return template.format(
             title=self.Title,
@@ -1351,7 +1451,7 @@ class SimpleSection():
     def __init__(self, Title: str):
         self.Title = Title
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = HTML_TEMPLATES[theme]['section']
         colors = PALETTE_COLORS[palette]
         return template.format(
@@ -1359,7 +1459,7 @@ class SimpleSection():
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = MARKDOWN_TEMPLATES[theme]['section']
         colors = PALETTE_COLORS[palette]
         return template.format(
@@ -1372,7 +1472,7 @@ class SimpleText():
         self.Title = Title
         self.Body = Body
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = HTML_TEMPLATES[theme]['text']
         colors = PALETTE_COLORS[palette]
         return template.format(
@@ -1381,7 +1481,7 @@ class SimpleText():
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = MARKDOWN_TEMPLATES[theme]['text']
         colors = PALETTE_COLORS[palette]
         return template.format(
@@ -1394,12 +1494,12 @@ class BlankSlide():
     def __init__(self):
         pass
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = HTML_TEMPLATES[theme]['blank']
         colors = PALETTE_COLORS[palette]
         return template.format(**colors)
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
         template = MARKDOWN_TEMPLATES[theme]['blank']
         colors = PALETTE_COLORS[palette]
         return template.format(**colors)
@@ -1419,9 +1519,10 @@ class SlidePage():
         self.Model = Model # Model will be used later to create more than one type of slide
 
 class TutorialExporter():
-    def __init__(self, Slides: list[SlidePage], Title: str):
+    def __init__(self, Slides: list[SlidePage], Title: str, html_dir: str = None):
         self.Slides = Slides
         self.Title = Title
+        self.HtmlDir = html_dir
         self.Html = """ <!DOCTYPE html>
                         <html lang="en">
                         <head>
@@ -1435,18 +1536,103 @@ class TutorialExporter():
                         <style>
                             {}
                         </style>
+                        <script>
+                        function fitSlides() {{
+                            var specs = [
+                                {{ container: '.slideContent', texts: ['.slideTitle', '.slideDescription'], scaleUp: false }},
+                                {{ container: '.textContent',  texts: ['.textTitle', '.textBody'], scaleUp: true }},
+                                {{ container: '.blankContent', texts: ['.blankBody'], scaleUp: true }}
+                            ];
+
+                            specs.forEach(function(spec) {{
+                                document.querySelectorAll(spec.container).forEach(function(el) {{
+                                    var textEls = spec.texts
+                                        .map(function(s) {{ return el.querySelector(s); }})
+                                        .filter(Boolean);
+                                    if (!textEls.length) return;
+
+                                    // reset any previous inline font-size
+                                    textEls.forEach(function(t) {{ t.style.fontSize = ''; }});
+
+                                    // Step 1: capture constrained dimensions
+                                    var rect      = el.getBoundingClientRect();
+                                    var available = rect.height;
+                                    var elWidth   = rect.width;
+                                    if (available <= 0 || elWidth <= 0) return;
+
+                                    // Step 2: clone off-screen with the SAME width → accurate natural height
+                                    function measure(source) {{
+                                        var c = source.cloneNode(true);
+                                        c.style.cssText = [
+                                            'position:fixed',
+                                            'top:-99999px',
+                                            'left:-99999px',
+                                            'width:' + elWidth + 'px',
+                                            'height:auto',
+                                            'min-height:0',
+                                            'overflow:visible',
+                                            'flex:none',
+                                            'visibility:hidden'
+                                        ].join(';');
+                                        document.body.appendChild(c);
+                                        var h = c.getBoundingClientRect().height;
+                                        document.body.removeChild(c);
+                                        return h;
+                                    }}
+
+                                    var natural = measure(el);
+
+                                    // Step 3: scale UP if text-only slide has significant empty space
+                                    if (spec.scaleUp && natural < available * 0.9) {{
+                                        var upRatio = (available * 0.95) / natural;
+                                        textEls.forEach(function(t) {{
+                                            var fs = parseFloat(window.getComputedStyle(t).fontSize);
+                                            t.style.fontSize = (fs * upRatio) + 'px';
+                                        }});
+                                        natural = measure(el);
+                                    }}
+
+                                    if (natural <= available) return;
+
+                                    // Step 4: single-shot scale down
+                                    var ratio = available / natural;
+                                    textEls.forEach(function(t) {{
+                                        var fs = parseFloat(window.getComputedStyle(t).fontSize);
+                                        t.style.fontSize = Math.max(fs * ratio, 6) + 'px';
+                                    }});
+
+                                    // Step 5: one correction pass for line-height rounding
+                                    var after = measure(el);
+                                    if (after > available) {{
+                                        var ratio2 = available / after;
+                                        textEls.forEach(function(t) {{
+                                            var fs = parseFloat(window.getComputedStyle(t).fontSize);
+                                            t.style.fontSize = Math.max(fs * ratio2, 6) + 'px';
+                                        }});
+                                    }}
+                                }});
+                            }});
+                        }}
+
+                        document.addEventListener('DOMContentLoaded', function() {{
+                            requestAnimationFrame(function() {{
+                                requestAnimationFrame(fitSlides);
+                            }});
+                        }});
+                        window.addEventListener('beforeprint', fitSlides);
+                        </script>
                         </html>
                     """
         self.Markdown = ""
         
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
-        body = "".join([slide.Model.ToHtml(palette=palette, theme=theme) for slide in self.Slides])
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+        body = "".join([slide.Model.ToHtml(palette=palette, theme=theme, embed=embed) for slide in self.Slides])
         colors = PALETTE_COLORS[palette]
         css = CSS_TEMPLATES[theme].format(**colors)
         return self.Html.format(self.Title, body, css)
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN):
-        md = "".join([slide.Model.ToMarkdown(palette=palette, theme=theme) for slide in self.Slides])
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+        md = "".join([slide.Model.ToMarkdown(palette=palette, theme=theme, embed=embed) for slide in self.Slides])
         self.Markdown = md
         return md
     
@@ -1462,7 +1648,7 @@ class TutorialExporter():
             printer.setOrientation(qt.QPrinter.Landscape)
 
             doc = qt.QTextDocument()
-            doc.setHtml(self.ToHtml(palette=palette, theme=theme))
+            doc.setHtml(self.ToHtml(palette=palette, theme=theme, embed=True))
             doc.setPageSize(qt.QSizeF(printer.pageRect().size()))
             doc.print_(printer)
             
