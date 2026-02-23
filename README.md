@@ -76,61 +76,182 @@ Open the **Tutorial Maker** module from the **Utilities** category in the Slicer
 <p align="center"><img src="https://github.com/user-attachments/assets/61f70e02-fd7c-4f0b-b2ec-b190021eaf5d" alt="Module selector"></p>
 
 > [!IMPORTANT]
-> Before starting this tutorial, switch Slicer to Full-Screen mode and set the font size to 14pt to ensure the screenshots are easy to read.
-- Select `FourMinuteTutorial`
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/33bb0de0-24e6-4edc-b807-69f593443dce" />
+> Before capturing screenshots, switch Slicer to **Full-Screen** mode and set the application font size to **14 pt** to ensure the screenshots are easy to read.
 
-- Click `Capture screenshots`  and follow the instructions to close the scene and close the Python console
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/1eac96d9-150f-416c-ba40-18730ef02ccd" />
+Select the desired tutorial from the list, for example `FourMinuteTutorial`.
 
-- After capturing the tutorial, click `Edit annotations.`
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/e2d1f02c-e8d6-4620-ade8-cc8dd2d30e30" />
+<p align="center"><img src="https://github.com/user-attachments/assets/33bb0de0-24e6-4edc-b807-69f593443dce" alt="Tutorial list"></p>
+
+---
+
+### 2. Capture Screenshots
+
+Click **Capture Screenshots**. A preparation dialog will appear before the capture begins.
+
+<p align="center"><img src="DOCS/README_18_02_2026/1.gif" alt="Capture Screenshots: preparation dialog"></p>
+
+The **Screenshot Capture Environment Setup** dialog offers three options:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| Save current scene data | Off | Opens the Save Data dialog so you can preserve your work before the scene is cleared. |
+| Maximize 3D Slicer window for screen capture | On | Ensures consistent screenshot dimensions across all slides. |
+| Close Python console and Error Log window | On | Hides developer panels for cleaner screenshots. |
+
+> [!WARNING]
+> The current scene will always be cleared before capture begins, regardless of the options chosen.
+
+Click **OK** to proceed. A progress dialog will track each capture step and ask you not to interact with Slicer until the capture is complete.
+
+<p align="center"><img src="DOCS/README_18_02_2026/2.gif" alt="Screenshot capture progress dialog"></p>
+
+When the capture finishes, Slicer returns to the Tutorial Maker module and displays a confirmation:
+
+> **Screenshot Capture Completed:** *Captured Tutorial: `<tutorial name>`*
+
+---
+
+### 3. Annotate Your Tutorial
+
+After capturing screenshots, the panel shows two buttons side by side:
+
+| Button | Behavior |
+|--------|----------|
+| **Edit Annotations** | Opens the Annotator with no annotations loaded. Use this button to start annotating from scratch or to discard all previous work. |
+| **Resume Annotations** | Opens the Annotator **and automatically reloads** the most recently saved `annotations.json` file for the selected tutorial. Use this button to continue work from a previous session. |
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_1.png" alt="Edit Annotations and Resume Annotations buttons"></p>
+
+<p align="center"><img src="DOCS/README_18_02_2026/3.gif" alt="Resume Annotations: annotator opening with saved annotations"></p>
+
+> [!NOTE]
+> **Edit Annotations** is enabled as soon as a tutorial is selected. **Resume Annotations** is only enabled when an `annotations.json` file already exists for the selected tutorial (i.e., you have saved at least once). When enabled, it restores all annotations (labels, positions, styles, slide titles and descriptions) exactly as you left them.
+
+---
+
+### 4. Generate Tutorial Output
+
+After saving your annotations, click **Generate Tutorial** to produce the final HTML and Markdown files.
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_2.png" alt="Generate Tutorial button"></p>
+
+If no annotations file is found, you will see a warning:
+
+> **No Annotations Found:** *You don't have any annotations to export. Please annotate your screenshots first using "Edit Annotations".*
+
+When generation completes successfully, Slicer opens the output folder automatically and displays a confirmation:
+
+> **Tutorial Generated:** *Generated Tutorial: `<tutorial name>`*
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_3.png" alt="Output folder opened in File Explorer"></p>
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_4.png" alt="Generated HTML output in browser"></p>
+
+---
 
 ## Annotation Tool
 
-- The screenshots will appear on the left
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/dcabfa14-8454-4458-a32a-a2040d03ef10" />
+The Annotator window opens as a separate modal window.
 
-- Each screenshot includes a title section (green arrow) and a Comments section (red arrow)
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/de1a97a9-a5e4-4cbd-8c8b-208a9b9e0ebe" />
+The thumbnail strip on the left displays all captured slides. Click any thumbnail to select it.
 
-- Select one of the four annotation tools
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/3b345eb6-5ac3-46c8-a87f-b2bd935173a9" />
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_5.png" alt="Annotator window: full layout overview"></p>
 
-- After selecting a tool, specify the style
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/62acbbba-c118-40f9-9a34-97674c64d121" />
+**Editing slide content**
 
-- Then click on the element that will receive the annotation and start typing
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/32a7de11-6dc8-4bcc-a78c-5aacc1e83087" />
+On regular screenshot slides, you can edit the **Title** and **Description** fields at the top of the panel at any time during the annotation session.
 
-- After creating all annotations, click on Save file
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/983da69f-78ae-4812-afa2-7d30eeec687f" />
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_6_2.png" alt="Slide title and description fields"></p>
 
-The Screenshots with Annotations are now saved in the Module folder under Outputs, inside the extension installation folder.
+Special slides (such as the **Cover Slide**) do not have Title and Description fields. Instead, they contain pre-made annotations (author, date, description, etc.) that you can select and edit directly on the slide canvas.
 
-- Click `Generate output` to generate the MD and HTML files.
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/6422a4fa-bcac-4634-8c1c-c03b20d55aee" />
+<p align="center"><img src="DOCS/README_18_02_2026/6.gif" alt="Editing cover slide premade annotations"></p>
 
-- You will receive a message warning you about the generation
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/4f0dd1cc-6d5f-44c6-8d9b-5579145aaa04" />
+**Adding annotations**
 
-- The extension will open the folder containing the screenshots annotated, and also the HTML and MD
-<img width="1706" height="1029" alt="image" src="https://github.com/user-attachments/assets/3e1b91bd-0d9f-42f6-8e47-e27ceeba72d4" />
+1. Select an annotation tool from the toolbar (Rectangle, Arrow, Text, etc.).
+   <p align="center"><img src="DOCS/README_18_02_2026/Screenshot_7.png" alt="Annotation toolbar"></p>
+2. Choose the annotation style (color, font size, line thickness).
+   <p align="center"><img src="DOCS/README_18_02_2026/Screenshot_8.png" alt="Annotation style options"></p>
+3. Click on the slide area where you want to place the annotation and type the label.
+   <p align="center"><img src="DOCS/README_18_02_2026/4.gif" alt="Placing a rectangle annotation"></p>
 
-<img width="1254" height="774" alt="image" src="https://github.com/user-attachments/assets/a7201cae-30b6-4ddd-8e4f-cd60079ba9a7" />
+**Saving**
 
-You can also change the layout from the annotator, dragging the menus.
-![dg](https://github.com/user-attachments/assets/b4269d5d-7c37-43f1-9e2e-f90d8aacb730)
+Click the **Save** button in the toolbar to save annotations to `Outputs/Annotations/<tutorial name>/annotations.json` inside the extension installation folder.
 
-It's possible to change the slide title and descriptions
-![dg2](https://github.com/user-attachments/assets/a0264344-6c3d-403d-ae49-db8b30507623)
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_9.png" alt="Save button in toolbar"></p>
 
-## Developer mode
-- If you have enabled developer mode (Edit > Application Settings > Developer > Enable developer mode) in Slicer, you may notice additional options within the extension. These represent experimental features and unstable processes currently undergoing test
-<img width="598" height="1007" alt="image" src="https://github.com/user-attachments/assets/ce9478fa-e195-4cc8-b2ef-f90b3d4c9ed1" />
+> [!NOTE]
+> When closing the Annotator, a dialog will ask whether you want to **Save**, **Discard**, or **Cancel** unsaved changes.
 
-- The Fetch From GitHub feature allows users to download tutorials directly from a curated list of external repositories. Currently, this feature is disabled to prevent issues regarding GitHub API rate limits.
-- .Tutorial Creation Tools: These features assist in developing new tutorials by allowing you to record widget names and paths automatically.
+**Layout customization**
 
-## Writing tutorials
-- For guidance on developing your own tutorials, please follow the template and examples hosted at the SlicerTestRepository (https://github.com/SoniaPujolLab/SlicerTestTutorial).
+You can resize or rearrange panels by dragging the dividers.
+
+<p align="center"><img src="DOCS/README_18_02_2026/5.gif" alt="Dragging panel dividers to rearrange layout"></p>
+
+---
+
+### Keyboard Shortcuts
+
+The following keyboard shortcuts are available while the Annotator window is in focus:
+
+| Key | Action |
+|-----|--------|
+| `Del` | Deletes the selected annotation. |
+| `Esc` | Deselects the current annotation without deleting it. |
+| `Shift` + click | Places an annotation and **keeps the same tool active**, allowing you to add multiple annotations in quick succession without reselecting the tool. |
+
+<p align="center"><img src="DOCS/README_18_02_2026/7.gif" alt="Shift+click to place multiple annotations in succession"></p>
+
+---
+
+## Developer Mode
+
+If **Developer Mode** is enabled in Slicer (**Edit → Application Settings → Developer → Enable developer mode**), additional options will appear in the Tutorial Maker panel.
+
+<p align="center"><img src="DOCS/README_18_02_2026/Screenshot_10.png" alt="Developer Mode extra options"></p>
+
+- **Fetch From GitHub:** Downloads tutorial scripts directly from a curated list of external repositories. Currently disabled by default to avoid issues with GitHub API rate limits.
+- **Tutorial Creation Tools:** Assists in developing new tutorials by automatically recording widget names and paths.
+
+> [!WARNING]
+> Developer Mode features are experimental and may cause instability. We strongly recommend keeping Developer Mode disabled for routine tutorial creation.
+
+---
+
+## Writing Tutorials
+
+For guidance on developing your own tutorial scripts, follow the templates and examples available at the [SlicerTutorialMakerCollection](https://github.com/SoniaPujolLab/SlicerTutorialMakerCollection).
+
+---
+
+## Uninstallation
+
+### Via Extension Manager (recommended)
+
+1. In 3D Slicer, open **View → Extension Manager** (or the **Extensions Manager** button in the toolbar).
+2. Switch to the **Installed Extensions** tab.
+3. Locate **TutorialMaker** in the list.
+4. Click the **Uninstall** (trash / remove) button next to the extension.
+5. Restart 3D Slicer when prompted to complete the removal.
+
+<p align="center"><img src="DOCS/README_18_02_2026/8.gif" alt="Uninstalling via Extension Manager"></p>
+
+### Manual removal (developer / source installation)
+
+If you installed the extension by adding it to the **Additional module paths**, follow these steps:
+
+1. Open **Edit → Application Settings → Modules**.
+2. In the **Additional module paths** list, select the entry pointing to the `TutorialMaker` folder (or `TutorialMaker.py`).
+3. Click the **Remove** (minus) button to delete the path entry.
+4. Click **OK** and restart 3D Slicer.
+5. After restarting, you can safely delete the `TutorialMaker-main` directory from your file system.
+
+> [!NOTE]
+> Removing the module path only unregisters the extension in Slicer. You must manually delete the source folder from disk to remove all files.
+
+**Removing generated output files**
+
+Tutorial output files (screenshots, annotations, HTML and Markdown) are stored inside the extension installation folder under `TutorialMaker/Outputs/`. These files are not removed automatically. Delete the `Outputs/` directory manually if you no longer need them.
