@@ -1,4 +1,5 @@
 import os
+import logging
 import zipfile
 import SampleData
 import urllib.request
@@ -65,32 +66,78 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
         def download_progress(count, block_size, total_size):
             slicer.app.processEvents()
 
+        def is_valid_zip(zip_file_path):
+            """Check if ZIP file is valid and has minimum size."""
+            if not os.path.exists(zip_file_path):
+                return False
+            if os.path.getsize(zip_file_path) < 1000:
+                return False
+            try:
+                with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
+                    if zip_ref.testzip() is not None:
+                        return False
+                return True
+            except Exception as e:
+                logging.error(f"ZIP validation failed: {e}")
+                return False
+
+        if os.path.exists(zip_path) and not is_valid_zip(zip_path):
+            logging.warning(f"Removing invalid ZIP file: {zip_path}")
+            os.remove(zip_path)
+
         if not os.path.exists(zip_path):
             self.delayDisplay("Downloading dataset... (may take a while)")
-            urllib.request.urlretrieve(zip_url, zip_path, reporthook=download_progress)
-            self.delayDisplay("Download complete.")
+            try:
+                urllib.request.urlretrieve(zip_url, zip_path, reporthook=download_progress)
+                self.delayDisplay("Download complete.")
+                if not is_valid_zip(zip_path):
+                    logging.error("Downloaded ZIP file is invalid or corrupted")
+                    raise RuntimeError("Downloaded ZIP file is invalid")
+            except Exception as e:
+                logging.error(f"Failed to download dataset: {e}")
+                raise
 
         if not os.path.exists(extract_path_check):
             self.delayDisplay("Extracting dataset...")
-            with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                zip_ref.extractall(slicer.app.temporaryPath)
-            self.delayDisplay("Extraction complete.")
+            try:
+                with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                    zip_ref.extractall(slicer.app.temporaryPath)
+                self.delayDisplay("Extraction complete.")
+                logging.info(f"Successfully extracted to {extract_path_check}")
+            except Exception as e:
+                logging.error(f"Failed to extract ZIP: {e}")
+                raise
 
         # Setup DICOM Database
         # Use DICOMUtils.openTemporaryDatabase to properly setup database
         dicomDatabasePath = os.path.join(slicer.app.temporaryPath, "DICOMDatabase")
         
-        # Save original database settings and open temporary database
-        originalDatabaseDir = DICOMUtils.openTemporaryDatabase(dicomDatabasePath)
-        
-        # Now switch to DICOM module
         mainWindow.moduleSelector().selectModule("DICOM")
         slicer.app.processEvents()
 
         dicom_data_path = os.path.join(slicer.app.temporaryPath, extraction_subfolder)
+
+        # Verify the data path exists before importing
+        if not os.path.exists(dicom_data_path):
+            logging.error(f"DICOM data path does not exist: {dicom_data_path}")
+            logging.error(f"Expected path: {dicom_data_path}")
+            root_data_dir = os.path.join(slicer.app.temporaryPath, "3DVisualizationDataset")
+            dir_contents = os.listdir(root_data_dir) if os.path.exists(root_data_dir) else []
+            logging.error(f"Available paths: {dir_contents}")
+            raise RuntimeError(f"DICOM data path not found: {dicom_data_path}")
+        else:
+            logging.info(f"Found DICOM data at: {dicom_data_path}")
+
+        # Save original database settings and open temporary database
+        originalDatabaseDir = DICOMUtils.openTemporaryDatabase(dicomDatabasePath)
         
         self.delayDisplay("Importing DICOM data... (may take a while)") 
-        DICOMUtils.importDicom(dicom_data_path)
+        try:
+            DICOMUtils.importDicom(dicom_data_path)
+            logging.info("DICOM import completed")
+        except Exception as e:
+            logging.error(f"Failed to import DICOM data: {e}")
+            raise
         slicer.app.processEvents()
 
         # TUTORIALMAKER SCREENSHOT
@@ -99,13 +146,16 @@ class VisualizationTutorialTest(ScriptedLoadableModuleTest):
         # 3 shot: Load DICOM Data
         try:
             patient_uids = slicer.dicomDatabase.patients()
+            logging.info(f"Found {len(patient_uids)} patients in DICOM database")
             if len(patient_uids) > 0:
+                logging.info(f"Loading patient: {patient_uids[0]}")
                 DICOMUtils.loadPatientByUID(patient_uids[0])
+                logging.info("Patient loaded successfully")
             else:
                 logging.warning("No patients found in DICOM database to load.")
         except Exception as e:
-            import logging
             logging.error(f"Failed to load patient via DICOMUtils: {e}")
+            raise
             
         max_wait_time = 30
         start_time = time.time()
