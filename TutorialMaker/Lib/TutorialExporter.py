@@ -71,6 +71,7 @@ HTML_TEMPLATES = {
                     </div>
                     <div class="slideDescription">{description}</div>
                 </div>
+                {slide_number}
             </div>
         """,
         'backcover': """
@@ -88,6 +89,7 @@ HTML_TEMPLATES = {
                 <div class="sectionContent">
                     <h1 class="sectionTitle">{title}</h1>
                 </div>
+                {slide_number}
             </div>
         """,
         'text': """
@@ -96,6 +98,7 @@ HTML_TEMPLATES = {
                     <h2 class="textTitle">{title}</h2>
                     <div class="textBody">{body}</div>
                 </div>
+                {slide_number}
             </div>
         """,
         'blank': """
@@ -127,6 +130,7 @@ HTML_TEMPLATES = {
                     </div>
                     <div class="slideDescription">{description}</div>
                 </div>
+                {slide_number}
             </div>
         """,
         'backcover': """
@@ -148,6 +152,7 @@ HTML_TEMPLATES = {
                         <h1 class="sectionTitle">{title}</h1>
                     </div>
                 </div>
+                {slide_number}
             </div>
         """,
         'text': """
@@ -156,6 +161,7 @@ HTML_TEMPLATES = {
                     <h2 class="textTitle">{title}</h2>
                     <div class="textBody">{body}</div>
                 </div>
+                {slide_number}
             </div>
         """,
         'blank': """
@@ -185,6 +191,7 @@ HTML_TEMPLATES = {
                     </div>
                     <div class="slideDescription">{description}</div>
                 </div>
+                {slide_number}
             </div>
         """,
         'backcover': """
@@ -202,6 +209,7 @@ HTML_TEMPLATES = {
                 <div class="sectionContent">
                     <h1 class="sectionTitle">{title}</h1>
                 </div>
+                {slide_number}
             </div>
         """,
         'text': """
@@ -210,6 +218,7 @@ HTML_TEMPLATES = {
                     <h2 class="textTitle">{title}</h2>
                     <div class="textBody">{body}</div>
                 </div>
+                {slide_number}
             </div>
         """,
         'blank': """
@@ -245,7 +254,7 @@ MARKDOWN_TEMPLATES = {
 ---
 ''',
         'slide': '''
-<div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px;">
+<div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px; position: relative;">
 
 ## <span style="color: {primary}; font-size: 3.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
 
@@ -261,6 +270,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
@@ -285,16 +295,17 @@ MARKDOWN_TEMPLATES = {
 ---
 ''',
         'section': '''
-<div style="text-align: center; padding: 60px; background: linear-gradient(135deg, {primary} 0%, {secondary} 100%); color: white; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); margin: 30px auto; max-width: 1200px; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+<div style="text-align: center; padding: 60px; background: linear-gradient(135deg, {primary} 0%, {secondary} 100%); color: white; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); margin: 30px auto; max-width: 1200px; min-height: 600px; display: flex; align-items: center; justify-content: center; position: relative;">
 
 # <span style="font-size: 5.5rem; font-weight: 700; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); display: block;">{title}</span>
 
+{slide_number}
 </div>
 
 ---
 ''',
         'text': '''
-<div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px;">
+<div style="background: white; max-width: 1200px; margin: 30px auto; border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 40px; position: relative;">
 
 ## <span style="color: {primary}; font-size: 3.5rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 3px solid {primary};">{title}</span>
 
@@ -304,6 +315,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
@@ -337,7 +349,7 @@ MARKDOWN_TEMPLATES = {
 ---
 ''',
         'slide': '''
-<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px;">
+<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px; position: relative;">
 
 ## <span style="color: {primary}; font-size: 3.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
 
@@ -353,6 +365,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
@@ -377,7 +390,7 @@ MARKDOWN_TEMPLATES = {
 ---
 ''',
         'section': '''
-<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px; min-height: 600px; display: flex; align-items: center; justify-content: center; position: relative;">
 
 <div style="border: 3px double {primary}; padding: 60px; text-align: center;">
 
@@ -385,12 +398,13 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
 ''',
         'text': '''
-<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px;">
+<div style="background: #fefefe; max-width: 1200px; margin: 30px auto; border: 2px solid {primary}; padding: 50px; position: relative;">
 
 ## <span style="color: {primary}; font-size: 3.2rem; font-weight: 600; display: block; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid {primary}; text-align: center; font-family: Georgia, serif;">{title}</span>
 
@@ -400,6 +414,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
@@ -433,7 +448,7 @@ MARKDOWN_TEMPLATES = {
 ---
 ''',
         'slide': '''
-<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px;">
+<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; position: relative;">
 
 ## <span style="color: {primary}; font-size: 3.3rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
 
@@ -449,6 +464,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
@@ -473,16 +489,17 @@ MARKDOWN_TEMPLATES = {
 ---
 ''',
         'section': '''
-<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; border-left: 8px solid {primary}; min-height: 600px; display: flex; align-items: center; justify-content: center;">
+<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; border-left: 8px solid {primary}; min-height: 600px; display: flex; align-items: center; justify-content: center; position: relative;">
 
 # <span style="font-size: 5.2rem; font-weight: 300; line-height: 1.2; color: {primary}; letter-spacing: -1px; display: block;">{title}</span>
 
+{slide_number}
 </div>
 
 ---
 ''',
         'text': '''
-<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px;">
+<div style="background: white; max-width: 1200px; margin: 30px auto; padding: 60px; position: relative;">
 
 ## <span style="color: {primary}; font-size: 3.3rem; font-weight: 400; display: block; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid {primary};">{title}</span>
 
@@ -492,6 +509,7 @@ MARKDOWN_TEMPLATES = {
 
 </div>
 
+{slide_number}
 </div>
 
 ---
@@ -537,6 +555,7 @@ CSS_TEMPLATES = {
             height: 600px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }}
 
         /* Stacked content */
@@ -711,6 +730,7 @@ CSS_TEMPLATES = {
         /* Text Slide */
         .textSlide {{
             background: white;
+            position: relative;
         }}
 
         .textTitle {{
@@ -727,6 +747,15 @@ CSS_TEMPLATES = {
             line-height: 1.8;
             color: #444;
             text-align: justify;
+        }}
+
+        /* Slide Number */
+        .slideNumber {{
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            font-size: 1.3rem;
+            color: #888;
         }}
 
         /* Blank Slide */
@@ -808,6 +837,7 @@ CSS_TEMPLATES = {
             height: 600px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }}
 
         .slideContent, .textContent, .blankContent {{
@@ -993,6 +1023,15 @@ CSS_TEMPLATES = {
             text-align: justify;
         }}
 
+        /* Slide Number */
+        .slideNumber {{
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            font-size: 1.3rem;
+            color: #888;
+        }}
+
         /* Blank Slide */
         .blankSlide {{
             background: #fefefe;
@@ -1071,6 +1110,7 @@ CSS_TEMPLATES = {
             height: 600px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }}
         
         .slideContent, .textContent, .blankContent {{
@@ -1234,6 +1274,15 @@ CSS_TEMPLATES = {
             font-size: 1.9rem;
             line-height: 1.8;
             color: {text};
+        }}
+
+        /* Slide Number */
+        .slideNumber {{
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            font-size: 1.3rem;
+            color: #888;
         }}
 
         /* Blank Slide */
@@ -1413,7 +1462,7 @@ class SimpleSlide():
             print(f"Warning: Could not convert image to base64 ({image_path}): {e}")
             return image_path
         
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False, slide_number=None, slide_total=None):
         template = HTML_TEMPLATES[theme]['slide']
         colors = PALETTE_COLORS[palette]
         base_dir = self.BaseDir
@@ -1421,16 +1470,17 @@ class SimpleSlide():
             image_src = self._get_image_data_url(self.ImagePath, base_dir=base_dir)
         else:
             image_src = self.ImagePath or ""
-
+        slide_number_str = f'<div class="slideNumber">{slide_number} / {slide_total}</div>' if (slide_number and slide_total) else ""
         return template.format(
             title=self.Title,
             image=image_src,
             alt=self.Title,
             description=self.Description,
+            slide_number=slide_number_str,
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False, slide_number=None, slide_total=None):
         template = MARKDOWN_TEMPLATES[theme]['slide']
         colors = PALETTE_COLORS[palette]
         base_dir = self.BaseDir
@@ -1438,12 +1488,13 @@ class SimpleSlide():
             image_src = self._get_image_data_url(self.ImagePath, base_dir=base_dir)
         else:
             image_src = self.ImagePath or ""
-        
+        slide_number_str = f"<div style='position: absolute; bottom: 25px; right: 40px; font-size: 1.3rem; color: #888;'>{slide_number} / {slide_total}</div>" if (slide_number and slide_total) else ""
         return template.format(
             title=self.Title,
             image=image_src,
             alt=self.Title,
             description=self.Description,
+            slide_number=slide_number_str,
             **colors
         )
 
@@ -1451,19 +1502,23 @@ class SimpleSection():
     def __init__(self, Title: str):
         self.Title = Title
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False, slide_number=None, slide_total=None):
         template = HTML_TEMPLATES[theme]['section']
         colors = PALETTE_COLORS[palette]
+        slide_number_str = f'<div class="slideNumber">{slide_number} / {slide_total}</div>' if (slide_number and slide_total) else ""
         return template.format(
             title=self.Title,
+            slide_number=slide_number_str,
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False, slide_number=None, slide_total=None):
         template = MARKDOWN_TEMPLATES[theme]['section']
         colors = PALETTE_COLORS[palette]
+        slide_number_str = f"<div style='position: absolute; bottom: 25px; right: 40px; font-size: 1.3rem; color: #888;'>{slide_number} / {slide_total}</div>" if (slide_number and slide_total) else ""
         return template.format(
             title=self.Title,
+            slide_number=slide_number_str,
             **colors
         )
 
@@ -1472,21 +1527,25 @@ class SimpleText():
         self.Title = Title
         self.Body = Body
     
-    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+    def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False, slide_number=None, slide_total=None):
         template = HTML_TEMPLATES[theme]['text']
         colors = PALETTE_COLORS[palette]
+        slide_number_str = f'<div class="slideNumber">{slide_number} / {slide_total}</div>' if (slide_number and slide_total) else ""
         return template.format(
             title=self.Title,
             body=self.Body,
+            slide_number=slide_number_str,
             **colors
         )
     
-    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
+    def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False, slide_number=None, slide_total=None):
         template = MARKDOWN_TEMPLATES[theme]['text']
         colors = PALETTE_COLORS[palette]
+        slide_number_str = f"<div style='position: absolute; bottom: 25px; right: 40px; font-size: 1.3rem; color: #888;'>{slide_number} / {slide_total}</div>" if (slide_number and slide_total) else ""
         return template.format(
             title=self.Title,
             body=self.Body,
+            slide_number=slide_number_str,
             **colors
         )
 
@@ -1626,13 +1685,35 @@ class TutorialExporter():
         self.Markdown = ""
         
     def ToHtml(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
-        body = "".join([slide.Model.ToHtml(palette=palette, theme=theme, embed=embed) for slide in self.Slides])
+        numberable_indices = [i for i, slide in enumerate(self.Slides)
+                             if hasattr(slide.Model, 'ToHtml') and type(slide.Model).__name__ in ['SimpleSlide', 'SimpleText', 'SimpleSection']]
+        total = len(numberable_indices)
+        body = ""
+        for idx, slide in enumerate(self.Slides):
+            model = slide.Model
+            if hasattr(model, 'ToHtml') and type(model).__name__ in ['SimpleSlide', 'SimpleText', 'SimpleSection']:
+                slide_number = numberable_indices.index(idx) + 1
+                body += model.ToHtml(palette=palette, theme=theme, embed=embed, slide_number=slide_number, slide_total=total)
+            else:
+                body += model.ToHtml(palette=palette, theme=theme, embed=embed)
         colors = PALETTE_COLORS[palette]
         css = CSS_TEMPLATES[theme].format(**colors)
         return self.Html.format(self.Title, body, css)
     
     def ToMarkdown(self, palette: Palette = Palette.BLUE, theme: Theme = Theme.MODERN, embed: bool = False):
-        md = "".join([slide.Model.ToMarkdown(palette=palette, theme=theme, embed=embed) for slide in self.Slides])
+        # Identify which slides are numberable (not cover or backcover)
+        numberable_indices = [i for i, slide in enumerate(self.Slides)
+                             if hasattr(slide.Model, 'ToMarkdown') and type(slide.Model).__name__ in ['SimpleSlide', 'SimpleText', 'SimpleSection']]
+        total = len(numberable_indices)
+        md = ""
+        for idx, slide in enumerate(self.Slides):
+            model = slide.Model
+            if hasattr(model, 'ToMarkdown') and type(model).__name__ in ['SimpleSlide', 'SimpleText', 'SimpleSection']:
+                # Slide number is 1-based index in numberable slides
+                slide_number = numberable_indices.index(idx) + 1
+                md += model.ToMarkdown(palette=palette, theme=theme, embed=embed, slide_number=slide_number, slide_total=total)
+            else:
+                md += model.ToMarkdown(palette=palette, theme=theme, embed=embed)
         self.Markdown = md
         return md
     
